@@ -93,7 +93,7 @@ namespace HSCentric
 			// pathInput2
 			// 
 			this.pathInput2.Location = new System.Drawing.Point(83, 61);
-			this.pathInput2.Name = "textBox1";
+			this.pathInput2.Name = "pathInput1";
 			this.pathInput2.Size = new System.Drawing.Size(212, 21);
 			this.pathInput2.TabIndex = 5;
 			// 
