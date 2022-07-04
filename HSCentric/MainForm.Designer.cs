@@ -93,7 +93,7 @@ namespace HSCentric
 			// pathInput2
 			// 
 			this.pathInput2.Location = new System.Drawing.Point(83, 61);
-			this.pathInput2.Name = "pathInput1";
+			this.pathInput2.Name = "pathInput2";
 			this.pathInput2.Size = new System.Drawing.Size(212, 21);
 			this.pathInput2.TabIndex = 5;
 			// 
@@ -120,6 +120,7 @@ namespace HSCentric
 			this.Controls.Add(this.run);
 			this.Name = "MainForm";
 			this.Text = "炉石监控程序";
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 

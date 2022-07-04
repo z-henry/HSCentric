@@ -283,5 +283,10 @@ namespace HSCentric
 			isRuning = !this.isRuning;
 			run.Text = ((!this.isRuning) ? "run" : "stop");
 		}
+
+		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			Tick.Stop();
+		}
 	}
 }
