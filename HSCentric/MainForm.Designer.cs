@@ -35,6 +35,7 @@ namespace HSCentric
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.run = new System.Windows.Forms.Button();
 			this.label1 = new System.Windows.Forms.Label();
 			this.pathInput = new System.Windows.Forms.TextBox();
@@ -42,6 +43,7 @@ namespace HSCentric
 			this.button2 = new System.Windows.Forms.Button();
 			this.pathInput2 = new System.Windows.Forms.TextBox();
 			this.label2 = new System.Windows.Forms.Label();
+			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.SuspendLayout();
 			// 
 			// run
@@ -119,7 +121,7 @@ namespace HSCentric
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.run);
 			this.Name = "MainForm";
-			this.Text = "炉石监控程序";
+			this.Text = "炉石监控程序 3.0.2";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.ResumeLayout(false);
 			this.PerformLayout();
@@ -128,8 +130,6 @@ namespace HSCentric
 		#endregion
 
 		// Token: 0x04000002 RID: 2
-		private Timer Tick = new Timer();
-
 		private Button run;
 
 		private Label label1;
@@ -144,6 +144,7 @@ namespace HSCentric
 
 
 		private bool isRuning;
+		private Timer timer1;
 	}
 }
 

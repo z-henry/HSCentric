@@ -39,9 +39,9 @@ namespace HSCentric
 		public MainForm()
 		{
 			this.InitializeComponent();
-			this.Tick.Interval = 30000;
-			this.Tick.Tick += this.process;
-			this.Tick.Start();
+			this.timer1.Interval = 30000;
+			this.timer1.Tick += this.process;
+			this.timer1.Start();
 			this.AutoGetBattleNetPath();
 			this.AutoGetHSPath();
 		}
@@ -236,7 +236,8 @@ namespace HSCentric
 		// Token: 0x0600000D RID: 13 RVA: 0x000022D0 File Offset: 0x000004D0
 		private void Delay(int mm)
 		{
-			while (DateTime.Now.AddMilliseconds((double)mm) > DateTime.Now)
+			DateTime timeInput = DateTime.Now;
+			while (timeInput.AddMilliseconds((double)mm) > DateTime.Now)
 			{
 				Application.DoEvents();
 			}
@@ -286,7 +287,7 @@ namespace HSCentric
 
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
-			Tick.Stop();
+			timer1.Stop();
 		}
 	}
 }
