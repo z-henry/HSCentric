@@ -59,14 +59,16 @@ namespace HSCentric
 			// label1
 			// 
 			this.label1.AutoSize = true;
+			this.label1.Enabled = false;
 			this.label1.Location = new System.Drawing.Point(25, 32);
 			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(53, 12);
+			this.label1.Size = new System.Drawing.Size(89, 12);
 			this.label1.TabIndex = 1;
-			this.label1.Text = "战网路径";
+			this.label1.Text = "战网路径(作废)";
 			// 
 			// pathInput
 			// 
+			this.pathInput.Enabled = false;
 			this.pathInput.Location = new System.Drawing.Point(84, 29);
 			this.pathInput.Name = "pathInput";
 			this.pathInput.Size = new System.Drawing.Size(212, 21);
@@ -74,6 +76,7 @@ namespace HSCentric
 			// 
 			// button1
 			// 
+			this.button1.Enabled = false;
 			this.button1.Location = new System.Drawing.Point(302, 29);
 			this.button1.Name = "button1";
 			this.button1.Size = new System.Drawing.Size(75, 23);
@@ -121,7 +124,7 @@ namespace HSCentric
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.run);
 			this.Name = "MainForm";
-			this.Text = "炉石监控程序 3.0.2";
+			this.Text = "炉石监控程序 3.0.3";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.ResumeLayout(false);
 			this.PerformLayout();

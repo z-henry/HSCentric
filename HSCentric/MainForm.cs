@@ -1,7 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
@@ -23,13 +21,13 @@ namespace HSCentric
 
 		// Token: 0x17000002 RID: 2
 		// (get) Token: 0x06000002 RID: 2 RVA: 0x0000205C File Offset: 0x0000025C
-		private Process[] BattleNetProcess
-		{
-			get
-			{
-				return Process.GetProcessesByName("Battle.net");
-			}
-		}
+// 		private Process[] BattleNetProcess
+// 		{
+// 			get
+// 			{
+// 				return Process.GetProcessesByName("Battle.net");
+// 			}
+// 		}
 
 		// Token: 0x06000003 RID: 3
 		[DllImport("kernel32.dll")]
@@ -42,7 +40,7 @@ namespace HSCentric
 			this.timer1.Interval = 30000;
 			this.timer1.Tick += this.process;
 			this.timer1.Start();
-			this.AutoGetBattleNetPath();
+// 			this.AutoGetBattleNetPath();
 			this.AutoGetHSPath();
 		}
 
@@ -150,11 +148,11 @@ namespace HSCentric
 		}
 
 		// Token: 0x0600000A RID: 10 RVA: 0x00002228 File Offset: 0x00000428
-		private bool IsBattleRuning()
-		{
-			Process[] battleNetProcess = BattleNetProcess;
-			return battleNetProcess.Length > 0;
-		}
+// 		private bool IsBattleRuning()
+// 		{
+// 			Process[] battleNetProcess = BattleNetProcess;
+// 			return battleNetProcess.Length > 0;
+// 		}
 
 		private bool IsExperienceMode()
 		{
@@ -211,27 +209,30 @@ namespace HSCentric
 				if (!AwakeExperienceMode())
 					return;
 
-			if (!IsBattleRuning())
-			{
-				StartBattle();
-			}
-			Process[] battleNetProcess = this.BattleNetProcess;
-			int num = 0;
-			if (num < battleNetProcess.Length)
-			{
-				Process.Start(battleNetProcess[num].MainModule.FileName, "--exec=\"launch WTCG\"");
-			}
+			MainForm.WinExec(pathInput2.Text, 2);
+
+
+// 			if (!IsBattleRuning())
+// 			{
+// 				StartBattle();
+// 			}
+// 			Process[] battleNetProcess = this.BattleNetProcess;
+// 			int num = 0;
+// 			if (num < battleNetProcess.Length)
+// 			{
+// 				Process.Start(battleNetProcess[num].MainModule.FileName, "--exec=\"launch WTCG\"");
+// 			}
 		}
 
 		// Token: 0x0600000C RID: 12 RVA: 0x0000229B File Offset: 0x0000049B
-		private void StartBattle()
-		{
-			while (BattleNetProcess.Length < 1 && isRuning)
-			{
-				MainForm.WinExec(pathInput.Text, 2);
-				Delay(5000);
-			}
-		}
+		// 		private void StartBattle()
+		// 		{
+		// 			while (BattleNetProcess.Length < 1 && isRuning)
+		// 			{
+		// 				MainForm.WinExec(pathInput.Text, 2);
+		// 				Delay(5000);
+		// 			}
+		// 		}
 
 		// Token: 0x0600000D RID: 13 RVA: 0x000022D0 File Offset: 0x000004D0
 		private void Delay(int mm)
