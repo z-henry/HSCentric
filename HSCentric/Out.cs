@@ -4,10 +4,8 @@ using System.Text;
 
 namespace HSCentric
 {
-	// Token: 0x02000006 RID: 6
 	public static class Out
 	{
-		// Token: 0x06000031 RID: 49 RVA: 0x0000417B File Offset: 0x0000237B
 		public static void Log(string log)
 		{
 			string errorLogFilePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Log");

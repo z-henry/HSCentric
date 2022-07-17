@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -10,7 +11,6 @@ namespace HSCentric
 		/// <summary>
 		/// 必需的设计器变量。
 		/// </summary>
-		// Token: 0x04000003 RID: 3
 		private IContainer components;
 
 		/// <summary>
@@ -36,118 +36,64 @@ namespace HSCentric
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			this.run = new System.Windows.Forms.Button();
-			this.label1 = new System.Windows.Forms.Label();
-			this.pathInput = new System.Windows.Forms.TextBox();
-			this.button1 = new System.Windows.Forms.Button();
-			this.button2 = new System.Windows.Forms.Button();
-			this.pathInput2 = new System.Windows.Forms.TextBox();
-			this.label2 = new System.Windows.Forms.Label();
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
+			this.btn_add = new System.Windows.Forms.Button();
+			this.btn_del = new System.Windows.Forms.Button();
+			this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
 			this.SuspendLayout();
 			// 
-			// run
+			// btn_add
 			// 
-			this.run.Location = new System.Drawing.Point(302, 112);
-			this.run.Name = "run";
-			this.run.Size = new System.Drawing.Size(75, 23);
-			this.run.TabIndex = 0;
-			this.run.Text = "run";
-			this.run.UseVisualStyleBackColor = true;
-			this.run.Click += new System.EventHandler(this.run_Click);
+			this.btn_add.Location = new System.Drawing.Point(89, 134);
+			this.btn_add.Name = "btn_add";
+			this.btn_add.Size = new System.Drawing.Size(75, 23);
+			this.btn_add.TabIndex = 8;
+			this.btn_add.Text = "添加";
+			this.btn_add.UseVisualStyleBackColor = true;
+			this.btn_add.Click += new System.EventHandler(this.btn_add_Click);
 			// 
-			// label1
+			// btn_del
 			// 
-			this.label1.AutoSize = true;
-			this.label1.Enabled = false;
-			this.label1.Location = new System.Drawing.Point(25, 32);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(89, 12);
-			this.label1.TabIndex = 1;
-			this.label1.Text = "战网路径(作废)";
+			this.btn_del.Location = new System.Drawing.Point(247, 134);
+			this.btn_del.Name = "btn_del";
+			this.btn_del.Size = new System.Drawing.Size(75, 23);
+			this.btn_del.TabIndex = 9;
+			this.btn_del.Text = "删除";
+			this.btn_del.UseVisualStyleBackColor = true;
+			this.btn_del.Click += new System.EventHandler(this.btn_del_Click);
 			// 
-			// pathInput
+			// checkedListBox1
 			// 
-			this.pathInput.Enabled = false;
-			this.pathInput.Location = new System.Drawing.Point(84, 29);
-			this.pathInput.Name = "pathInput";
-			this.pathInput.Size = new System.Drawing.Size(212, 21);
-			this.pathInput.TabIndex = 2;
-			// 
-			// button1
-			// 
-			this.button1.Enabled = false;
-			this.button1.Location = new System.Drawing.Point(302, 29);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(75, 23);
-			this.button1.TabIndex = 3;
-			this.button1.Text = "选择路径";
-			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
-			// 
-			// button2
-			// 
-			this.button2.Location = new System.Drawing.Point(301, 61);
-			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(75, 23);
-			this.button2.TabIndex = 6;
-			this.button2.Text = "选择路径";
-			this.button2.UseVisualStyleBackColor = true;
-			this.button2.Click += new System.EventHandler(this.button2_Click);
-			// 
-			// pathInput2
-			// 
-			this.pathInput2.Location = new System.Drawing.Point(83, 61);
-			this.pathInput2.Name = "pathInput2";
-			this.pathInput2.Size = new System.Drawing.Size(212, 21);
-			this.pathInput2.TabIndex = 5;
-			// 
-			// label2
-			// 
-			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(24, 64);
-			this.label2.Name = "label2";
-			this.label2.Size = new System.Drawing.Size(53, 12);
-			this.label2.TabIndex = 4;
-			this.label2.Text = "炉石路径";
+			this.checkedListBox1.FormattingEnabled = true;
+			this.checkedListBox1.Location = new System.Drawing.Point(12, 12);
+			this.checkedListBox1.Name = "checkedListBox1";
+			this.checkedListBox1.Size = new System.Drawing.Size(383, 116);
+			this.checkedListBox1.TabIndex = 10;
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(400, 145);
-			this.Controls.Add(this.button2);
-			this.Controls.Add(this.pathInput2);
-			this.Controls.Add(this.label2);
-			this.Controls.Add(this.button1);
-			this.Controls.Add(this.pathInput);
-			this.Controls.Add(this.label1);
-			this.Controls.Add(this.run);
+			this.ClientSize = new System.Drawing.Size(407, 166);
+			this.Controls.Add(this.checkedListBox1);
+			this.Controls.Add(this.btn_del);
+			this.Controls.Add(this.btn_add);
 			this.Name = "MainForm";
-			this.Text = "炉石监控程序 3.0.3";
+			this.Text = "炉石监控程序 3.1.0";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.ResumeLayout(false);
-			this.PerformLayout();
 
 		}
 		#endregion
-
-		// Token: 0x04000002 RID: 2
-		private Button run;
-
-		private Label label1;
-		private Label label2;
-
-		private TextBox pathInput;
-		private TextBox pathInput2;
-
-		// Token: 0x04000007 RID: 7
-		private Button button1;
-		private Button button2;
-
-
-		private bool isRuning;
 		private Timer timer1;
+		private Button btn_add;
+		private Button btn_del;
+		private CheckedListBox checkedListBox1;
+
+
+
+		private List<HSUnit> m_listHS = new List<HSUnit>();
+		private object m_lockHS = new object();
 	}
 }
 
