@@ -2,16 +2,129 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
-using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 namespace HSCentric
 {
-	class HSUnit
+	public class HSUnit
 	{
-		public HSUnit(string HSPath)
+		public HSUnit(string _HSPath, bool _Enable = false, DateTime? _StartTime = null, DateTime? _StopTime = null)
 		{
-			m_HSPath = HSPath;
+			m_HSPath = _HSPath;
+			m_Enable = _Enable;
+			m_NickName = Directory.GetParent(m_HSPath).Name;
+			m_StartTime = _StartTime ?? new DateTime(2000, 1, 1, 0, 0, 0);
+			m_StopTime = _StopTime ?? new DateTime(2000, 1, 1, 23, 59, 59);
 		}
+
+		public string Mode
+		{
+			get
+			{
+				try
+				{
+					string[] fileLines = File.ReadAllLines(System.IO.Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
+					foreach (string line in fileLines)
+					{
+						if (line.IndexOf("插件运行模式") != 0)
+							continue;
+
+						Regex regex = new Regex(@"^(.*)=(.*)$");
+						Match match = regex.Match(line);
+						if (match.Groups.Count == 3)
+							return match.Groups[2].Value.Trim(' ');
+					}
+					return "";
+				}
+				catch
+				{
+					return "";
+				}
+		}
+		}
+		public DateTime AwakeTime
+		{
+			get
+			{
+				try
+				{
+					string[] fileLines = File.ReadAllLines(System.IO.Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
+					foreach (string line in fileLines)
+					{
+						if (line.IndexOf("唤醒时间") != 0)
+							continue;
+
+						Regex regex = new Regex(@"^(.*)=(.*)$");
+						Match match = regex.Match(line);
+						if (match.Groups.Count == 3)
+							return Convert.ToDateTime(match.Groups[2].Value.Trim(' '));
+					}
+					return new DateTime(2000, 1, 1);
+				}
+				catch
+				{
+					return new DateTime(2000, 1, 1);
+				}
+			}
+		}
+		public bool Enable
+		{
+			get
+			{
+				return m_Enable;
+			}
+			set
+			{
+				m_Enable = value;
+			}
+		}
+		public string NickName
+		{
+			get
+			{
+				return m_NickName;
+			}
+		}
+		public FileVerison Version
+		{
+			get
+			{
+				try
+				{
+					FileVersionInfo info = FileVersionInfo.GetVersionInfo(m_HSPath);
+					return new FileVerison(info.FileMajorPart, info.FileMinorPart, info.FileBuildPart, info.FilePrivatePart);
+				}
+				catch
+				{
+					return new FileVerison(0,0,0,0);
+				}
+			}
+		}
+		public DateTime StartTime
+		{
+			get
+			{
+				return m_StartTime;
+			}
+		}
+		public DateTime StopTime
+		{
+			get
+			{
+				return m_StopTime;
+			}
+		}
+		public string Path
+		{
+			get
+			{
+				return m_HSPath;
+			}
+		}
+
+
+
+
 
 		private List<Process> HearthstoneProcess()
 		{
@@ -24,111 +137,63 @@ namespace HSCentric
 			}
 			return ps;
 		}
+		public bool IsActive()
+		{
+			TimeSpan time_now = DateTime.Now.TimeOfDay;
+			if (StartTime < StopTime)
+				return time_now >= StartTime.TimeOfDay && time_now <= StopTime.TimeOfDay;
+			else
+				return time_now <= StartTime.TimeOfDay || time_now >= StopTime.TimeOfDay;
+		}
 
-		public bool IsHsRuning()
+		public bool IsRunning()
 		{
 			List<Process> hearthstoneProcess = HearthstoneProcess();
 			if (hearthstoneProcess.Count <= 0)
 			{
-				Out.Log(string.Format("[轮询检测] 无炉石进程"));
+				Out.Log(string.Format("[{0}]无炉石进程", m_NickName));
 				return false;
 			}
-
-			//检查炉石日志, 5分钟没更新就杀死
-			bool killHS = true;
-			DirectoryInfo rootHS = new DirectoryInfo(Path.GetDirectoryName(m_HSPath) + "/Logs");
+			return true;
+		}
+		public bool IsResponding()
+		{
+			//检查炉石日志, 5分钟没更新
+			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath) + "/Logs");
 			foreach (FileInfo logFile in rootHS.GetFiles("hearthstone_*.log", SearchOption.TopDirectoryOnly)) //查找文件
 			{
 				double inteval = 5f;
 				TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
 				if (timeSpan.TotalMinutes < inteval)
 				{
-					killHS = false;
-					break;
-				}
-			}
-
-			if (killHS == true)
-			{
-				foreach (Process processHS in hearthstoneProcess)
-				{
-					Out.Log(string.Format("[轮询检测] 结束炉石进程"));
-					processHS.Kill();
-					processHS.WaitForExit();
-					Delay(5000);
-				}
-				return false;
-			}
-			Out.Log(string.Format("[轮询检测] 炉石进程正常{0}", m_HSPath));
-			return true;
-		}
-
-
-		public bool IsExperienceMode()
-		{
-			string[] fileLines = File.ReadAllLines(Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
-			foreach (string line in fileLines)
-			{
-				if (line.IndexOf("插件运行模式") != 0)
-					continue;
-
-
-				if (line.Contains("挂机收菜"))
-				{
-					Out.Log(string.Format("[轮询检测] 挂机收菜模式"));
 					return true;
 				}
-				else
-				{
-					Out.Log(string.Format("[轮询检测] 非挂机收菜模式"));
-					return false;
-				}
 			}
-			Out.Log(string.Format("[轮询检测] 无模式设置"));
 			return false;
 		}
-
-
-		public bool AwakeExperienceMode()
+		public void KillHS()
 		{
-			string[] fileLines = File.ReadAllLines(Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
-			foreach (string line in fileLines)
+			List<Process> hearthstoneProcess = HearthstoneProcess();
+			foreach (Process processHS in hearthstoneProcess)
 			{
-				if (line.IndexOf("唤醒时间") != 0)
-					continue;
-
-				if (DateTime.Now > Convert.ToDateTime(line.Remove(0, "唤醒时间 = ".Length)))
-				{
-					Out.Log(string.Format("[轮询检测] 到达唤醒时间"));
-					return true;
-				}
-				else
-				{
-					Out.Log(string.Format("[轮询检测] 未到达唤醒时间"));
-					return false;
-				}
+				processHS.Kill();
+				Out.Log(string.Format("[{0}]结束炉石进程", m_NickName));
 			}
-			Out.Log(string.Format("[轮询检测] 未设置唤醒时间"));
-			return true;
 		}
 
 		public void StartHS()
 		{
 			MainForm.WinExec(m_HSPath, 2);
-			Out.Log(string.Format("[轮询检测] 启动炉石{0}", m_HSPath));
-		}
-
-		private void Delay(int mm)
-		{
-			DateTime timeInput = DateTime.Now;
-			while (timeInput.AddMilliseconds((double)mm) > DateTime.Now)
-			{
-				Application.DoEvents();
-			}
+			Out.Log(string.Format("[{0}]启动炉石进程", m_NickName));
 		}
 
 
 
-		private string m_HSPath;
+		private string m_HSPath;//炉石路径
+		private bool m_Enable;//启用状态
+		private string m_NickName;//昵称
+		private DateTime m_StartTime;
+		private DateTime m_StopTime;
+
 	}
 }

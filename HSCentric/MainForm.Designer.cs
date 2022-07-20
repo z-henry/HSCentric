@@ -39,12 +39,16 @@ namespace HSCentric
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.btn_add = new System.Windows.Forms.Button();
 			this.btn_del = new System.Windows.Forms.Button();
-			this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
+			this.listHS = new System.Windows.Forms.ListView();
+			this.contextMenuStrip_RMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.更新ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.更新ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// btn_add
 			// 
-			this.btn_add.Location = new System.Drawing.Point(89, 134);
+			this.btn_add.Location = new System.Drawing.Point(444, 274);
 			this.btn_add.Name = "btn_add";
 			this.btn_add.Size = new System.Drawing.Size(75, 23);
 			this.btn_add.TabIndex = 8;
@@ -54,7 +58,7 @@ namespace HSCentric
 			// 
 			// btn_del
 			// 
-			this.btn_del.Location = new System.Drawing.Point(247, 134);
+			this.btn_del.Location = new System.Drawing.Point(525, 274);
 			this.btn_del.Name = "btn_del";
 			this.btn_del.Size = new System.Drawing.Size(75, 23);
 			this.btn_del.TabIndex = 9;
@@ -62,38 +66,70 @@ namespace HSCentric
 			this.btn_del.UseVisualStyleBackColor = true;
 			this.btn_del.Click += new System.EventHandler(this.btn_del_Click);
 			// 
-			// checkedListBox1
+			// listHS
 			// 
-			this.checkedListBox1.FormattingEnabled = true;
-			this.checkedListBox1.Location = new System.Drawing.Point(12, 12);
-			this.checkedListBox1.Name = "checkedListBox1";
-			this.checkedListBox1.Size = new System.Drawing.Size(383, 116);
-			this.checkedListBox1.TabIndex = 10;
+			this.listHS.FullRowSelect = true;
+			this.listHS.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.listHS.HideSelection = false;
+			this.listHS.Location = new System.Drawing.Point(12, 13);
+			this.listHS.MultiSelect = false;
+			this.listHS.Name = "listHS";
+			this.listHS.Size = new System.Drawing.Size(593, 255);
+			this.listHS.TabIndex = 10;
+			this.listHS.UseCompatibleStateImageBehavior = false;
+			this.listHS.View = System.Windows.Forms.View.Details;
+			this.listHS.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listHS_MouseDoubleClick);
+			this.listHS.MouseUp += new System.Windows.Forms.MouseEventHandler(this.listHS_MouseUp);
+			// 
+			// contextMenuStrip_RMenu
+			// 
+			this.contextMenuStrip_RMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.更新ToolStripMenuItem,
+            this.更新ToolStripMenuItem1});
+			this.contextMenuStrip_RMenu.Name = "contextMenuStrip1";
+			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(101, 48);
+			// 
+			// 更新ToolStripMenuItem
+			// 
+			this.更新ToolStripMenuItem.Name = "更新ToolStripMenuItem";
+			this.更新ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+			this.更新ToolStripMenuItem.Text = "启用";
+			this.更新ToolStripMenuItem.Click += new System.EventHandler(this.启用ToolStripMenuItem_Click);
+			// 
+			// 更新ToolStripMenuItem1
+			// 
+			this.更新ToolStripMenuItem1.Name = "更新ToolStripMenuItem1";
+			this.更新ToolStripMenuItem1.Size = new System.Drawing.Size(100, 22);
+			this.更新ToolStripMenuItem1.Text = "更新";
+			this.更新ToolStripMenuItem1.Click += new System.EventHandler(this.更新ToolStripMenuItem1_Click);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(407, 166);
-			this.Controls.Add(this.checkedListBox1);
+			this.ClientSize = new System.Drawing.Size(617, 309);
+			this.Controls.Add(this.listHS);
 			this.Controls.Add(this.btn_del);
 			this.Controls.Add(this.btn_add);
 			this.Name = "MainForm";
-			this.Text = "炉石监控程序 3.1.0";
+			this.Text = "炉石监控程序 3.2.0";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
+			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
 
 		}
 		#endregion
+		private List<HSUnit> m_listHS = new List<HSUnit>();
+		private object m_lockHS = new object();
+		private int m_TickCount = 0;//计时器时钟
+
 		private Timer timer1;
 		private Button btn_add;
 		private Button btn_del;
-		private CheckedListBox checkedListBox1;
-
-
-
-		private List<HSUnit> m_listHS = new List<HSUnit>();
-		private object m_lockHS = new object();
+		private ListView listHS;
+		private ContextMenuStrip contextMenuStrip_RMenu;
+		private ToolStripMenuItem 更新ToolStripMenuItem;
+		private ToolStripMenuItem 更新ToolStripMenuItem1;
 	}
 }
 
