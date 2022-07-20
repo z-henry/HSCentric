@@ -211,7 +211,7 @@ namespace HSCentric
 				if (listHS.SelectedItems.Count > 0)
 				{
 					int index = listHS.SelectedItems[0].Index;
-					contextMenuStrip_RMenu.Items[(int)RMenu.启用].Text = listHS.Items[index].SubItems[(int)LIST_COLUMN.启用].Text == "√" ? "停止" : "启动";
+					contextMenuStrip_RMenu.Items[(int)RMenu.启用].Text = listHS.Items[index].SubItems[(int)LIST_COLUMN.启用].Text == "√" ? "停用" : "启用";
 					if (listHS.Items[index].SubItems[(int)LIST_COLUMN.成员].Text == "Hearthstone")
 						contextMenuStrip_RMenu.Items[(int)RMenu.更新].Enabled = false;
 					else
