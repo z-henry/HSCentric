@@ -312,5 +312,20 @@ namespace HSCentric
 			config.Save();
 			ConfigurationManager.RefreshSection("userinfo");
 		}
+
+		private void 启动ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (listHS.SelectedItems.Count > 0)
+			{
+				int index = listHS.SelectedItems[0].Index;
+				lock (m_lockHS)
+				{
+					if (!m_listHS[index].IsRunning())
+						m_listHS[index].StartHS();
+				}
+			}
+			else
+				MessageBox.Show("请选中一个成员", "ERROR");
+		}
 	}
 }

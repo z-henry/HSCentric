@@ -41,8 +41,9 @@ namespace HSCentric
 			this.btn_del = new System.Windows.Forms.Button();
 			this.listHS = new System.Windows.Forms.ListView();
 			this.contextMenuStrip_RMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.启用ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.更新ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.更新ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.启动ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -84,24 +85,32 @@ namespace HSCentric
 			// contextMenuStrip_RMenu
 			// 
 			this.contextMenuStrip_RMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.启用ToolStripMenuItem,
             this.更新ToolStripMenuItem,
-            this.更新ToolStripMenuItem1});
+            this.启动ToolStripMenuItem});
 			this.contextMenuStrip_RMenu.Name = "contextMenuStrip1";
-			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(101, 48);
+			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(181, 92);
 			// 
 			// 更新ToolStripMenuItem
 			// 
-			this.更新ToolStripMenuItem.Name = "更新ToolStripMenuItem";
-			this.更新ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
-			this.更新ToolStripMenuItem.Text = "启用";
-			this.更新ToolStripMenuItem.Click += new System.EventHandler(this.启用ToolStripMenuItem_Click);
+			this.启用ToolStripMenuItem.Name = "启用ToolStripMenuItem";
+			this.启用ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.启用ToolStripMenuItem.Text = "启用";
+			this.启用ToolStripMenuItem.Click += new System.EventHandler(this.启用ToolStripMenuItem_Click);
 			// 
 			// 更新ToolStripMenuItem1
 			// 
-			this.更新ToolStripMenuItem1.Name = "更新ToolStripMenuItem1";
-			this.更新ToolStripMenuItem1.Size = new System.Drawing.Size(100, 22);
-			this.更新ToolStripMenuItem1.Text = "更新";
-			this.更新ToolStripMenuItem1.Click += new System.EventHandler(this.更新ToolStripMenuItem1_Click);
+			this.更新ToolStripMenuItem.Name = "更新ToolStripMenuItem1";
+			this.更新ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.更新ToolStripMenuItem.Text = "更新";
+			this.更新ToolStripMenuItem.Click += new System.EventHandler(this.更新ToolStripMenuItem1_Click);
+			// 
+			// 启动ToolStripMenuItem
+			// 
+			this.启动ToolStripMenuItem.Name = "启动ToolStripMenuItem";
+			this.启动ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.启动ToolStripMenuItem.Text = "启动";
+			this.启动ToolStripMenuItem.Click += new System.EventHandler(this.启动ToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
@@ -112,7 +121,7 @@ namespace HSCentric
 			this.Controls.Add(this.btn_del);
 			this.Controls.Add(this.btn_add);
 			this.Name = "MainForm";
-			this.Text = "炉石监控程序 3.2.0";
+			this.Text = "炉石监控程序 3.2.1";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -128,8 +137,9 @@ namespace HSCentric
 		private Button btn_del;
 		private ListView listHS;
 		private ContextMenuStrip contextMenuStrip_RMenu;
+		private ToolStripMenuItem 启用ToolStripMenuItem;
 		private ToolStripMenuItem 更新ToolStripMenuItem;
-		private ToolStripMenuItem 更新ToolStripMenuItem1;
+		private ToolStripMenuItem 启动ToolStripMenuItem;
 	}
 }
 

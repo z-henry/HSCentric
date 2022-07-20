@@ -5,6 +5,7 @@ namespace HSCentric.Const
 	{
 		启用 = 0,
 		更新 = 1,
+		启动 = 2,
 	}
 	enum LIST_COLUMN
 	{
