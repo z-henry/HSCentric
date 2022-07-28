@@ -143,7 +143,7 @@ namespace HSCentric
 			if (StartTime < StopTime)
 				return time_now >= StartTime.TimeOfDay && time_now <= StopTime.TimeOfDay;
 			else
-				return time_now <= StartTime.TimeOfDay || time_now >= StopTime.TimeOfDay;
+				return time_now >= StartTime.TimeOfDay || time_now <= StopTime.TimeOfDay;
 		}
 
 		public bool IsRunning()
