@@ -124,7 +124,20 @@ namespace HSCentric
 
 
 
+		public bool SwitchBepinEx(bool _switch)
+		{
+			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath));
+			foreach (FileInfo logFile in rootHS.GetFiles("*winhttp*.dll", SearchOption.TopDirectoryOnly)) //查找文件
+			{
+				if (true == _switch)
+					logFile.MoveTo(System.IO.Path.GetDirectoryName(m_HSPath) + "/winhttp.dll");
+				else
+					logFile.MoveTo(System.IO.Path.GetDirectoryName(m_HSPath) + "/autostop-winhttp.dll");
 
+				break;
+			}
+			return true;
+		}
 
 		private List<Process> HearthstoneProcess()
 		{
@@ -151,7 +164,6 @@ namespace HSCentric
 			List<Process> hearthstoneProcess = HearthstoneProcess();
 			if (hearthstoneProcess.Count <= 0)
 			{
-				Out.Log(string.Format("[{0}]无炉石进程", m_NickName));
 				return false;
 			}
 			return true;

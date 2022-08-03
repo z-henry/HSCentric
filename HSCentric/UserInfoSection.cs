@@ -85,6 +85,12 @@ namespace HSCentric
 			get { return (string)this["stoptime"]; }
 			set { this["stoptime"] = value; }
 		}
+		[ConfigurationProperty("enable", IsRequired = true)]
+		public bool Enable
+		{
+			get { return (bool)this["enable"]; }
+			set { this["enable"] = value; }
+		}
 	}
 	public class HSUnitSection : ConfigurationSection
 	{

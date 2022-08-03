@@ -46,17 +46,16 @@ namespace HSCentric
 
 				lock (m_lockHS)
 				{
-					for (int i = 0; i < m_listHS.Count; ++i)
+					foreach (HSUnit hsUnit in m_listHS)
 					{
-						HSUnit hsUnit = m_listHS[i];
-
 						// 没启用就跳过
-						if (!m_listHS[i].Enable)
+						if (!hsUnit.Enable)
 							continue;
 
 						// 不在启用时间段,启动了就干掉
 						if (!hsUnit.IsActive())
 						{
+							hsUnit.SwitchBepinEx(false);
 							if (hsUnit.IsRunning())
 							{
 								hsUnit.KillHS();
@@ -64,6 +63,7 @@ namespace HSCentric
 							}
 							continue;
 						}
+						hsUnit.SwitchBepinEx(true);
 
 						// 炉石在运行
 						if (hsUnit.IsRunning())
@@ -79,13 +79,17 @@ namespace HSCentric
 						//炉石没运行就判断是否需要启动
 						else
 						{
-							// 挂机收菜模式下，没到唤醒时间不用启动
 							if ("挂机收菜" == hsUnit.Mode)
 							{
-								if (DateTime.Now < hsUnit.AwakeTime)
-									continue;
-								else
+								// 挂机收菜模式下，
+								// 1. 到唤醒时间唤醒
+								if (DateTime.Now >= hsUnit.AwakeTime)
 									Out.Log(string.Format("[{0}]唤醒", hsUnit.NickName));
+								// 2. 没到唤醒时间，但是距离结束不到5分钟了，唤醒
+								else if ((hsUnit.StopTime.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds < 300f)
+									Out.Log(string.Format("[{0}]快结束了，唤醒", hsUnit.NickName));
+								else
+									continue;
 							}
 							hsUnit.StartHS();
 							Out.Log(string.Format("[{0}]启动", hsUnit.NickName));
@@ -100,6 +104,13 @@ namespace HSCentric
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			timer1.Stop();
+			lock (m_lockHS)
+			{
+				foreach (HSUnit hsUnit in m_listHS)
+					hsUnit.SwitchBepinEx(false);
+			}
+			SaveConfig();
+
 		}
 		private void btn_add_Click(object sender, EventArgs e)
 		{
@@ -241,7 +252,7 @@ namespace HSCentric
 				Delay(5000);
 
 				//运行备份更新bat
-				Process proc = null;
+				Process proc;
 				try
 				{
 					proc = new Process();
@@ -292,7 +303,7 @@ namespace HSCentric
 			HSUnitSection config = ConfigurationManager.GetSection("userinfo") as HSUnitSection;
 			foreach (HSUnitElement elem in config.HSUnit.Cast<HSUnitElement>().ToList())
 			{
-				m_listHS.Add(new HSUnit(elem.Path, false, Convert.ToDateTime(elem.StartTime), Convert.ToDateTime(elem.StopTime)));
+				m_listHS.Add(new HSUnit(elem.Path, elem.Enable, Convert.ToDateTime(elem.StartTime), Convert.ToDateTime(elem.StopTime)));
 			}
 // 			m_listHS = ConfigurationManager.GetSection("userinfo") as List<HSUnit>;
 		}
@@ -307,6 +318,7 @@ namespace HSCentric
 					Path = unit.Path, 
 					StartTime = unit.StartTime.ToString("G"),
 					StopTime = unit.StopTime.ToString("G"),
+					Enable = unit.Enable,
 				});
 			}
 			config.Save();
