@@ -159,7 +159,7 @@ namespace HSCentric
 				return time_now >= StartTime.TimeOfDay || time_now <= StopTime.TimeOfDay;
 		}
 
-		public bool IsRunning()
+		public bool IsAlive()
 		{
 			List<Process> hearthstoneProcess = HearthstoneProcess();
 			if (hearthstoneProcess.Count <= 0)

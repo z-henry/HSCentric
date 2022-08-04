@@ -46,17 +46,21 @@ namespace HSCentric
 
 				lock (m_lockHS)
 				{
-					foreach (HSUnit hsUnit in m_listHS)
+					for( int i = 0, ii = m_listHS.Count;i < ii; ++i)
 					{
+						HSUnit hsUnit = m_listHS[i];
+
 						// 没启用就跳过
 						if (!hsUnit.Enable)
 							continue;
+
+						backup(i);
 
 						// 不在启用时间段,启动了就干掉
 						if (!hsUnit.IsActive())
 						{
 							hsUnit.SwitchBepinEx(false);
-							if (hsUnit.IsRunning())
+							if (hsUnit.IsAlive())
 							{
 								hsUnit.KillHS();
 								Out.Log(string.Format("[{0}]未到启用时间，关闭进程", hsUnit.NickName));
@@ -66,7 +70,7 @@ namespace HSCentric
 						hsUnit.SwitchBepinEx(true);
 
 						// 炉石在运行
-						if (hsUnit.IsRunning())
+						if (hsUnit.IsAlive())
 						{
 							// 炉石在运行，不更新日志就滚蛋
 							if (!hsUnit.IsResponding())
@@ -244,20 +248,20 @@ namespace HSCentric
 					return;
 				}
 
-				lock (m_lockHS)
+				m_listHS[index].Enable = false;
+				if (m_listHS[index].IsAlive())
 				{
-					m_listHS[index].Enable = false;
+					m_listHS[index].KillHS();
+					Delay(5000);
 				}
-				m_listHS[index].KillHS();
-				Delay(5000);
 
 				//运行备份更新bat
 				Process proc;
 				try
 				{
 					proc = new Process();
-					proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + "备份.bat";
-					proc.StartInfo.Arguments = m_listHS[index].NickName;
+					proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + @"script\backup\upgrade.bat";
+					proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_listHS[index].Path) + "\"";
 					proc.StartInfo.CreateNoWindow = false;
 					proc.Start();
 					proc.WaitForExit();
@@ -332,12 +336,46 @@ namespace HSCentric
 				int index = listHS.SelectedItems[0].Index;
 				lock (m_lockHS)
 				{
-					if (!m_listHS[index].IsRunning())
+					if (!m_listHS[index].IsAlive())
 						m_listHS[index].StartHS();
 				}
 			}
 			else
 				MessageBox.Show("请选中一个成员", "ERROR");
+		}
+
+		private void 备份插件设置ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (listHS.SelectedItems.Count > 0)
+			{
+				int index = listHS.SelectedItems[0].Index;
+
+				try
+				{
+					backup(index);
+					MessageBox.Show(string.Format("成员：{0}，备份完成", listHS.Items[index].SubItems[(int)LIST_COLUMN.成员].Text));
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show(string.Format("Exception Occurred :{0},{1}", ex.Message, ex.StackTrace.ToString()), "ERROR");
+				}
+
+				UI_Flush();
+			}
+			else
+				MessageBox.Show("请选中一个成员", "ERROR");
+		}
+
+		private void backup(int index)
+		{
+			//运行备份更新bat
+			Process proc;
+			proc = new Process();
+			proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + @"script\backup\backup.bat";
+			proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_listHS[index].Path) + "\"";
+			proc.StartInfo.CreateNoWindow = false;
+			proc.Start();
+			proc.WaitForExit();
 		}
 	}
 }
