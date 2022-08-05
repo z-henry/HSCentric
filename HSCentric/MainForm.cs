@@ -39,10 +39,11 @@ namespace HSCentric
 
 		private void TickProcess(object sender, EventArgs e)
 		{
+			const int global_checkpriod = 30;
 			//30秒检测重启
-			if (++m_TickCount > 30)
+			if (DateTime.Now > m_CheckTime)
 			{
-				m_TickCount = 0;
+				m_CheckTime = DateTime.Now.AddSeconds(global_checkpriod);
 
 				lock (m_lockHS)
 				{
@@ -102,8 +103,11 @@ namespace HSCentric
 					}
 				}
 				UI_Flush();
-				return;
 			}
+
+			label_currenttime.Text = DateTime.Now.ToString("G");
+			label_checktime.Text = m_CheckTime.ToString("G");
+			label_checktime.BackColor = GetColor(global_checkpriod, new TimeSpan(m_CheckTime.Ticks - DateTime.Now.Ticks).TotalSeconds);
 		}
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
@@ -377,6 +381,49 @@ namespace HSCentric
 			proc.StartInfo.UseShellExecute = false;   //不使用shell壳运行
 			proc.Start();
 			proc.WaitForExit();
+		}
+
+		private Color GetColor(double period, double val)
+		{
+			val = period - val;
+			Color color_step1 = Color.YellowGreen;
+			Color color_step2 = Color.Yellow;
+			Color color_step3 = Color.Red;
+			double r_one = (color_step2.R - color_step1.R) / (period / 2);
+			double g_one = (color_step2.G - color_step1.G) / (period / 2);
+			double b_one = (color_step2.B - color_step1.B) / (period / 2);
+			double r_two = (color_step3.R - color_step2.R) / (period / 2);
+			double g_two = (color_step3.G - color_step2.G) / (period / 2);
+			double b_two = (color_step3.B - color_step2.B) / (period / 2);
+			int r = 0, g = 0, b = 0;
+			if (val < 0)
+			{
+				r = color_step1.R;
+				g = color_step1.G;
+				b = color_step1.B;
+			}
+			else if (val < period/2)
+			{
+				r = color_step1.R + (int)(r_one * val);
+				g = color_step1.G + (int)(g_one * val);
+				b = color_step1.B + (int)(b_one * val);
+			}
+			else if (val >= period/2 && val < period)
+			{
+				r = color_step2.R + (int)(r_two * (val - period / 2));
+				g = color_step2.G + (int)(g_two * (val - period / 2));
+				b = color_step2.B + (int)(b_two * (val - period / 2));
+			}
+			else 
+			{
+				r = color_step3.R;
+				g = color_step3.G;
+				b = color_step3.B;
+			}
+			r = Math.Min(Math.Max(0, r), 255);
+			g = Math.Min(Math.Max(0, g), 255);
+			b = Math.Min(Math.Max(0, b), 255);
+			return Color.FromArgb(r, g, b);
 		}
 	}
 }
