@@ -373,7 +373,8 @@ namespace HSCentric
 			proc = new Process();
 			proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + @"script\backup\backup.bat";
 			proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_listHS[index].Path) + "\"";
-			proc.StartInfo.CreateNoWindow = false;
+			proc.StartInfo.CreateNoWindow = true;   //不创建该进程的窗口
+			proc.StartInfo.UseShellExecute = false;   //不使用shell壳运行
 			proc.Start();
 			proc.WaitForExit();
 		}
