@@ -21,69 +21,34 @@ namespace HSCentric
 		{
 			get
 			{
-				try
-				{
-					string[] fileLines = File.ReadAllLines(System.IO.Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
-					foreach (string line in fileLines)
-					{
-						if (line.IndexOf("插件运行模式") != 0)
-							continue;
-
-						Regex regex = new Regex(@"^(.*)=(.*)$");
-						Match match = regex.Match(line);
-						if (match.Groups.Count == 3)
-							return match.Groups[2].Value.Trim(' ');
-					}
-					return "";
-				}
-				catch
-				{
-					return "";
-				}
-		}
+				RefreshPluginConfig();
+				return m_Mode;
+			}
 		}
 		public DateTime AwakeTime
 		{
 			get
 			{
-				try
-				{
-					string[] fileLines = File.ReadAllLines(System.IO.Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
-					foreach (string line in fileLines)
-					{
-						if (line.IndexOf("唤醒时间") != 0)
-							continue;
-
-						Regex regex = new Regex(@"^(.*)=(.*)$");
-						Match match = regex.Match(line);
-						if (match.Groups.Count == 3)
-							return Convert.ToDateTime(match.Groups[2].Value.Trim(' '));
-					}
-					return new DateTime(2000, 1, 1);
-				}
-				catch
-				{
-					return new DateTime(2000, 1, 1);
-				}
+				RefreshPluginConfig();
+				return m_AwakeTime;
+			}
+		}
+		public int AwakePeriod
+		{
+			get
+			{
+				RefreshPluginConfig();
+				return m_AwakePeriod;
 			}
 		}
 		public bool Enable
 		{
-			get
-			{
-				return m_Enable;
-			}
-			set
-			{
-				m_Enable = value;
-			}
+			get { return m_Enable; }
+			set { m_Enable = value; }
 		}
 		public string NickName
 		{
-			get
-			{
-				return m_NickName;
-			}
+			get { return m_NickName; }
 		}
 		public FileVerison Version
 		{
@@ -102,24 +67,15 @@ namespace HSCentric
 		}
 		public DateTime StartTime
 		{
-			get
-			{
-				return m_StartTime;
-			}
+			get { return m_StartTime; }
 		}
 		public DateTime StopTime
 		{
-			get
-			{
-				return m_StopTime;
-			}
+			get { return m_StopTime; }
 		}
 		public string Path
 		{
-			get
-			{
-				return m_HSPath;
-			}
+			get { return m_HSPath; }
 		}
 
 
@@ -138,18 +94,6 @@ namespace HSCentric
 			}
 			return true;
 		}
-
-		private List<Process> HearthstoneProcess()
-		{
-			List<Process> ps = new List<Process>(Process.GetProcessesByName("Hearthstone"));
-			for (int i = ps.Count - 1; i >= 0; --i)
-			{
-				string path = ps[i].MainModule.FileName.ToString();
-				if (path != m_HSPath)
-					ps.RemoveAt(i);
-			}
-			return ps;
-		}
 		public bool IsActive()
 		{
 			TimeSpan time_now = DateTime.Now.TimeOfDay;
@@ -158,7 +102,6 @@ namespace HSCentric
 			else
 				return time_now >= StartTime.TimeOfDay || time_now <= StopTime.TimeOfDay;
 		}
-
 		public bool IsAlive()
 		{
 			List<Process> hearthstoneProcess = HearthstoneProcess();
@@ -192,7 +135,6 @@ namespace HSCentric
 				Out.Log(string.Format("[{0}]结束炉石进程", m_NickName));
 			}
 		}
-
 		public void StartHS()
 		{
 			MainForm.WinExec(m_HSPath, 2);
@@ -200,12 +142,88 @@ namespace HSCentric
 		}
 
 
+		private List<Process> HearthstoneProcess()
+		{
+			List<Process> ps = new List<Process>(Process.GetProcessesByName("Hearthstone"));
+			for (int i = ps.Count - 1; i >= 0; --i)
+			{
+				string path = ps[i].MainModule.FileName.ToString();
+				if (path != m_HSPath)
+					ps.RemoveAt(i);
+			}
+			return ps;
+		}
+		private void RefreshPluginConfig()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
+			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
+			if (fileConfig.LastWriteTime <= m_configLastEdit)
+				return;
+
+			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
+			foreach (string line in fileLines)
+			{
+				if (line.IndexOf("唤醒时间 = ") == 0)
+				{
+					try
+					{
+						int start_pos = "唤醒时间 = ".Length;
+						if (line.Length > start_pos)
+							m_AwakeTime = Convert.ToDateTime(line.Substring(start_pos));
+						else
+							m_AwakeTime = new DateTime(2000, 1, 1);
+					}
+					catch
+					{
+						m_AwakeTime = new DateTime(2000, 1, 1);
+					}
+				}
+				else if (line.IndexOf("唤醒时间间隔 = ") == 0)
+				{
+					try
+					{
+						int start_pos = "唤醒时间间隔 = ".Length;
+						if (line.Length > start_pos)
+							m_AwakePeriod = Convert.ToInt32(line.Substring(start_pos)) * 60;
+						else
+							m_AwakePeriod = 22 * 60;
+					}
+					catch
+					{
+						m_AwakePeriod = 22 * 60;
+					}
+					continue;
+				}
+				else if (line.IndexOf("插件运行模式 = ") == 0)
+				{
+					try
+					{
+						int start_pos = "插件运行模式 = ".Length;
+						if (line.Length > start_pos)
+							m_Mode = line.Substring(start_pos);
+						else
+							m_Mode = "";
+					}
+					catch
+					{
+						m_Mode = "";
+					}
+				}
+				else
+					continue;
+			}
+		}
 
 		private string m_HSPath;//炉石路径
 		private bool m_Enable;//启用状态
 		private string m_NickName;//昵称
 		private DateTime m_StartTime;
 		private DateTime m_StopTime;
+		private string m_Mode;
+		private DateTime m_AwakeTime;
+		private int m_AwakePeriod;
+		private DateTime m_configLastEdit = new DateTime(2000,1,1);
+
 
 	}
 }

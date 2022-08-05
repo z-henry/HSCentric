@@ -107,7 +107,8 @@ namespace HSCentric
 
 			label_currenttime.Text = DateTime.Now.ToString("G");
 			label_checktime.Text = m_CheckTime.ToString("G");
-			label_checktime.BackColor = GetColor(global_checkpriod, new TimeSpan(m_CheckTime.Ticks - DateTime.Now.Ticks).TotalSeconds);
+			label_checktime.BackColor = GetColor(global_checkpriod, new TimeSpan(m_CheckTime.Ticks - DateTime.Now.Ticks).TotalSeconds,
+				new List<Color>() { Color.YellowGreen, Color.Yellow, Color.Red });
 		}
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
@@ -181,6 +182,9 @@ namespace HSCentric
 						{
 							case LIST_COLUMN.唤醒时间:
 								subitem.Text = unit.AwakeTime.ToString("G");
+								if (unit.Enable && unit.Mode == "挂机收菜")
+								subitem.BackColor = GetColor(unit.AwakePeriod, new TimeSpan(unit.AwakeTime.Ticks - DateTime.Now.Ticks).TotalSeconds,
+									new List<Color>() { Color.White, default_color });
 								break;
 							case LIST_COLUMN.成员:
 								subitem.Text = unit.NickName;
@@ -383,43 +387,30 @@ namespace HSCentric
 			proc.WaitForExit();
 		}
 
-		private Color GetColor(double period, double val)
+		private Color GetColor(double period, double val, List<Color> colors)
 		{
+			if (colors.Count <= 0)
+				return Color.White;
+			if (colors.Count == 1)
+				return colors[0];
+
 			val = period - val;
-			Color color_step1 = Color.YellowGreen;
-			Color color_step2 = Color.Yellow;
-			Color color_step3 = Color.Red;
-			double r_one = (color_step2.R - color_step1.R) / (period / 2);
-			double g_one = (color_step2.G - color_step1.G) / (period / 2);
-			double b_one = (color_step2.B - color_step1.B) / (period / 2);
-			double r_two = (color_step3.R - color_step2.R) / (period / 2);
-			double g_two = (color_step3.G - color_step2.G) / (period / 2);
-			double b_two = (color_step3.B - color_step2.B) / (period / 2);
-			int r = 0, g = 0, b = 0;
-			if (val < 0)
-			{
-				r = color_step1.R;
-				g = color_step1.G;
-				b = color_step1.B;
-			}
-			else if (val < period/2)
-			{
-				r = color_step1.R + (int)(r_one * val);
-				g = color_step1.G + (int)(g_one * val);
-				b = color_step1.B + (int)(b_one * val);
-			}
-			else if (val >= period/2 && val < period)
-			{
-				r = color_step2.R + (int)(r_two * (val - period / 2));
-				g = color_step2.G + (int)(g_two * (val - period / 2));
-				b = color_step2.B + (int)(b_two * (val - period / 2));
-			}
-			else 
-			{
-				r = color_step3.R;
-				g = color_step3.G;
-				b = color_step3.B;
-			}
+			int step_count = colors.Count - 1;
+			double step_interval = period / step_count;
+
+			val = Math.Min(Math.Max(0, val), period - 1);
+			int current_step_index = (int)(val / step_interval);
+			int current_step_progress = (int)(val - step_interval * current_step_index);
+			if (current_step_index >= step_count)
+				return colors[0];
+
+			Color color_from = colors[current_step_index];
+			Color color_to = colors[current_step_index+1];
+
+			int r = color_from.R + (int)((color_to.R - color_from.R) / step_interval * current_step_progress);
+			int g = color_from.G + (int)((color_to.G - color_from.G) / step_interval * current_step_progress);
+			int b = color_from.B + (int)((color_to.B - color_from.B) / step_interval * current_step_progress);
+
 			r = Math.Min(Math.Max(0, r), 255);
 			g = Math.Min(Math.Max(0, g), 255);
 			b = Math.Min(Math.Max(0, b), 255);
