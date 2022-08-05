@@ -175,7 +175,7 @@ namespace HSCentric
 			this.Controls.Add(this.btn_del);
 			this.Controls.Add(this.btn_add);
 			this.Name = "MainForm";
-			this.Text = "炉石监控程序 4.0.2";
+			this.Text = "炉石监控程序 4.0.3";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
