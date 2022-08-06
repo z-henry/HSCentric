@@ -29,22 +29,21 @@ namespace HSCentric
 		/// </summary>
 		private void InitializeComponent()
 		{
+			this.components = new System.ComponentModel.Container();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.textbox_Path = new System.Windows.Forms.TextBox();
-			this.textbox_StartHour = new System.Windows.Forms.TextBox();
-			this.label3 = new System.Windows.Forms.Label();
-			this.label4 = new System.Windows.Forms.Label();
-			this.textbox_StartMin = new System.Windows.Forms.TextBox();
-			this.textbox_StopMin = new System.Windows.Forms.TextBox();
-			this.label5 = new System.Windows.Forms.Label();
-			this.label6 = new System.Windows.Forms.Label();
-			this.textbox_StopHour = new System.Windows.Forms.TextBox();
-			this.label7 = new System.Windows.Forms.Label();
 			this.btn_selectpath = new System.Windows.Forms.Button();
 			this.btn_ok = new System.Windows.Forms.Button();
 			this.label8 = new System.Windows.Forms.Label();
 			this.checkbox_Enable = new System.Windows.Forms.CheckBox();
+			this.btn_cancel = new System.Windows.Forms.Button();
+			this.listTasks = new System.Windows.Forms.ListView();
+			this.contextMenuStrip_RMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.添加ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.删除ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.修改ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -63,7 +62,7 @@ namespace HSCentric
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(53, 12);
 			this.label2.TabIndex = 1;
-			this.label2.Text = "启用区间";
+			this.label2.Text = "模式设置";
 			// 
 			// textbox_Path
 			// 
@@ -71,79 +70,6 @@ namespace HSCentric
 			this.textbox_Path.Name = "textbox_Path";
 			this.textbox_Path.Size = new System.Drawing.Size(287, 21);
 			this.textbox_Path.TabIndex = 2;
-			// 
-			// textbox_StartHour
-			// 
-			this.textbox_StartHour.Location = new System.Drawing.Point(71, 77);
-			this.textbox_StartHour.Name = "textbox_StartHour";
-			this.textbox_StartHour.Size = new System.Drawing.Size(29, 21);
-			this.textbox_StartHour.TabIndex = 3;
-			// 
-			// label3
-			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(106, 80);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(17, 12);
-			this.label3.TabIndex = 5;
-			this.label3.Text = "时";
-			// 
-			// label4
-			// 
-			this.label4.AutoSize = true;
-			this.label4.Location = new System.Drawing.Point(164, 80);
-			this.label4.Name = "label4";
-			this.label4.Size = new System.Drawing.Size(17, 12);
-			this.label4.TabIndex = 6;
-			this.label4.Text = "分";
-			// 
-			// textbox_StartMin
-			// 
-			this.textbox_StartMin.Location = new System.Drawing.Point(129, 77);
-			this.textbox_StartMin.Name = "textbox_StartMin";
-			this.textbox_StartMin.Size = new System.Drawing.Size(29, 21);
-			this.textbox_StartMin.TabIndex = 7;
-			// 
-			// textbox_StopMin
-			// 
-			this.textbox_StopMin.Location = new System.Drawing.Point(278, 77);
-			this.textbox_StopMin.Name = "textbox_StopMin";
-			this.textbox_StopMin.Size = new System.Drawing.Size(29, 21);
-			this.textbox_StopMin.TabIndex = 11;
-			// 
-			// label5
-			// 
-			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(313, 80);
-			this.label5.Name = "label5";
-			this.label5.Size = new System.Drawing.Size(17, 12);
-			this.label5.TabIndex = 10;
-			this.label5.Text = "分";
-			// 
-			// label6
-			// 
-			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(255, 80);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(17, 12);
-			this.label6.TabIndex = 9;
-			this.label6.Text = "时";
-			// 
-			// textbox_StopHour
-			// 
-			this.textbox_StopHour.Location = new System.Drawing.Point(220, 77);
-			this.textbox_StopHour.Name = "textbox_StopHour";
-			this.textbox_StopHour.Size = new System.Drawing.Size(29, 21);
-			this.textbox_StopHour.TabIndex = 8;
-			// 
-			// label7
-			// 
-			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(187, 80);
-			this.label7.Name = "label7";
-			this.label7.Size = new System.Drawing.Size(17, 12);
-			this.label7.TabIndex = 12;
-			this.label7.Text = "至";
 			// 
 			// btn_selectpath
 			// 
@@ -157,7 +83,7 @@ namespace HSCentric
 			// 
 			// btn_ok
 			// 
-			this.btn_ok.Location = new System.Drawing.Point(326, 108);
+			this.btn_ok.Location = new System.Drawing.Point(232, 333);
 			this.btn_ok.Name = "btn_ok";
 			this.btn_ok.Size = new System.Drawing.Size(75, 23);
 			this.btn_ok.TabIndex = 14;
@@ -183,29 +109,75 @@ namespace HSCentric
 			this.checkbox_Enable.TabIndex = 16;
 			this.checkbox_Enable.UseVisualStyleBackColor = true;
 			// 
+			// btn_cancel
+			// 
+			this.btn_cancel.Location = new System.Drawing.Point(325, 333);
+			this.btn_cancel.Name = "btn_cancel";
+			this.btn_cancel.Size = new System.Drawing.Size(75, 23);
+			this.btn_cancel.TabIndex = 17;
+			this.btn_cancel.Text = "取消";
+			this.btn_cancel.UseVisualStyleBackColor = true;
+			this.btn_cancel.Click += new System.EventHandler(this.btn_cancel_Click);
+			// 
+			// listTasks
+			// 
+			this.listTasks.HideSelection = false;
+			this.listTasks.Location = new System.Drawing.Point(14, 106);
+			this.listTasks.Name = "listTasks";
+			this.listTasks.Size = new System.Drawing.Size(390, 221);
+			this.listTasks.TabIndex = 18;
+			this.listTasks.UseCompatibleStateImageBehavior = false;
+			this.listTasks.View = System.Windows.Forms.View.Details;
+			this.listTasks.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listTasks_MouseDoubleClick);
+			this.listTasks.MouseUp += new System.Windows.Forms.MouseEventHandler(this.listTasks_MouseUp);
+			// 
+			// contextMenuStrip_RMenu
+			// 
+			this.contextMenuStrip_RMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.添加ToolStripMenuItem,
+            this.删除ToolStripMenuItem,
+            this.修改ToolStripMenuItem});
+			this.contextMenuStrip_RMenu.Name = "contextMenuStrip_RMenu";
+			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(101, 70);
+			// 
+			// 添加ToolStripMenuItem
+			// 
+			this.添加ToolStripMenuItem.Name = "添加ToolStripMenuItem";
+			this.添加ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+			this.添加ToolStripMenuItem.Text = "添加";
+			this.添加ToolStripMenuItem.Click += new System.EventHandler(this.添加ToolStripMenuItem_Click);
+			// 
+			// 删除ToolStripMenuItem
+			// 
+			this.删除ToolStripMenuItem.Name = "删除ToolStripMenuItem";
+			this.删除ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+			this.删除ToolStripMenuItem.Text = "删除";
+			this.删除ToolStripMenuItem.Click += new System.EventHandler(this.删除ToolStripMenuItem_Click);
+			// 
+			// 修改ToolStripMenuItem
+			// 
+			this.修改ToolStripMenuItem.Name = "修改ToolStripMenuItem";
+			this.修改ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
+			this.修改ToolStripMenuItem.Text = "修改";
+			this.修改ToolStripMenuItem.Click += new System.EventHandler(this.修改ToolStripMenuItem_Click);
+			// 
 			// HSUnitForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(412, 135);
+			this.ClientSize = new System.Drawing.Size(412, 368);
+			this.Controls.Add(this.listTasks);
+			this.Controls.Add(this.btn_cancel);
 			this.Controls.Add(this.checkbox_Enable);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.btn_ok);
 			this.Controls.Add(this.btn_selectpath);
-			this.Controls.Add(this.label7);
-			this.Controls.Add(this.textbox_StopMin);
-			this.Controls.Add(this.label5);
-			this.Controls.Add(this.label6);
-			this.Controls.Add(this.textbox_StopHour);
-			this.Controls.Add(this.textbox_StartMin);
-			this.Controls.Add(this.label4);
-			this.Controls.Add(this.label3);
-			this.Controls.Add(this.textbox_StartHour);
 			this.Controls.Add(this.textbox_Path);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Name = "HSUnitForm";
 			this.Text = "HSUnitForm";
+			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -216,18 +188,15 @@ namespace HSCentric
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.TextBox textbox_Path;
-		private System.Windows.Forms.TextBox textbox_StartHour;
-		private System.Windows.Forms.Label label3;
-		private System.Windows.Forms.Label label4;
-		private System.Windows.Forms.TextBox textbox_StartMin;
-		private System.Windows.Forms.TextBox textbox_StopMin;
-		private System.Windows.Forms.Label label5;
-		private System.Windows.Forms.Label label6;
-		private System.Windows.Forms.TextBox textbox_StopHour;
-		private System.Windows.Forms.Label label7;
 		private System.Windows.Forms.Button btn_selectpath;
 		private System.Windows.Forms.Button btn_ok;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.CheckBox checkbox_Enable;
+		private System.Windows.Forms.Button btn_cancel;
+		private System.Windows.Forms.ListView listTasks;
+		private System.Windows.Forms.ContextMenuStrip contextMenuStrip_RMenu;
+		private System.Windows.Forms.ToolStripMenuItem 添加ToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem 删除ToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem 修改ToolStripMenuItem;
 	}
 }

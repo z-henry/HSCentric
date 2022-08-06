@@ -1,4 +1,7 @@
-﻿using System;
+﻿using HSCentric.Const;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
@@ -6,96 +9,50 @@ namespace HSCentric
 {
 	public partial class HSUnitForm : Form
 	{
-		public HSUnitForm(string _HSPath, bool _Enable, DateTime _StartTime, DateTime _StopTime)
+		public HSUnitForm(HSUnit unit = null)
 		{
 			InitializeComponent();
-			checkbox_Enable.Checked = _Enable;
-			textbox_Path.Text = _HSPath;
-			textbox_StartHour.Text = _StartTime.Hour.ToString();
-			textbox_StartMin.Text = _StartTime.Minute.ToString();
-			textbox_StopHour.Text = _StopTime.Hour.ToString();
-			textbox_StopMin.Text = _StopTime.Minute.ToString();
-		}
-		public HSUnitForm()
-		{
-			InitializeComponent();
-			textbox_StartHour.Text = "0";
-			textbox_StartMin.Text = "0";
-			textbox_StopHour.Text = "23";
-			textbox_StopMin.Text = "59";
+			if (unit != null)
+				m_unit = (HSUnit)unit.DeepClone();
+			checkbox_Enable.Checked = m_unit.Enable;
+			textbox_Path.Text = m_unit.Path;
 
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.模式.ToString(), 80);
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.队伍.ToString(), 80);
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.策略.ToString(), 80);
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.启动时间.ToString(), 80);
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.停止时间.ToString(), 80);
+
+			UI_Flush();
 		}
 
-		public bool Enable
+		public HSUnit Unit
 		{
-			get
-			{
-				return m_Enable;
-			}
+			get { return m_unit; }
 		}
-		public DateTime StartTime
-		{
-			get
-			{
-				return new DateTime(2000, 1, 1, m_StartHour, m_StartMin, 59);
-			}
-		}
-		public DateTime StopTime
-		{
-			get
-			{
-				return new DateTime(2000, 1, 1, m_StopHour, m_StopMin, 59);
-			}
-		}
-		public string Path
-		{
-			get
-			{
-				return m_Path;
-			}
-		}
-
 
 
 		private void btn_ok_Click(object sender, EventArgs e)
 		{
-			if (!CheckHour(textbox_StartHour.Text))
-			{
-				MessageBox.Show("开始小时 请输入0-23的数字", "Error");
-				return;
-			}
-
-			if (!CheckHour(textbox_StopHour.Text))
-			{
-				MessageBox.Show("开始小时 请输入0-23的数字", "Error");
-				return;
-			}
-
-			if (!CheckMin(textbox_StartMin.Text))
-			{ 
-				MessageBox.Show("结束分钟 请输入0-59的数字", "Error");
-				return;
-			}
-
-			if (!CheckMin(textbox_StopMin.Text))
-			{ 
-				MessageBox.Show("结束分钟 请输入0-59的数字", "Error");
-				return;
-			}
-
 			if (textbox_Path.Text.Length <= 0)
 			{
 				MessageBox.Show("请选择炉石路径", "Error");
 				return;
 			}
+			if (listTasks.Items.Count <= 0)
+			{
+				MessageBox.Show("请添加一个模式", "Error");
+				return;
+			}
 
-			m_Path = textbox_Path.Text;
-			m_Enable = checkbox_Enable.Checked;
-			m_StartHour = int.Parse(textbox_StartHour.Text);
-			m_StartMin = int.Parse(textbox_StartMin.Text);
-			m_StopHour = int.Parse(textbox_StopHour.Text);
-			m_StopMin = int.Parse(textbox_StopMin.Text);
+			m_unit.Path = textbox_Path.Text;
+			m_unit.Enable = checkbox_Enable.Checked;
 			DialogResult = DialogResult.OK;
+			Close();
+		}
+		private void btn_cancel_Click(object sender, EventArgs e)
+		{
+			DialogResult = DialogResult.Cancel;
 			Close();
 		}
 
@@ -111,26 +68,126 @@ namespace HSCentric
 			textbox_Path.Text = openFileDialog.FileName;
 		}
 
-		private bool CheckMin(string _text)
+		private void 添加ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			TaskForm dlg = new TaskForm();
+			if (dlg.ShowDialog() != DialogResult.OK)
+				return;
 
-			Regex regex = new Regex(@"^[0-5]?\d$");
-			Match match = regex.Match(_text);
-			return match.Success;
+			if (!m_unit.Tasks.Add(dlg.Task))
+			{
+				MessageBox.Show("所选时间段有重合，添加失败", "ERROR");
+				return;
+			}
+			UI_Flush();
 		}
-		private bool CheckHour(string _text)
+
+		private void 删除ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			if (listTasks.SelectedItems.Count > 0)
+			{
+				if (!m_unit.Tasks.Remove(listTasks.SelectedItems[0].Index))
+				{
+					MessageBox.Show("删除失败", "ERROR");
+					return;
+				}
 
-			Regex regex = new Regex(@"^2[0-3]|[0-1]?\d$");
-			Match match = regex.Match(_text);
-			return match.Success;
+				UI_Flush();
+			}
+			else
+				MessageBox.Show("请选中一个任务", "ERROR");
 		}
 
-		private bool m_Enable;
-		private string m_Path;
-		private int m_StartHour;
-		private int m_StartMin;
-		private int m_StopHour;
-		private int m_StopMin;
+		private void 修改ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (listTasks.SelectedItems.Count > 0)
+			{
+				int index = listTasks.SelectedItems[0].Index;
+				TaskForm dlg = new TaskForm((TaskUnit)m_unit.Tasks.GetTask(index));
+				if (dlg.ShowDialog() != DialogResult.OK)
+					return;
+
+				if (!m_unit.Tasks.Modify(index, dlg.Task))
+				{
+					MessageBox.Show("所选时间段有重合，添加失败", "ERROR");
+					return;
+				}
+				UI_Flush();
+			}
+			else
+				MessageBox.Show("请选中一个任务", "ERROR");
+		}
+
+		private void listTasks_MouseUp(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+			{
+				if (listTasks.SelectedItems.Count < 0)
+				{
+					contextMenuStrip_RMenu.Items[(int)R_TASK_MENU.删除].Enabled = false; 
+					contextMenuStrip_RMenu.Items[(int)R_TASK_MENU.修改].Enabled = false;
+
+				}
+				contextMenuStrip_RMenu.Show(listTasks, new Point(e.X, e.Y));
+			}
+		}
+
+		private void listTasks_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			if (listTasks.SelectedItems.Count > 0)
+			{
+				int index = listTasks.SelectedItems[0].Index;
+				TaskForm dlg = new TaskForm((TaskUnit)m_unit.Tasks.GetTask(index));
+				if (dlg.ShowDialog() != DialogResult.OK)
+					return;
+
+				if (!m_unit.Tasks.Modify(index, dlg.Task))
+				{
+					MessageBox.Show("所选时间段有重合，添加失败", "ERROR");
+					return;
+				}
+				UI_Flush();
+			}
+		}
+		private void UI_Flush()
+		{
+			listTasks.Items.Clear();
+
+			foreach (TaskUnit task in m_unit.Tasks.GetTasks())
+			{
+				ListViewItem item = new ListViewItem();
+				item.Text = task.Mode.ToString();
+
+				foreach (LIST_TASK_COLUMN list_item in Enum.GetValues(typeof(LIST_TASK_COLUMN)))
+				{
+					if (list_item == LIST_TASK_COLUMN.模式)
+						continue;
+
+					ListViewItem.ListViewSubItem subitem = new ListViewItem.ListViewSubItem();
+					switch (list_item)
+					{
+						case LIST_TASK_COLUMN.队伍:
+							subitem.Text = task.TeamName;
+							break;
+						case LIST_TASK_COLUMN.策略:
+							subitem.Text = task.StragyName;
+							break;
+						case LIST_TASK_COLUMN.停止时间:
+							subitem.Text = task.StopTime.ToString("T");
+							break;
+						case LIST_TASK_COLUMN.启动时间:
+							subitem.Text = task.StopTime.ToString("T");
+							break;
+						default:
+							break;
+					}
+					item.SubItems.Add(subitem);
+				}
+				listTasks.Items.Add(item);
+			}
+		}
+
+
+		private HSUnit m_unit = new HSUnit();
 	}
 }

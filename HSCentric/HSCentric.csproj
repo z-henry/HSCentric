@@ -47,6 +47,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="TaskManager.cs" />
+    <Compile Include="TaskForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TaskForm.Designer.cs">
+      <DependentUpon>TaskForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="UserInfoSection.cs" />
     <Compile Include="Const.cs" />
     <Compile Include="FileVersion.cs" />
@@ -69,6 +76,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="HSUnitForm.resx">
       <DependentUpon>HSUnitForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -83,6 +91,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="TaskForm.resx">
+      <DependentUpon>TaskForm.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

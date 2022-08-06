@@ -2,43 +2,37 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
-using System.Text.RegularExpressions;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using HSCentric.Const;
 
 namespace HSCentric
 {
+	[Serializable]
 	public class HSUnit
 	{
-		public HSUnit(string _HSPath, bool _Enable = false, DateTime? _StartTime = null, DateTime? _StopTime = null)
+		public HSUnit(string _HSPath = null, bool _Enable = false, List<TaskUnit> _Tasks = null)
 		{
-			m_HSPath = _HSPath;
+			m_HSPath = _HSPath ?? "";
 			m_Enable = _Enable;
-			m_NickName = Directory.GetParent(m_HSPath).Name;
-			m_StartTime = _StartTime ?? new DateTime(2000, 1, 1, 0, 0, 0);
-			m_StopTime = _StopTime ?? new DateTime(2000, 1, 1, 23, 59, 59);
+			m_taskManager = new TaskManager(_Tasks);
 		}
 
-		public string Mode
+		public object DeepClone()
 		{
-			get
-			{
-				RefreshPluginConfig();
-				return m_Mode;
-			}
+			BinaryFormatter bf = new BinaryFormatter();
+			MemoryStream ms = new MemoryStream();
+			bf.Serialize(ms, this); //复制到流中
+			ms.Position = 0;
+			return (bf.Deserialize(ms));
 		}
-		public DateTime AwakeTime
+
+		public (string Mode, DateTime AwakeTime, int AwakePeriod, string TeamName, string StragyName) BasicConfigValue
 		{
 			get
 			{
-				RefreshPluginConfig();
-				return m_AwakeTime;
-			}
-		}
-		public int AwakePeriod
-		{
-			get
-			{
-				RefreshPluginConfig();
-				return m_AwakePeriod;
+				ReadConfigValue();
+				return (m_Mode, m_AwakeTime, m_AwakePeriod, m_TeamName, m_StragyName);
 			}
 		}
 		public bool Enable
@@ -48,7 +42,10 @@ namespace HSCentric
 		}
 		public string NickName
 		{
-			get { return m_NickName; }
+			get
+			{
+				return m_HSPath.Length > 0 ? Directory.GetParent(m_HSPath).Name : ""; ;
+			}
 		}
 		public FileVerison Version
 		{
@@ -65,20 +62,22 @@ namespace HSCentric
 				}
 			}
 		}
-		public DateTime StartTime
-		{
-			get { return m_StartTime; }
-		}
-		public DateTime StopTime
-		{
-			get { return m_StopTime; }
-		}
 		public string Path
 		{
 			get { return m_HSPath; }
+			set
+			{
+				m_HSPath = value;
+			}
 		}
-
-
+		public TaskUnit CurrentTask
+		{
+			get { return Tasks.GetCurrentTask(); }
+		}
+		public TaskManager Tasks
+		{
+			get { return m_taskManager; }
+		}
 
 		public bool SwitchBepinEx(bool _switch)
 		{
@@ -96,11 +95,9 @@ namespace HSCentric
 		}
 		public bool IsActive()
 		{
+			TaskUnit currentTask = CurrentTask;
 			TimeSpan time_now = DateTime.Now.TimeOfDay;
-			if (StartTime < StopTime)
-				return time_now >= StartTime.TimeOfDay && time_now <= StopTime.TimeOfDay;
-			else
-				return time_now >= StartTime.TimeOfDay || time_now <= StopTime.TimeOfDay;
+			return time_now >= currentTask.StartTime.TimeOfDay && time_now <= currentTask.StopTime.TimeOfDay;
 		}
 		public bool IsAlive()
 		{
@@ -132,13 +129,26 @@ namespace HSCentric
 			foreach (Process processHS in hearthstoneProcess)
 			{
 				processHS.Kill();
-				Out.Log(string.Format("[{0}]结束炉石进程", m_NickName));
+				Out.Log(string.Format("[{0}]结束炉石进程", NickName));
 			}
 		}
 		public void StartHS()
 		{
 			MainForm.WinExec(m_HSPath, 2);
-			Out.Log(string.Format("[{0}]启动炉石进程", m_NickName));
+			Out.Log(string.Format("[{0}]启动炉石进程", NickName));
+		}
+		public bool AdjustMode()
+		{
+			var basicConfigValue = BasicConfigValue;
+			TaskUnit currentTask = CurrentTask;
+			if (currentTask.Mode.ToString() != basicConfigValue.Mode ||
+				currentTask.TeamName != basicConfigValue.TeamName ||
+				currentTask.StragyName != basicConfigValue.StragyName)
+			{
+				WriteConfigValue(currentTask.Mode, currentTask.TeamName, currentTask.StragyName);
+				return true;
+			}
+			return false;
 		}
 
 
@@ -153,13 +163,14 @@ namespace HSCentric
 			}
 			return ps;
 		}
-		private void RefreshPluginConfig()
+		private void ReadConfigValue()
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
 			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
 			if (fileConfig.LastWriteTime <= m_configLastEdit)
 				return;
 
+			m_configLastEdit = fileConfig.LastWriteTime;
 			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
 			foreach (string line in fileLines)
 			{
@@ -209,21 +220,72 @@ namespace HSCentric
 						m_Mode = "";
 					}
 				}
+				else if (line.IndexOf("使用的队伍名称 = ") == 0)
+				{
+					try
+					{
+						int start_pos = "使用的队伍名称 = ".Length;
+						if (line.Length > start_pos)
+							m_TeamName = line.Substring(start_pos);
+						else
+							m_TeamName = "";
+					}
+					catch
+					{
+						m_TeamName = "";
+					}
+				}
+				else if (line.IndexOf("战斗策略 = ") == 0)
+				{
+					try
+					{
+						int start_pos = "战斗策略 = ".Length;
+						if (line.Length > start_pos)
+							m_StragyName = line.Substring(start_pos);
+						else
+							m_StragyName = "";
+					}
+					catch
+					{
+						m_StragyName = "";
+					}
+				}
 				else
 					continue;
 			}
 		}
+		private void WriteConfigValue(TASK_MODE Mode, string TeamName, string StragyName)
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
+			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
+			for (int i = 0, ii = fileLines.Length; i < ii; ++i)
+			{
+				string line = fileLines[i];
+				if (line.IndexOf("插件运行模式 = ") == 0)
+				{
+					line = "插件运行模式 = " + Mode.ToString();
+				}
+				else if (line.IndexOf("使用的队伍名称 = ") == 0)
+				{
+					line = "使用的队伍名称 = " + TeamName;
+				}
+				else if (line.IndexOf("战斗策略 = ") == 0)
+				{
+					line = "战斗策略 = " + StragyName;
+				}
+			}
+			File.WriteAllLines(pathConfig.ToString(), fileLines);
+		}
 
-		private string m_HSPath;//炉石路径
-		private bool m_Enable;//启用状态
-		private string m_NickName;//昵称
-		private DateTime m_StartTime;
-		private DateTime m_StopTime;
-		private string m_Mode;
-		private DateTime m_AwakeTime;
-		private int m_AwakePeriod;
+		private string m_Mode = "";
+		private DateTime m_AwakeTime = new DateTime(2000, 1, 1);
+		private int m_AwakePeriod = 25;
+		private string m_TeamName = "";
+		private string m_StragyName = "";
+
+		private string m_HSPath = "";//炉石路径
+		private bool m_Enable = false;//启用状态
 		private DateTime m_configLastEdit = new DateTime(2000,1,1);
-
-
+		private TaskManager m_taskManager = new TaskManager();
 	}
 }

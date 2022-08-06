@@ -25,12 +25,12 @@ namespace HSCentric
 			this.timer1.Tick += this.TickProcess;
 			this.timer1.Start();
 
-			this.listHS.Columns.Add("启用", 40);
-			this.listHS.Columns.Add("成员", 120);
-			this.listHS.Columns.Add("模式", 80);
-			this.listHS.Columns.Add("唤醒时间", 120);
-			this.listHS.Columns.Add("版本", 120);
-			this.listHS.Columns.Add("启用时间段", 120);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用.ToString(), 40);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.成员.ToString(), 120);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.模式.ToString(), 80);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 120);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.版本.ToString(), 120);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 120);
 
 			LoadConfig();
 
@@ -56,7 +56,11 @@ namespace HSCentric
 							continue;
 
 						backup(i);
+						// 先判断设置当前的模式
+						hsUnit.AdjustMode();
 
+						var basicConfigValue = hsUnit.BasicConfigValue;
+						var currentTask = hsUnit.CurrentTask;
 						// 不在启用时间段,启动了就干掉
 						if (!hsUnit.IsActive())
 						{
@@ -84,14 +88,14 @@ namespace HSCentric
 						//炉石没运行就判断是否需要启动
 						else
 						{
-							if ("挂机收菜" == hsUnit.Mode)
+							if (TASK_MODE.挂机收菜.ToString() == basicConfigValue.Mode)
 							{
 								// 挂机收菜模式下，
 								// 1. 到唤醒时间唤醒
-								if (DateTime.Now >= hsUnit.AwakeTime)
+								if (DateTime.Now >= basicConfigValue.AwakeTime)
 									Out.Log(string.Format("[{0}]唤醒", hsUnit.NickName));
 								// 2. 没到唤醒时间，但是距离结束不到5分钟了，唤醒
-								else if ((hsUnit.StopTime.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds < 300f)
+								else if ((currentTask.StopTime.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds < 300f)
 									Out.Log(string.Format("[{0}]快结束了，唤醒", hsUnit.NickName));
 								else
 									continue;
@@ -129,7 +133,7 @@ namespace HSCentric
 
 			lock (m_lockHS)
 			{
-				m_listHS.Add(new HSUnit(dlg.Path, dlg.Enable, dlg.StartTime, dlg.StopTime));
+				m_listHS.Add(dlg.Unit);
 			}
 			UI_Flush();
 		}
@@ -158,6 +162,8 @@ namespace HSCentric
 
 				foreach (HSUnit unit in m_listHS)
 				{
+					var basicConfigValue = unit.BasicConfigValue;
+					var currentTask = unit.CurrentTask;
 					Color default_color;
 					if (!unit.Enable)
 						default_color = Color.Pink;
@@ -171,34 +177,34 @@ namespace HSCentric
 					item.BackColor = default_color;
 					item.Text = unit.Enable ? "√" : "";
 
-					foreach (LIST_COLUMN list_item in Enum.GetValues(typeof(LIST_COLUMN)))
+					foreach (LIST_UNIT_COLUMN list_item in Enum.GetValues(typeof(LIST_UNIT_COLUMN)))
 					{
-						if (list_item == LIST_COLUMN.启用)
+						if (list_item == LIST_UNIT_COLUMN.启用)
 							continue;
 
 						ListViewItem.ListViewSubItem subitem = new ListViewItem.ListViewSubItem();
 						subitem.BackColor = default_color;
 						switch (list_item)
 						{
-							case LIST_COLUMN.唤醒时间:
-								subitem.Text = unit.AwakeTime.ToString("G");
-								if (unit.Enable && unit.Mode == "挂机收菜")
-								subitem.BackColor = GetColor(unit.AwakePeriod, new TimeSpan(unit.AwakeTime.Ticks - DateTime.Now.Ticks).TotalSeconds,
-									new List<Color>() { Color.White, default_color });
+							case LIST_UNIT_COLUMN.唤醒时间:
+								subitem.Text = basicConfigValue.AwakeTime.ToString("G");
+								if (unit.Enable && basicConfigValue.Mode == TASK_MODE.挂机收菜.ToString())
+									subitem.BackColor = GetColor(basicConfigValue.AwakePeriod, new TimeSpan(basicConfigValue.AwakeTime.Ticks - DateTime.Now.Ticks).TotalSeconds,
+										new List<Color>() { Color.White, default_color });
 								break;
-							case LIST_COLUMN.成员:
+							case LIST_UNIT_COLUMN.成员:
 								subitem.Text = unit.NickName;
 								break;
-							case LIST_COLUMN.模式:
-								subitem.Text = unit.Mode;
+							case LIST_UNIT_COLUMN.模式:
+								subitem.Text = basicConfigValue.Mode;
 								break;
-							case LIST_COLUMN.版本:
+							case LIST_UNIT_COLUMN.版本:
 								subitem.Text = unit.Version.ToString();
 								if (unit.Version < max_version)
 									subitem.BackColor = Color.Yellow;
 								break;
-							case LIST_COLUMN.启用时间段:
-								subitem.Text = unit.StartTime.ToString("t") + " - " + unit.StopTime.ToString("t");
+							case LIST_UNIT_COLUMN.启用时间段:
+								subitem.Text = currentTask.StartTime.ToString("T") + " - " + currentTask.StopTime.ToString("T");
 								break;
 							default:
 								break;
@@ -216,9 +222,9 @@ namespace HSCentric
 		{
 			if (listHS.SelectedItems.Count > 0)
 			{
+				int index = listHS.SelectedItems[0].Index;
 				lock (m_lockHS)
 				{
-					int index = listHS.SelectedItems[0].Index;
 					m_listHS[index].Enable = !m_listHS[index].Enable;
 				}
 				UI_Flush();
@@ -234,11 +240,11 @@ namespace HSCentric
 				if (listHS.SelectedItems.Count > 0)
 				{
 					int index = listHS.SelectedItems[0].Index;
-					contextMenuStrip_RMenu.Items[(int)RMenu.启用].Text = listHS.Items[index].SubItems[(int)LIST_COLUMN.启用].Text == "√" ? "停用" : "启用";
-					if (listHS.Items[index].SubItems[(int)LIST_COLUMN.成员].Text == "Hearthstone")
-						contextMenuStrip_RMenu.Items[(int)RMenu.更新].Enabled = false;
+					contextMenuStrip_RMenu.Items[(int)R_UNIT_MENU.启用].Text = listHS.Items[index].SubItems[(int)LIST_UNIT_COLUMN.启用].Text == "√" ? "停用" : "启用";
+					if (listHS.Items[index].SubItems[(int)LIST_UNIT_COLUMN.成员].Text == "Hearthstone")
+						contextMenuStrip_RMenu.Items[(int)R_UNIT_MENU.更新].Enabled = false;
 					else
-						contextMenuStrip_RMenu.Items[(int)RMenu.更新].Enabled = true;
+						contextMenuStrip_RMenu.Items[(int)R_UNIT_MENU.更新].Enabled = true;
 
 					contextMenuStrip_RMenu.Show(listHS, new Point(e.X, e.Y));
 				}
@@ -250,34 +256,36 @@ namespace HSCentric
 			if (listHS.SelectedItems.Count > 0)
 			{
 				int index = listHS.SelectedItems[0].Index;
-				if (listHS.Items[index].SubItems[(int)LIST_COLUMN.成员].Text == "Hearthstone")
+				if (listHS.Items[index].SubItems[(int)LIST_UNIT_COLUMN.成员].Text == "Hearthstone")
 				{
 					MessageBox.Show("成员：Hearthstone无法更新", "ERROR");
 					return;
 				}
+				lock (m_lockHS)
+				{
+					m_listHS[index].Enable = false;
+					if (m_listHS[index].IsAlive())
+					{
+						m_listHS[index].KillHS();
+						Delay(1000);
+					}
 
-				m_listHS[index].Enable = false;
-				if (m_listHS[index].IsAlive())
-				{
-					m_listHS[index].KillHS();
-					Delay(5000);
-				}
-
-				//运行备份更新bat
-				Process proc;
-				try
-				{
-					proc = new Process();
-					proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + @"script\backup\upgrade.bat";
-					proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_listHS[index].Path) + "\"";
-					proc.StartInfo.CreateNoWindow = false;
-					proc.Start();
-					proc.WaitForExit();
-					MessageBox.Show(string.Format("成员：{0}，更新完成", listHS.Items[index].SubItems[(int)LIST_COLUMN.成员].Text));
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show(string.Format("Exception Occurred :{0},{1}", ex.Message, ex.StackTrace.ToString()), "ERROR");
+					//运行备份更新bat
+					Process proc;
+					try
+					{
+						proc = new Process();
+						proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + @"script\backup\upgrade.bat";
+						proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_listHS[index].Path) + "\"";
+						proc.StartInfo.CreateNoWindow = false;
+						proc.Start();
+						proc.WaitForExit();
+						MessageBox.Show(string.Format("成员：{0}，更新完成", listHS.Items[index].SubItems[(int)LIST_UNIT_COLUMN.成员].Text));
+					}
+					catch (Exception ex)
+					{
+						MessageBox.Show(string.Format("Exception Occurred :{0},{1}", ex.Message, ex.StackTrace.ToString()), "ERROR");
+					}
 				}
 				UI_Flush();
 			}
@@ -299,13 +307,13 @@ namespace HSCentric
 			if (listHS.SelectedItems.Count > 0)
 			{
 				int index = listHS.SelectedItems[0].Index;
-				HSUnitForm dlg = new HSUnitForm(m_listHS[index].Path, m_listHS[index].Enable, m_listHS[index].StartTime, m_listHS[index].StopTime);
+				HSUnitForm dlg = new HSUnitForm(m_listHS[index]);
 				if (dlg.ShowDialog() != DialogResult.OK)
 					return;
 
 				lock (m_lockHS)
 				{
-					m_listHS[index] = new HSUnit(dlg.Path, dlg.Enable, dlg.StartTime, dlg.StopTime);
+					m_listHS[index] = dlg.Unit;
 				}
 				UI_Flush();
 			}
@@ -313,9 +321,21 @@ namespace HSCentric
 		private void LoadConfig()
 		{
 			HSUnitSection config = ConfigurationManager.GetSection("userinfo") as HSUnitSection;
-			foreach (HSUnitElement elem in config.HSUnit.Cast<HSUnitElement>().ToList())
+			foreach (HSUnitElement hs in config.HSUnit.Cast<HSUnitElement>().ToList())
 			{
-				m_listHS.Add(new HSUnit(elem.Path, elem.Enable, Convert.ToDateTime(elem.StartTime), Convert.ToDateTime(elem.StopTime)));
+				List<TaskUnit> tasks = new List<TaskUnit>();
+				foreach (TaskElement task in hs.Tasks.Cast<TaskElement>().ToList())
+				{
+					tasks.Add(new TaskUnit()
+					{
+						Mode = (TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.Mode),
+						StartTime = Convert.ToDateTime(task.StartTime),
+						StopTime = Convert.ToDateTime(task.StopTime),
+						StragyName = task.StragyName,
+						TeamName = task.TeamName,
+					});
+				}
+				m_listHS.Add(new HSUnit(hs.Path, hs.Enable, tasks));
 			}
 // 			m_listHS = ConfigurationManager.GetSection("userinfo") as List<HSUnit>;
 		}
@@ -324,13 +344,29 @@ namespace HSCentric
 			Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 			HSUnitSection section = config.GetSection("userinfo") as HSUnitSection;
 			section.HSUnit.Clear();
-			foreach (HSUnit unit in m_listHS)
+			int index_hs = 0;
+			foreach (HSUnit hs in m_listHS)
 			{
-				section.HSUnit.Add(new HSUnitElement() { 
-					Path = unit.Path, 
-					StartTime = unit.StartTime.ToString("G"),
-					StopTime = unit.StopTime.ToString("G"),
-					Enable = unit.Enable,
+				int index_task = 0;
+				TaskCollection tasks = new TaskCollection();
+				foreach (TaskUnit task in hs.Tasks.GetTasks())
+				{
+					tasks.Add(new TaskElement()
+					{
+						ID = ++index_task,
+						Mode = task.Mode.ToString(),
+						TeamName = task.TeamName,
+						StragyName = task.StragyName,
+						StartTime = task.StartTime.ToString("G"),
+						StopTime = task.StopTime.ToString("G"),
+					});
+				}
+				section.HSUnit.Add(new HSUnitElement()
+				{
+					ID = ++index_hs,
+					Path = hs.Path,
+					Enable = hs.Enable,
+					Tasks = tasks,
 				});
 			}
 			config.Save();
@@ -361,7 +397,7 @@ namespace HSCentric
 				try
 				{
 					backup(index);
-					MessageBox.Show(string.Format("成员：{0}，备份完成", listHS.Items[index].SubItems[(int)LIST_COLUMN.成员].Text));
+					MessageBox.Show(string.Format("成员：{0}，备份完成", listHS.Items[index].SubItems[(int)LIST_UNIT_COLUMN.成员].Text));
 				}
 				catch (Exception ex)
 				{

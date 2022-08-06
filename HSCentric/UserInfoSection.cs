@@ -5,39 +5,17 @@ using System.Xml;
 
 namespace HSCentric
 {
-	// 	public class UserInfoSection : IConfigurationSectionHandler
-	// 	{
-	// 		public object Create(object parent, object configContext, XmlNode section)
-	// 		{
-	// 			List<HSUnit> myConfigObject = new List<HSUnit>();
-	// 
-	// 			foreach (XmlNode childNode in section.ChildNodes)
-	// 			{
-	// 				string path = "", starttime = "", stoptime = "";
-	// 				foreach (XmlAttribute attrib in childNode.Attributes)
-	// 				{
-	// 					switch (attrib.Name)
-	// 					{
-	// 						case "path":
-	// 							path = attrib.Value;
-	// 							break;
-	// 						case "starttime":
-	// 							starttime = attrib.Value;
-	// 							break;
-	// 						case "stoptime":
-	// 							stoptime = attrib.Value;
-	// 							break;
-	// 						default:
-	// 							break;
-	// 					}
-	// 				}
-	// 				myConfigObject.Add(new HSUnit(path, false, Convert.ToDateTime(starttime), Convert.ToDateTime(stoptime)));
-	// 			}
-	// 			return myConfigObject;
-	// 		}
-	// 	}
+	public class HSUnitSection : ConfigurationSection
+	{
 
-
+		// Declare the UrlsCollection collection property.
+		[ConfigurationProperty("HSUnit", IsRequired = true)]
+		public HSUnitCollection HSUnit
+		{
+			get { return (HSUnitCollection)base["HSUnit"]; }
+			set { base["HSUnit"] = value; }
+		}
+	}
 	public class HSUnitCollection : ConfigurationElementCollection
 	{
 		protected override ConfigurationElement CreateNewElement()
@@ -47,7 +25,7 @@ namespace HSCentric
 
 		protected override Object GetElementKey(ConfigurationElement element)
 		{
-			return ((HSUnitElement)element).Path;
+			return ((HSUnitElement)element).ID;
 		}
 		public void Add(HSUnitElement setting)
 		{
@@ -64,14 +42,85 @@ namespace HSCentric
 			base.BaseRemove(name);
 		}
 	}
-
 	public class HSUnitElement : System.Configuration.ConfigurationElement
 	{
+
+		[ConfigurationProperty("id", IsRequired = true)]
+		public int ID
+		{
+			get { return (int)this["id"]; }
+			set { this["id"] = value; }
+		}
 		[ConfigurationProperty("path", IsRequired = true)]
 		public string Path
 		{
 			get { return (string)this["path"]; }
 			set { this["path"] = value; }
+		}
+		[ConfigurationProperty("enable", IsRequired = true)]
+		public bool Enable
+		{
+			get { return (bool)this["enable"]; }
+			set { this["enable"] = value; }
+		}
+		[ConfigurationProperty("tasks", IsRequired = true)]
+		public TaskCollection Tasks
+		{
+			get { return (TaskCollection)base["tasks"]; }
+			set { base["tasks"] = value; }
+		}
+	}
+	public class TaskCollection : ConfigurationElementCollection
+	{
+		protected override ConfigurationElement CreateNewElement()
+		{
+			return new TaskElement();
+		}
+
+		protected override Object GetElementKey(ConfigurationElement element)
+		{
+			return ((TaskElement)element).ID;
+		}
+		public void Add(TaskElement setting)
+		{
+			this.BaseAdd(setting);
+		}
+
+		public void Clear()
+		{
+			base.BaseClear();
+		}
+
+		public void Remove(string name)
+		{
+			base.BaseRemove(name);
+		}
+	}
+	public class TaskElement : System.Configuration.ConfigurationElement
+	{
+		[ConfigurationProperty("id", IsRequired = true)]
+		public int ID
+		{
+			get { return (int)this["id"]; }
+			set { this["id"] = value; }
+		}
+		[ConfigurationProperty("mode", IsRequired = true)]
+		public string Mode
+		{
+			get { return (string)this["mode"]; }
+			set { this["mode"] = value; }
+		}
+		[ConfigurationProperty("teamname", IsRequired = true)]
+		public string TeamName
+		{
+			get { return (string)this["teamname"]; }
+			set { this["teamname"] = value; }
+		}
+		[ConfigurationProperty("stragyname", IsRequired = true)]
+		public string StragyName
+		{
+			get { return (string)this["stragyname"]; }
+			set { this["stragyname"] = value; }
 		}
 		[ConfigurationProperty("starttime", IsRequired = true)]
 		public string StartTime
@@ -84,23 +133,6 @@ namespace HSCentric
 		{
 			get { return (string)this["stoptime"]; }
 			set { this["stoptime"] = value; }
-		}
-		[ConfigurationProperty("enable", IsRequired = true)]
-		public bool Enable
-		{
-			get { return (bool)this["enable"]; }
-			set { this["enable"] = value; }
-		}
-	}
-	public class HSUnitSection : ConfigurationSection
-	{
-
-		// Declare the UrlsCollection collection property.
-		[ConfigurationProperty("HSUnit", IsRequired = true)]
-		public HSUnitCollection HSUnit
-		{
-			get	{ return (HSUnitCollection)base["HSUnit"]; }
-			set	{ base["HSUnit"] = value;}
 		}
 	}
 }
