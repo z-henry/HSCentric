@@ -121,8 +121,11 @@ namespace HSCentric
 			// 
 			// listTasks
 			// 
+			this.listTasks.FullRowSelect = true;
+			this.listTasks.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.listTasks.HideSelection = false;
 			this.listTasks.Location = new System.Drawing.Point(14, 106);
+			this.listTasks.MultiSelect = false;
 			this.listTasks.Name = "listTasks";
 			this.listTasks.Size = new System.Drawing.Size(390, 221);
 			this.listTasks.TabIndex = 18;

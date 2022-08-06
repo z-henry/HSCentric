@@ -116,11 +116,11 @@ namespace HSCentric
 			get { return (string)this["teamname"]; }
 			set { this["teamname"] = value; }
 		}
-		[ConfigurationProperty("stragyname", IsRequired = true)]
-		public string StragyName
+		[ConfigurationProperty("strategyname", IsRequired = true)]
+		public string StrategyName
 		{
-			get { return (string)this["stragyname"]; }
-			set { this["stragyname"] = value; }
+			get { return (string)this["strategyname"]; }
+			set { this["strategyname"] = value; }
 		}
 		[ConfigurationProperty("starttime", IsRequired = true)]
 		public string StartTime

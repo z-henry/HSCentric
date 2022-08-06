@@ -47,7 +47,7 @@ namespace HSCentric
 		}
 		public bool Modify(int index, TaskUnit task)
 		{
-			if (!IsTimeLegal(task))
+			if (!IsTimeLegal(task, index))
 				return false;
 
 			m_tasks[index] = task;
@@ -78,10 +78,14 @@ namespace HSCentric
 		{
 			m_tasks.Sort();
 		}
-		private bool IsTimeLegal(TaskUnit task)
+		private bool IsTimeLegal(TaskUnit task, int exclude = -1)
 		{
-			foreach (TaskUnit task_iter in m_tasks)
+			for (int i = 0, ii = m_tasks.Count; i < ii; ++i)
 			{
+				if (i == exclude)
+					continue;
+
+				TaskUnit task_iter = m_tasks[i];
 				if ((task_iter.StartTime.TimeOfDay >= task.StartTime.TimeOfDay && task_iter.StopTime.TimeOfDay <= task.StopTime.TimeOfDay) ||
 					(task_iter.StopTime.TimeOfDay >= task.StartTime.TimeOfDay && task_iter.StartTime.TimeOfDay <= task.StopTime.TimeOfDay))
 					return false;
@@ -120,10 +124,10 @@ namespace HSCentric
 			get { return m_mode; }
 			set { m_mode = value; }
 		}
-		public string StragyName
+		public string StrategyName
 		{
-			get { return m_stragyName; }
-			set { m_stragyName = value; }
+			get { return m_strategyName; }
+			set { m_strategyName = value; }
 		}
 
 		public bool IsTimeLegal()
@@ -148,6 +152,6 @@ namespace HSCentric
 		private DateTime m_stopTime = DateTime.Now;
 		private TASK_MODE m_mode = TASK_MODE.挂机收菜;
 		private string m_teamName ="";
-		private string m_stragyName = "";
+		private string m_strategyName = "";
 	}
 }

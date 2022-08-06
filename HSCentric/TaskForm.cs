@@ -24,7 +24,7 @@ namespace HSCentric
 
 			comboBox_mode.SelectedIndex = (int)Task.Mode;
 			textBox_team.Text = Task.TeamName;
-			textBox_stragy.Text = Task.StragyName;
+			textBox_strategy.Text = Task.StrategyName;
 			dateTimePicker_start.Value = Task.StartTime;
 			dateTimePicker_stop.Value = Task.StopTime;
 		}
@@ -50,12 +50,12 @@ namespace HSCentric
 			}
 			Task.TeamName = textBox_team.Text;
 
-			if (textBox_stragy.Text.Length <= 0)
+			if (textBox_strategy.Text.Length <= 0)
 			{
 				MessageBox.Show("请填写策略名称");
 				return;
 			}
-			Task.StragyName = textBox_stragy.Text;
+			Task.StrategyName = textBox_strategy.Text;
 
 			Task.StartTime = dateTimePicker_start.Value;
 			Task.StopTime = dateTimePicker_stop.Value;

@@ -170,13 +170,13 @@ namespace HSCentric
 							subitem.Text = task.TeamName;
 							break;
 						case LIST_TASK_COLUMN.策略:
-							subitem.Text = task.StragyName;
+							subitem.Text = task.StrategyName;
 							break;
 						case LIST_TASK_COLUMN.停止时间:
 							subitem.Text = task.StopTime.ToString("T");
 							break;
 						case LIST_TASK_COLUMN.启动时间:
-							subitem.Text = task.StopTime.ToString("T");
+							subitem.Text = task.StartTime.ToString("T");
 							break;
 						default:
 							break;

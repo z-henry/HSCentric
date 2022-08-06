@@ -27,12 +27,12 @@ namespace HSCentric
 			return (bf.Deserialize(ms));
 		}
 
-		public (string Mode, DateTime AwakeTime, int AwakePeriod, string TeamName, string StragyName) BasicConfigValue
+		public (string Mode, DateTime AwakeTime, int AwakePeriod, string TeamName, string StrategyName) BasicConfigValue
 		{
 			get
 			{
 				ReadConfigValue();
-				return (m_Mode, m_AwakeTime, m_AwakePeriod, m_TeamName, m_StragyName);
+				return (m_Mode, m_AwakeTime, m_AwakePeriod, m_TeamName, m_StrategyName);
 			}
 		}
 		public bool Enable
@@ -143,9 +143,10 @@ namespace HSCentric
 			TaskUnit currentTask = CurrentTask;
 			if (currentTask.Mode.ToString() != basicConfigValue.Mode ||
 				currentTask.TeamName != basicConfigValue.TeamName ||
-				currentTask.StragyName != basicConfigValue.StragyName)
+				currentTask.StrategyName != basicConfigValue.StrategyName)
 			{
-				WriteConfigValue(currentTask.Mode, currentTask.TeamName, currentTask.StragyName);
+				WriteConfigValue(currentTask.Mode, currentTask.TeamName, currentTask.StrategyName);
+				Out.Log(string.Format("切换模式[{0}][{1}][{2}]", currentTask.Mode.ToString(), currentTask.TeamName, currentTask.StrategyName));
 				return true;
 			}
 			return false;
@@ -241,37 +242,36 @@ namespace HSCentric
 					{
 						int start_pos = "战斗策略 = ".Length;
 						if (line.Length > start_pos)
-							m_StragyName = line.Substring(start_pos);
+							m_StrategyName = line.Substring(start_pos);
 						else
-							m_StragyName = "";
+							m_StrategyName = "";
 					}
 					catch
 					{
-						m_StragyName = "";
+						m_StrategyName = "";
 					}
 				}
 				else
 					continue;
 			}
 		}
-		private void WriteConfigValue(TASK_MODE Mode, string TeamName, string StragyName)
+		private void WriteConfigValue(TASK_MODE Mode, string TeamName, string StrategyName)
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
 			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
 			for (int i = 0, ii = fileLines.Length; i < ii; ++i)
 			{
-				string line = fileLines[i];
-				if (line.IndexOf("插件运行模式 = ") == 0)
+				if (fileLines[i].IndexOf("插件运行模式 = ") == 0)
 				{
-					line = "插件运行模式 = " + Mode.ToString();
+					fileLines[i] = "插件运行模式 = " + Mode.ToString();
 				}
-				else if (line.IndexOf("使用的队伍名称 = ") == 0)
+				else if (fileLines[i].IndexOf("使用的队伍名称 = ") == 0)
 				{
-					line = "使用的队伍名称 = " + TeamName;
+					fileLines[i] = "使用的队伍名称 = " + TeamName;
 				}
-				else if (line.IndexOf("战斗策略 = ") == 0)
+				else if (fileLines[i].IndexOf("战斗策略 = ") == 0)
 				{
-					line = "战斗策略 = " + StragyName;
+					fileLines[i] = "战斗策略 = " + StrategyName;
 				}
 			}
 			File.WriteAllLines(pathConfig.ToString(), fileLines);
@@ -281,7 +281,7 @@ namespace HSCentric
 		private DateTime m_AwakeTime = new DateTime(2000, 1, 1);
 		private int m_AwakePeriod = 25;
 		private string m_TeamName = "";
-		private string m_StragyName = "";
+		private string m_StrategyName = "";
 
 		private string m_HSPath = "";//炉石路径
 		private bool m_Enable = false;//启用状态

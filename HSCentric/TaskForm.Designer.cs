@@ -39,7 +39,7 @@ namespace HSCentric
 			this.dateTimePicker_stop = new System.Windows.Forms.DateTimePicker();
 			this.btn_ok = new System.Windows.Forms.Button();
 			this.btn_cancel = new System.Windows.Forms.Button();
-			this.textBox_stragy = new System.Windows.Forms.TextBox();
+			this.textBox_strategy = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
@@ -130,12 +130,12 @@ namespace HSCentric
 			this.btn_cancel.UseVisualStyleBackColor = true;
 			this.btn_cancel.Click += new System.EventHandler(this.btn_cancel_Click);
 			// 
-			// textBox_stragy
+			// textBox_strategy
 			// 
-			this.textBox_stragy.Location = new System.Drawing.Point(69, 63);
-			this.textBox_stragy.Name = "textBox_stragy";
-			this.textBox_stragy.Size = new System.Drawing.Size(120, 21);
-			this.textBox_stragy.TabIndex = 11;
+			this.textBox_strategy.Location = new System.Drawing.Point(69, 63);
+			this.textBox_strategy.Name = "textBox_strategy";
+			this.textBox_strategy.Size = new System.Drawing.Size(120, 21);
+			this.textBox_strategy.TabIndex = 11;
 			// 
 			// label5
 			// 
@@ -151,7 +151,7 @@ namespace HSCentric
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(202, 183);
-			this.Controls.Add(this.textBox_stragy);
+			this.Controls.Add(this.textBox_strategy);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.btn_cancel);
 			this.Controls.Add(this.btn_ok);
@@ -182,7 +182,7 @@ namespace HSCentric
 		private System.Windows.Forms.DateTimePicker dateTimePicker_stop;
 		private System.Windows.Forms.Button btn_ok;
 		private System.Windows.Forms.Button btn_cancel;
-		private System.Windows.Forms.TextBox textBox_stragy;
+		private System.Windows.Forms.TextBox textBox_strategy;
 		private System.Windows.Forms.Label label5;
 	}
 }

@@ -29,8 +29,8 @@ namespace HSCentric
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.成员.ToString(), 120);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.模式.ToString(), 80);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 120);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.版本.ToString(), 120);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 120);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.版本.ToString(), 90);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 140);
 
 			LoadConfig();
 
@@ -331,7 +331,7 @@ namespace HSCentric
 						Mode = (TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.Mode),
 						StartTime = Convert.ToDateTime(task.StartTime),
 						StopTime = Convert.ToDateTime(task.StopTime),
-						StragyName = task.StragyName,
+						StrategyName = task.StrategyName,
 						TeamName = task.TeamName,
 					});
 				}
@@ -356,7 +356,7 @@ namespace HSCentric
 						ID = ++index_task,
 						Mode = task.Mode.ToString(),
 						TeamName = task.TeamName,
-						StragyName = task.StragyName,
+						StrategyName = task.StrategyName,
 						StartTime = task.StartTime.ToString("G"),
 						StopTime = task.StopTime.ToString("G"),
 					});
