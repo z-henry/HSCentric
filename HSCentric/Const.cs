@@ -11,10 +11,11 @@ namespace HSCentric.Const
 	{
 		启用,
 		成员,
-		模式,
+		当前模式,
+		预设模式,
 		唤醒时间,
-		版本,
 		启用时间段,
+		版本,
 	}
 	enum R_TASK_MENU
 	{

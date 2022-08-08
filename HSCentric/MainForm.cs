@@ -21,16 +21,17 @@ namespace HSCentric
 		public MainForm()
 		{
 			this.InitializeComponent();
-			this.timer1.Interval = 1000;
+			this.timer1.Interval = 100;
 			this.timer1.Tick += this.TickProcess;
 			this.timer1.Start();
 
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用.ToString(), 40);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.成员.ToString(), 120);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.模式.ToString(), 80);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.当前模式.ToString(), 80);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.预设模式.ToString(), 80);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 120);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.版本.ToString(), 90);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 140);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.版本.ToString(), 90);
 
 			LoadConfig();
 
@@ -39,11 +40,11 @@ namespace HSCentric
 
 		private void TickProcess(object sender, EventArgs e)
 		{
-			const int global_checkpriod = 30;
+			TimeSpan global_checkpriod = new TimeSpan(0, 0, 30);
 			//30秒检测重启
 			if (DateTime.Now > m_CheckTime)
 			{
-				m_CheckTime = DateTime.Now.AddSeconds(global_checkpriod);
+				m_CheckTime = DateTime.Now.AddSeconds(global_checkpriod.TotalSeconds);
 
 				lock (m_lockHS)
 				{
@@ -58,19 +59,25 @@ namespace HSCentric
 						// 备份配置
 						backup(i);
 
-						var basicConfigValue = hsUnit.BasicConfigValue;
-						var currentTask = hsUnit.CurrentTask;
+						// 需要切换模式
+						if (hsUnit.NeedAdjustMode())
+						{
+							if (hsUnit.IsAlive())
+							{
+								Out.Log(string.Format("[{0}]切换模式", hsUnit.NickName));
+								hsUnit.KillHS();
+								continue;
+							}
+						}
 
 						// 不在启用时间段,启动了就干掉
-						bool flag_active = hsUnit.IsActive();
-						hsUnit.AdjustMode();
-						if (!flag_active)
+						if (!hsUnit.IsActive())
 						{
 							hsUnit.SwitchBepinEx(false);
 							if (hsUnit.IsAlive())
 							{
+								Out.Log(string.Format("[{0}]未到启用时间", hsUnit.NickName));
 								hsUnit.KillHS();
-								Out.Log(string.Format("[{0}]未到启用时间，关闭进程", hsUnit.NickName));
 							}
 							continue;
 						}
@@ -82,14 +89,16 @@ namespace HSCentric
 							// 炉石在运行，不更新日志就滚蛋
 							if (!hsUnit.IsResponding())
 							{
+								Out.Log(string.Format("[{0}]无响应", hsUnit.NickName));
 								hsUnit.KillHS();
-								Out.Log(string.Format("[{0}]无响应，关闭进程", hsUnit.NickName));
 								continue;
 							}
 						}
 						//炉石没运行就判断是否需要启动
 						else
 						{
+							var basicConfigValue = hsUnit.BasicConfigValue;
+							var currentTask = hsUnit.CurrentTask;
 							if (TASK_MODE.挂机收菜.ToString() == basicConfigValue.Mode)
 							{
 								// 挂机收菜模式下，
@@ -103,7 +112,6 @@ namespace HSCentric
 									continue;
 							}
 							hsUnit.StartHS();
-							Out.Log(string.Format("[{0}]启动", hsUnit.NickName));
 							continue;
 						}
 					}
@@ -113,7 +121,7 @@ namespace HSCentric
 
 			label_currenttime.Text = DateTime.Now.ToString("G");
 			label_checktime.Text = m_CheckTime.ToString("G");
-			label_checktime.BackColor = GetColor(global_checkpriod, new TimeSpan(m_CheckTime.Ticks - DateTime.Now.Ticks).TotalSeconds,
+			label_checktime.BackColor = GetColor(global_checkpriod.TotalMilliseconds, new TimeSpan(m_CheckTime.Ticks - DateTime.Now.Ticks).TotalMilliseconds,
 				new List<Color>() { Color.YellowGreen, Color.Yellow, Color.Red });
 		}
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -197,8 +205,11 @@ namespace HSCentric
 							case LIST_UNIT_COLUMN.成员:
 								subitem.Text = unit.NickName;
 								break;
-							case LIST_UNIT_COLUMN.模式:
+							case LIST_UNIT_COLUMN.当前模式:
 								subitem.Text = basicConfigValue.Mode;
+								break;
+							case LIST_UNIT_COLUMN.预设模式:
+								subitem.Text = currentTask.Mode.ToString();
 								break;
 							case LIST_UNIT_COLUMN.版本:
 								subitem.Text = unit.Version.ToString();

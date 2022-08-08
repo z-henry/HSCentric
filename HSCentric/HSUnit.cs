@@ -134,8 +134,21 @@ namespace HSCentric
 		}
 		public void StartHS()
 		{
+			AdjustMode();
 			MainForm.WinExec(m_HSPath, 2);
 			Out.Log(string.Format("[{0}]启动炉石进程", NickName));
+		}
+		public bool NeedAdjustMode()
+		{
+			var basicConfigValue = BasicConfigValue;
+			TaskUnit currentTask = CurrentTask;
+			if (currentTask.Mode.ToString() != basicConfigValue.Mode ||
+				currentTask.TeamName != basicConfigValue.TeamName ||
+				currentTask.StrategyName != basicConfigValue.StrategyName)
+			{
+				return true;
+			}
+			return false;
 		}
 		public bool AdjustMode()
 		{
@@ -146,7 +159,7 @@ namespace HSCentric
 				currentTask.StrategyName != basicConfigValue.StrategyName)
 			{
 				WriteConfigValue(currentTask.Mode, currentTask.TeamName, currentTask.StrategyName);
-				Out.Log(string.Format("切换模式[{0}][{1}][{2}]", currentTask.Mode.ToString(), currentTask.TeamName, currentTask.StrategyName));
+				Out.Log(string.Format("[{0}]切换模式[{1}][{2}][{3}]", NickName, currentTask.Mode.ToString(), currentTask.TeamName, currentTask.StrategyName));
 				return true;
 			}
 			return false;
