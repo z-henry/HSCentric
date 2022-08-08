@@ -59,7 +59,7 @@ namespace HSCentric
 			DateTime currentTime = DateTime.Now;
 			foreach (TaskUnit task in m_tasks)
 			{
-				if (currentTime <= task.StopTime)
+				if (currentTime.TimeOfDay <= task.StopTime.TimeOfDay)
 					return task;
 			}
 			return m_tasks[0];

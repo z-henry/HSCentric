@@ -55,14 +55,16 @@ namespace HSCentric
 						if (!hsUnit.Enable)
 							continue;
 
+						// 备份配置
 						backup(i);
-						// 先判断设置当前的模式
-						hsUnit.AdjustMode();
 
 						var basicConfigValue = hsUnit.BasicConfigValue;
 						var currentTask = hsUnit.CurrentTask;
+
 						// 不在启用时间段,启动了就干掉
-						if (!hsUnit.IsActive())
+						bool flag_active = hsUnit.IsActive();
+						hsUnit.AdjustMode();
+						if (!flag_active)
 						{
 							hsUnit.SwitchBepinEx(false);
 							if (hsUnit.IsAlive())
