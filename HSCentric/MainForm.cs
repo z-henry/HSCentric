@@ -87,7 +87,7 @@ namespace HSCentric
 
 							if (msg_kill_reason.Length > 0)
 							{
-								Out.Log(string.Format("[{0}] 结束进程 [reason{1}]", hsUnit.NickName, msg_kill_reason));
+								Out.Log(string.Format("[{0}]{1}", hsUnit.NickName, msg_kill_reason));
 								hsUnit.KillHS();
 							}
 						}
@@ -105,7 +105,7 @@ namespace HSCentric
 									msg_start_reason = string.Format("收菜唤醒时间到了", timespan_farmendding.TotalSeconds);
 								// 2. 没到唤醒时间，但是距离结束不到X分钟了，唤醒
 								else if ((currentTask.StopTime.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds < timespan_farmendding.TotalSeconds)
-									msg_start_reason = string.Format("收菜模式[{0}]秒内结束", timespan_farmendding.TotalSeconds);
+									msg_start_reason = string.Format("收菜模式{0}秒内结束", timespan_farmendding.TotalSeconds);
 								// 3. 其他情况就不拽起了
 								else
 									msg_start_reason = "";
@@ -113,7 +113,7 @@ namespace HSCentric
 
 							if (msg_start_reason.Length > 0)
 							{
-								Out.Log(string.Format("[{0}] 启动进程 [reason{1}]", hsUnit.NickName, msg_start_reason));
+								Out.Log(string.Format("[{0}]{1}", hsUnit.NickName, msg_start_reason));
 								hsUnit.StartHS();
 							}
 						}
