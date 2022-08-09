@@ -99,7 +99,7 @@ namespace HSCentric
 			TimeSpan time_now = DateTime.Now.TimeOfDay;
 			return time_now >= currentTask.StartTime.TimeOfDay && time_now <= currentTask.StopTime.TimeOfDay;
 		}
-		public bool IsAlive()
+		public bool IsProcessAlive()
 		{
 			List<Process> hearthstoneProcess = HearthstoneProcess();
 			if (hearthstoneProcess.Count <= 0)
@@ -108,7 +108,7 @@ namespace HSCentric
 			}
 			return true;
 		}
-		public bool IsResponding()
+		public bool IsLogUpdated()
 		{
 			//检查炉石日志, 5分钟没更新
 			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath) + "/Logs");
@@ -152,17 +152,10 @@ namespace HSCentric
 		}
 		public bool AdjustMode()
 		{
-			var basicConfigValue = BasicConfigValue;
 			TaskUnit currentTask = CurrentTask;
-			if (currentTask.Mode.ToString() != basicConfigValue.Mode ||
-				currentTask.TeamName != basicConfigValue.TeamName ||
-				currentTask.StrategyName != basicConfigValue.StrategyName)
-			{
-				WriteConfigValue(currentTask.Mode, currentTask.TeamName, currentTask.StrategyName);
-				Out.Log(string.Format("[{0}]切换模式[{1}][{2}][{3}]", NickName, currentTask.Mode.ToString(), currentTask.TeamName, currentTask.StrategyName));
-				return true;
-			}
-			return false;
+			WriteConfigValue(currentTask.Mode, currentTask.TeamName, currentTask.StrategyName);
+			Out.Log(string.Format("[{0}]切换模式[{1}][{2}][{3}]", NickName, currentTask.Mode.ToString(), currentTask.TeamName, currentTask.StrategyName));
+			return true;
 		}
 
 

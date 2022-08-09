@@ -40,11 +40,12 @@ namespace HSCentric
 
 		private void TickProcess(object sender, EventArgs e)
 		{
-			TimeSpan global_checkpriod = new TimeSpan(0, 0, 30);
+			TimeSpan timespan_checkpriod = new TimeSpan(0, 0, 10);//检测间隔
+			TimeSpan timespan_farmendding = new TimeSpan(0, 2, 0);//收菜模式结束一定时间内启动收尾
 			//30秒检测重启
 			if (DateTime.Now > m_CheckTime)
 			{
-				m_CheckTime = DateTime.Now.AddSeconds(global_checkpriod.TotalSeconds);
+				m_CheckTime = DateTime.Now.AddSeconds(timespan_checkpriod.TotalSeconds);
 
 				lock (m_lockHS)
 				{
@@ -59,60 +60,62 @@ namespace HSCentric
 						// 备份配置
 						backup(i);
 
-						// 需要切换模式
-						if (hsUnit.NeedAdjustMode())
-						{
-							if (hsUnit.IsAlive())
-							{
-								Out.Log(string.Format("[{0}]切换模式", hsUnit.NickName));
-								hsUnit.KillHS();
-								continue;
-							}
-						}
-
 						// 不在启用时间段,启动了就干掉
 						if (!hsUnit.IsActive())
 						{
-							hsUnit.SwitchBepinEx(false);
-							if (hsUnit.IsAlive())
+							if (hsUnit.IsProcessAlive())
 							{
 								Out.Log(string.Format("[{0}]未到启用时间", hsUnit.NickName));
 								hsUnit.KillHS();
 							}
+							hsUnit.SwitchBepinEx(false);
 							continue;
 						}
 						hsUnit.SwitchBepinEx(true);
 
-						// 炉石在运行
-						if (hsUnit.IsAlive())
+
+						// 在运行就判断是否需要杀掉
+						if (hsUnit.IsProcessAlive())
 						{
-							// 炉石在运行，不更新日志就滚蛋
-							if (!hsUnit.IsResponding())
+							string msg_kill_reason = "";
+							// 需要切换模式
+							if (hsUnit.NeedAdjustMode())
+								msg_kill_reason = "切换模式";
+							// 不更新日志就滚蛋
+							else if (!hsUnit.IsLogUpdated())
+								msg_kill_reason = "炉石进程日志不更新";
+
+							if (msg_kill_reason.Length > 0)
 							{
-								Out.Log(string.Format("[{0}]无响应", hsUnit.NickName));
+								Out.Log(string.Format("[{0}] 结束进程 [reason{1}]", hsUnit.NickName, msg_kill_reason));
 								hsUnit.KillHS();
-								continue;
 							}
 						}
 						//炉石没运行就判断是否需要启动
 						else
 						{
+							string msg_start_reason = "正常拽起";
 							var basicConfigValue = hsUnit.BasicConfigValue;
 							var currentTask = hsUnit.CurrentTask;
-							if (TASK_MODE.挂机收菜.ToString() == basicConfigValue.Mode)
+							if (TASK_MODE.挂机收菜 == currentTask.Mode)
 							{
 								// 挂机收菜模式下，
 								// 1. 到唤醒时间唤醒
 								if (DateTime.Now >= basicConfigValue.AwakeTime)
-									Out.Log(string.Format("[{0}]唤醒", hsUnit.NickName));
-								// 2. 没到唤醒时间，但是距离结束不到5分钟了，唤醒
-								else if ((currentTask.StopTime.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds < 300f)
-									Out.Log(string.Format("[{0}]快结束了，唤醒", hsUnit.NickName));
+									msg_start_reason = string.Format("收菜唤醒时间到了", timespan_farmendding.TotalSeconds);
+								// 2. 没到唤醒时间，但是距离结束不到X分钟了，唤醒
+								else if ((currentTask.StopTime.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds < timespan_farmendding.TotalSeconds)
+									msg_start_reason = string.Format("收菜模式[{0}]秒内结束", timespan_farmendding.TotalSeconds);
+								// 3. 其他情况就不拽起了
 								else
-									continue;
+									msg_start_reason = "";
 							}
-							hsUnit.StartHS();
-							continue;
+
+							if (msg_start_reason.Length > 0)
+							{
+								Out.Log(string.Format("[{0}] 启动进程 [reason{1}]", hsUnit.NickName, msg_start_reason));
+								hsUnit.StartHS();
+							}
 						}
 					}
 				}
@@ -121,7 +124,7 @@ namespace HSCentric
 
 			label_currenttime.Text = DateTime.Now.ToString("G");
 			label_checktime.Text = m_CheckTime.ToString("G");
-			label_checktime.BackColor = GetColor(global_checkpriod.TotalMilliseconds, new TimeSpan(m_CheckTime.Ticks - DateTime.Now.Ticks).TotalMilliseconds,
+			label_checktime.BackColor = GetColor(timespan_checkpriod.TotalMilliseconds, new TimeSpan(m_CheckTime.Ticks - DateTime.Now.Ticks).TotalMilliseconds,
 				new List<Color>() { Color.YellowGreen, Color.Yellow, Color.Red });
 		}
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -277,7 +280,7 @@ namespace HSCentric
 				lock (m_lockHS)
 				{
 					m_listHS[index].Enable = false;
-					if (m_listHS[index].IsAlive())
+					if (m_listHS[index].IsProcessAlive())
 					{
 						m_listHS[index].KillHS();
 						Delay(1000);
@@ -393,7 +396,7 @@ namespace HSCentric
 				int index = listHS.SelectedItems[0].Index;
 				lock (m_lockHS)
 				{
-					if (!m_listHS[index].IsAlive())
+					if (!m_listHS[index].IsProcessAlive())
 						m_listHS[index].StartHS();
 				}
 			}
