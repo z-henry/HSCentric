@@ -123,20 +123,22 @@ namespace HSCentric
 			}
 			return false;
 		}
-		public void KillHS()
+		public void KillHS(string msg = "")
 		{
 			List<Process> hearthstoneProcess = HearthstoneProcess();
 			foreach (Process processHS in hearthstoneProcess)
 			{
 				processHS.Kill();
-				Out.Log(string.Format("[{0}]结束炉石进程", NickName));
+				Out.Log(string.Format("[{0}]结束 {1}", NickName, msg));
 			}
 		}
-		public void StartHS()
+		public void StartHS(string msg = "")
 		{
-			AdjustMode();
+			if (NeedAdjustMode())
+				AdjustMode();
+
 			MainForm.WinExec(m_HSPath, 2);
-			Out.Log(string.Format("[{0}]启动炉石进程", NickName));
+			Out.Log(string.Format("[{0}]启动 {1}", NickName, msg));
 		}
 		public bool NeedAdjustMode()
 		{

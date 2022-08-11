@@ -86,10 +86,7 @@ namespace HSCentric
 								msg_kill_reason = "炉石进程日志不更新";
 
 							if (msg_kill_reason.Length > 0)
-							{
-								Out.Log(string.Format("[{0}]{1}", hsUnit.NickName, msg_kill_reason));
-								hsUnit.KillHS();
-							}
+								hsUnit.KillHS(msg_kill_reason);
 						}
 						//炉石没运行就判断是否需要启动
 						else
@@ -112,10 +109,7 @@ namespace HSCentric
 							}
 
 							if (msg_start_reason.Length > 0)
-							{
-								Out.Log(string.Format("[{0}]{1}", hsUnit.NickName, msg_start_reason));
-								hsUnit.StartHS();
-							}
+								hsUnit.StartHS(msg_start_reason);
 						}
 					}
 				}
@@ -282,7 +276,7 @@ namespace HSCentric
 					m_listHS[index].Enable = false;
 					if (m_listHS[index].IsProcessAlive())
 					{
-						m_listHS[index].KillHS();
+						m_listHS[index].KillHS("手动更新");
 						Delay(1000);
 					}
 
@@ -397,7 +391,7 @@ namespace HSCentric
 				lock (m_lockHS)
 				{
 					if (!m_listHS[index].IsProcessAlive())
-						m_listHS[index].StartHS();
+						m_listHS[index].StartHS("手动启动");
 				}
 			}
 			else
