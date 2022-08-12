@@ -169,7 +169,7 @@ namespace HSCentric
 				string path = "";
 				try
 				{
-					string = ps[i].MainModule.FileName.ToString();
+					path = ps[i].MainModule.FileName.ToString();
 				}
 				catch
 				{
