@@ -128,12 +128,23 @@ namespace HSCentric
 
 		private List<Process> HearthstoneProcess()
 		{
-			List<Process> ps = new List<Process>(Process.GetProcessesByName("Hearthstone"));
+				List<Process> ps = new List<Process>(Process.GetProcessesByName("Hearthstone"));
 			for (int i = ps.Count - 1; i >= 0; --i)
 			{
-				string path = ps[i].MainModule.FileName.ToString();
-				if (path != m_HSPath)
-					ps.RemoveAt(i);
+				string path = "";
+				try
+				{
+					path = ps[i].MainModule.FileName.ToString();
+				}
+				catch
+				{
+
+				}
+				finally
+				{
+					if (path != m_HSPath)
+						ps.RemoveAt(i);
+				}
 			}
 			return ps;
 		}
