@@ -5,12 +5,16 @@ using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using HSCentric.Const;
+using System.Runtime.InteropServices;
 
 namespace HSCentric
 {
+
 	[Serializable]
 	public class HSUnit
 	{
+		[DllImport("kernel32.dll")]
+		public static extern int WinExec(string exeName, int operType);
 		public HSUnit(string _HSPath = null, bool _Enable = false, List<TaskUnit> _Tasks = null)
 		{
 			m_HSPath = _HSPath ?? "";
@@ -137,7 +141,7 @@ namespace HSCentric
 			if (NeedAdjustMode())
 				AdjustMode();
 
-			MainForm.WinExec(m_HSPath, 2);
+			WinExec(m_HSPath, 2);
 			Out.Log(string.Format("[{0}]启动 {1}", NickName, msg));
 		}
 		public bool NeedAdjustMode()
