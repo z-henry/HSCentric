@@ -175,7 +175,7 @@ namespace HSCentric
 			this.Controls.Add(this.btn_del);
 			this.Controls.Add(this.btn_add);
 			this.Name = "MainForm";
-			this.Text = "炉石监控程序 4.2.0";
+			this.Text = "炉石监控程序 4.2.1";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -183,7 +183,8 @@ namespace HSCentric
 
 		}
 		#endregion
-		private DateTime m_CheckTime = new DateTime(2000,1,1,0,0,0);
+		private DateTime m_CheckTime_runinfo = new DateTime(2000,1,1,0,0,0);
+		private DateTime m_CheckTime_readlog = new DateTime(2000, 1, 1, 0, 0, 0);
 
 		private Timer timer1;
 		private Button btn_add;

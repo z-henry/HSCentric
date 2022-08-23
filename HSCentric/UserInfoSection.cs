@@ -69,6 +69,18 @@ namespace HSCentric
 			get { return (TaskCollection)base["tasks"]; }
 			set { base["tasks"] = value; }
 		}
+		[ConfigurationProperty("level", IsRequired = true)]
+		public int Level
+		{
+			get { return (int)this["level"]; }
+			set { this["level"] = value; }
+		}
+		[ConfigurationProperty("xp", IsRequired = true)]
+		public int XP
+		{
+			get { return (int)this["xp"]; }
+			set { this["xp"] = value; }
+		}
 	}
 	public class TaskCollection : ConfigurationElementCollection
 	{

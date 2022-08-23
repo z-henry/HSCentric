@@ -69,6 +69,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HSUnitManager.cs" />
+    <Compile Include="RewardXP.cs" />
     <Compile Include="WebRestFul.cs" />
     <Compile Include="TaskManager.cs" />
     <Compile Include="TaskForm.cs">

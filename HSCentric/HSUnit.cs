@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
 using HSCentric.Const;
 using System.Runtime.InteropServices;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace HSCentric
 {
@@ -15,12 +16,6 @@ namespace HSCentric
 	{
 		[DllImport("kernel32.dll")]
 		public static extern int WinExec(string exeName, int operType);
-		public HSUnit(string _HSPath = null, bool _Enable = false, List<TaskUnit> _Tasks = null)
-		{
-			m_HSPath = _HSPath ?? "";
-			m_Enable = _Enable;
-			m_taskManager = new TaskManager(_Tasks);
-		}
 
 		public object DeepClone()
 		{
@@ -36,19 +31,19 @@ namespace HSCentric
 			get
 			{
 				ReadConfigValue();
-				return (m_Mode, m_AwakeTime, m_AwakePeriod, m_TeamName, m_StrategyName);
+				return (m_mode, m_awakeTime, m_awakePeriod, m_teamName, m_strategyName);
 			}
 		}
 		public bool Enable
 		{
-			get { return m_Enable; }
-			set { m_Enable = value; }
+			get { return m_enable; }
+			set { m_enable = value; }
 		}
 		public string NickName
 		{
 			get
 			{
-				return m_HSPath.Length > 0 ? Directory.GetParent(m_HSPath).Name : ""; ;
+				return m_hsPath.Length > 0 ? Directory.GetParent(m_hsPath).Name : ""; ;
 			}
 		}
 		public FileVerison Version
@@ -57,7 +52,7 @@ namespace HSCentric
 			{
 				try
 				{
-					FileVersionInfo info = FileVersionInfo.GetVersionInfo(m_HSPath);
+					FileVersionInfo info = FileVersionInfo.GetVersionInfo(m_hsPath);
 					return new FileVerison(info.FileMajorPart, info.FileMinorPart, info.FileBuildPart, info.FilePrivatePart);
 				}
 				catch
@@ -68,11 +63,8 @@ namespace HSCentric
 		}
 		public string Path
 		{
-			get { return m_HSPath; }
-			set
-			{
-				m_HSPath = value;
-			}
+			get { return m_hsPath; }
+			set { m_hsPath = value; }
 		}
 		public TaskUnit CurrentTask
 		{
@@ -81,17 +73,24 @@ namespace HSCentric
 		public TaskManager Tasks
 		{
 			get { return m_taskManager; }
+			set { m_taskManager = value; }
 		}
+		public RewardXP XP
+		{
+			get { return m_rewardXP; }
+			set { m_rewardXP = value; }
+		}
+
 
 		public bool SwitchBepinEx(bool _switch)
 		{
-			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath));
+			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath));
 			foreach (FileInfo logFile in rootHS.GetFiles("*winhttp*.dll", SearchOption.TopDirectoryOnly)) //查找文件
 			{
 				if (true == _switch)
-					logFile.MoveTo(System.IO.Path.GetDirectoryName(m_HSPath) + "/winhttp.dll");
+					logFile.MoveTo(System.IO.Path.GetDirectoryName(m_hsPath) + "/winhttp.dll");
 				else
-					logFile.MoveTo(System.IO.Path.GetDirectoryName(m_HSPath) + "/autostop-winhttp.dll");
+					logFile.MoveTo(System.IO.Path.GetDirectoryName(m_hsPath) + "/autostop-winhttp.dll");
 
 				break;
 			}
@@ -115,7 +114,7 @@ namespace HSCentric
 		public bool IsLogUpdated()
 		{
 			//检查炉石日志, 5分钟没更新
-			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath) + "/Logs");
+			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/Logs");
 			foreach (FileInfo logFile in rootHS.GetFiles("hearthstone_*.log", SearchOption.TopDirectoryOnly)) //查找文件
 			{
 				double inteval = 5f;
@@ -141,7 +140,7 @@ namespace HSCentric
 			if (NeedAdjustMode())
 				AdjustMode();
 
-			WinExec(m_HSPath, 2);
+			WinExec(m_hsPath, 2);
 			Out.Log(string.Format("[{0}]启动 {1}", NickName, msg));
 		}
 		public bool NeedAdjustMode()
@@ -180,7 +179,7 @@ namespace HSCentric
 				}
 				finally
 				{
-					if (path != m_HSPath)
+					if (path != m_hsPath)
 						ps.RemoveAt(i);
 				}
 
@@ -189,7 +188,7 @@ namespace HSCentric
 		}
 		private void ReadConfigValue()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
 			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
 			if (fileConfig.LastWriteTime <= m_configLastEdit)
 				return;
@@ -204,13 +203,13 @@ namespace HSCentric
 					{
 						int start_pos = "唤醒时间 = ".Length;
 						if (line.Length > start_pos)
-							m_AwakeTime = Convert.ToDateTime(line.Substring(start_pos));
+							m_awakeTime = Convert.ToDateTime(line.Substring(start_pos));
 						else
-							m_AwakeTime = new DateTime(2000, 1, 1);
+							m_awakeTime = new DateTime(2000, 1, 1);
 					}
 					catch
 					{
-						m_AwakeTime = new DateTime(2000, 1, 1);
+						m_awakeTime = new DateTime(2000, 1, 1);
 					}
 				}
 				else if (line.IndexOf("唤醒时间间隔 = ") == 0)
@@ -219,13 +218,13 @@ namespace HSCentric
 					{
 						int start_pos = "唤醒时间间隔 = ".Length;
 						if (line.Length > start_pos)
-							m_AwakePeriod = Convert.ToInt32(line.Substring(start_pos)) * 60;
+							m_awakePeriod = Convert.ToInt32(line.Substring(start_pos)) * 60;
 						else
-							m_AwakePeriod = 22 * 60;
+							m_awakePeriod = 22 * 60;
 					}
 					catch
 					{
-						m_AwakePeriod = 22 * 60;
+						m_awakePeriod = 22 * 60;
 					}
 					continue;
 				}
@@ -235,13 +234,13 @@ namespace HSCentric
 					{
 						int start_pos = "插件运行模式 = ".Length;
 						if (line.Length > start_pos)
-							m_Mode = line.Substring(start_pos);
+							m_mode = line.Substring(start_pos);
 						else
-							m_Mode = "";
+							m_mode = "";
 					}
 					catch
 					{
-						m_Mode = "";
+						m_mode = "";
 					}
 				}
 				else if (line.IndexOf("使用的队伍名称 = ") == 0)
@@ -250,13 +249,13 @@ namespace HSCentric
 					{
 						int start_pos = "使用的队伍名称 = ".Length;
 						if (line.Length > start_pos)
-							m_TeamName = line.Substring(start_pos);
+							m_teamName = line.Substring(start_pos);
 						else
-							m_TeamName = "";
+							m_teamName = "";
 					}
 					catch
 					{
-						m_TeamName = "";
+						m_teamName = "";
 					}
 				}
 				else if (line.IndexOf("战斗策略 = ") == 0)
@@ -265,13 +264,13 @@ namespace HSCentric
 					{
 						int start_pos = "战斗策略 = ".Length;
 						if (line.Length > start_pos)
-							m_StrategyName = line.Substring(start_pos);
+							m_strategyName = line.Substring(start_pos);
 						else
-							m_StrategyName = "";
+							m_strategyName = "";
 					}
 					catch
 					{
-						m_StrategyName = "";
+						m_strategyName = "";
 					}
 				}
 				else
@@ -280,7 +279,7 @@ namespace HSCentric
 		}
 		private void WriteConfigValue(TASK_MODE Mode, string TeamName, string StrategyName)
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_HSPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
 			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
 			for (int i = 0, ii = fileLines.Length; i < ii; ++i)
 			{
@@ -300,14 +299,44 @@ namespace HSCentric
 			File.WriteAllLines(pathConfig.ToString(), fileLines);
 		}
 
-		private string m_Mode = "";
-		private DateTime m_AwakeTime = new DateTime(2000, 1, 1);
-		private int m_AwakePeriod = 25;
-		private string m_TeamName = "";
-		private string m_StrategyName = "";
+		public void ReadLog()
+		{
+			DirectoryInfo pathLog = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/Log/mercenarylog@" + DateTime.Today.ToString("yyyy-MM-dd") + ".log");
+			if (!File.Exists(pathLog.ToString()))
+				return;
 
-		private string m_HSPath = "";//炉石路径
-		private bool m_Enable = false;//启用状态
+			foreach (string line in File.ReadLines(pathLog.ToString()).Reverse<string>())
+			{
+				if (line.IndexOf("战令信息") > 0)
+				{
+					try
+					{
+						Regex regex = new Regex(@"^.*等级:([\d]*).*经验:([\d]*).*$");
+						Match match = regex.Match(line);
+						if (match.Groups.Count == 3)
+						{
+							m_rewardXP.Level = Convert.ToInt32(match.Groups[1].Value);
+							m_rewardXP.ProgressXP = Convert.ToInt32(match.Groups[2].Value);
+						}
+					}
+					catch
+					{
+					}
+					return;
+				}
+			}
+		}
+
+
+		private string m_mode = "";
+		private DateTime m_awakeTime = new DateTime(2000, 1, 1);
+		private int m_awakePeriod = 25;
+		private string m_teamName = "";
+		private string m_strategyName = "";
+		private RewardXP m_rewardXP = new RewardXP();
+
+		private string m_hsPath = "";//炉石路径
+		private bool m_enable = false;//启用状态
 		private DateTime m_configLastEdit = new DateTime(2000,1,1);
 		private TaskManager m_taskManager = new TaskManager();
 	}

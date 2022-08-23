@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSCentric
@@ -107,6 +105,17 @@ namespace HSCentric
 				}
 			}
 			}
+		public static void CheckLog()
+		{
+			lock (m_lockHS)
+			{
+				for (int i = 0, ii = m_listHS.Count; i < ii; ++i)
+				{
+					HSUnit hsUnit = m_listHS[i];
+					hsUnit.ReadLog();
+				}
+			}
+		}
 
 		internal static void FlipEnable(int index)
 		{
@@ -159,7 +168,13 @@ namespace HSCentric
 						TeamName = task.TeamName,
 					});
 				}
-				m_listHS.Add(new HSUnit(hs.Path, /*hs.Enable*/ true, tasks));
+				m_listHS.Add(new HSUnit()
+				{
+					Path = hs.Path,
+					Enable = true,
+					Tasks = new TaskManager(tasks),
+					XP = new RewardXP () { Level = hs.Level, ProgressXP = hs.XP }
+				});
 			}
 			// 			m_listHS = ConfigurationManager.GetSection("userinfo") as List<HSUnit>;
 		}
@@ -191,6 +206,8 @@ namespace HSCentric
 					Path = hs.Path,
 					Enable = hs.Enable,
 					Tasks = tasks,
+					Level = hs.XP.Level,
+					XP = hs.XP.ProgressXP,
 				});
 			}
 			config.Save();

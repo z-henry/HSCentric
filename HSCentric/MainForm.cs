@@ -13,9 +13,6 @@ namespace HSCentric
 {
 	public sealed partial class MainForm : Form
 	{
-		
-
-
 		public MainForm()
 		{
 			this.InitializeComponent();
@@ -37,18 +34,26 @@ namespace HSCentric
 		}
 		private void TickProcess(object sender, EventArgs e)
 		{
+			//检测重启
 			TimeSpan timespan_checkpriod = new TimeSpan(0, 0, 10);//检测间隔
-			//30秒检测重启
-			if (DateTime.Now > m_CheckTime)
+			if (DateTime.Now > m_CheckTime_runinfo)
 			{
-				m_CheckTime = DateTime.Now.AddSeconds(timespan_checkpriod.TotalSeconds);
+				m_CheckTime_runinfo = DateTime.Now.AddSeconds(timespan_checkpriod.TotalSeconds);
 				HSUnitManager.Check();
 				UI_Flush();
 			}
 
+			//检测日志
+			TimeSpan timespan_readlogpriod = new TimeSpan(0, 1, 0);
+			if (DateTime.Now > m_CheckTime_readlog)
+			{
+				m_CheckTime_readlog = DateTime.Now.AddSeconds(timespan_readlogpriod.TotalSeconds);
+				HSUnitManager.CheckLog();
+			}
+
 			label_currenttime.Text = DateTime.Now.ToString("G");
-			label_checktime.Text = m_CheckTime.ToString("G");
-			label_checktime.BackColor = GetColor(timespan_checkpriod.TotalMilliseconds, new TimeSpan(m_CheckTime.Ticks - DateTime.Now.Ticks).TotalMilliseconds,
+			label_checktime.Text = m_CheckTime_runinfo.ToString("G");
+			label_checktime.BackColor = GetColor(timespan_checkpriod.TotalMilliseconds, new TimeSpan(m_CheckTime_runinfo.Ticks - DateTime.Now.Ticks).TotalMilliseconds,
 				new List<Color>() { Color.YellowGreen, Color.Yellow, Color.Red });
 		}
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
