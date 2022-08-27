@@ -12,7 +12,7 @@ namespace HSCentric
 		public TaskManager (List<TaskUnit> tasks = null)
 		{
 			if (tasks != null)
-				tasks.ForEach(i => m_tasks.Add(i));
+				tasks.ForEach(i => Add(i));
 		}
 		public List<TaskUnit> GetTasks()
 		{
