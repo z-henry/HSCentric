@@ -14,7 +14,7 @@
 | 自动领奖  | true |
 | HsMod状态  | true |
 
-2. 佣兵部分，需要配合Mercenary使用
+2. 佣兵部分，需要配合Mercenary使用，工作在[推荐方式]下
 3. 传统对战部分，需要配合HearthBuddy(author:琴弦上的宇宙)使用
 
 ### 切换原理
