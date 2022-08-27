@@ -84,7 +84,7 @@ namespace HSCentric
 		private void btn_selecthbpath_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog openFileDialog = new OpenFileDialog();
-			openFileDialog.Filter = "炉石兄弟中控.exe|*.exe";
+			openFileDialog.Filter = "Hearthbuddy.exe|*.exe";
 			openFileDialog.DereferenceLinks = false;
 			openFileDialog.ShowDialog();
 			if (string.IsNullOrEmpty(openFileDialog.FileName))
