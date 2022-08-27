@@ -46,9 +46,9 @@ namespace HSCentric
 	{
 
 		[ConfigurationProperty("id", IsRequired = true)]
-		public int ID
+		public string ID
 		{
-			get { return (int)this["id"]; }
+			get { return (string)this["id"]; }
 			set { this["id"] = value; }
 		}
 		[ConfigurationProperty("path", IsRequired = true)]
@@ -80,6 +80,18 @@ namespace HSCentric
 		{
 			get { return (int)this["xp"]; }
 			set { this["xp"] = value; }
+		}
+		[ConfigurationProperty("hbpath")]
+		public string HBPath
+		{
+			get { return (string)this["hbpath"]; }
+			set { this["hbpath"] = value; }
+		}
+		[ConfigurationProperty("token", IsRequired = true)]
+		public string Token
+		{
+			get { return (string)this["token"]; }
+			set { this["token"] = value; }
 		}
 	}
 	public class TaskCollection : ConfigurationElementCollection

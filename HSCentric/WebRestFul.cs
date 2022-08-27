@@ -73,7 +73,7 @@ namespace HSCentric
 						resultInfo.units.Add(new UnitInfo()
 						{
 							enable = iter.Enable,
-							name = iter.NickName,
+							name = iter.ID,
 							level = string.Format("等级:{0} 经验{1}", iter.XP.Level, iter.XP.ProgressXP),
 							xp = iter.XP.TotalXP,
 						});
@@ -95,10 +95,12 @@ namespace HSCentric
 
 	public static class MyRestFul
 	{
-		public static void Init()
+		public static void Init(string url)
 		{
+			if (string.IsNullOrEmpty(url))
+				return;
 			MyRestFulServices demoServices = new MyRestFulServices();
-			m_serviceHost = new WebServiceHost(demoServices, new Uri("http://124.221.7.52:9000/"));
+			m_serviceHost = new WebServiceHost(demoServices, new Uri("http://" + url + "/"));
 			m_serviceHost.Open();
 		}
 		public static void Rlease()

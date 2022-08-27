@@ -26,11 +26,10 @@ namespace HSCentric
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.预设模式.ToString(), 80);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 120);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 140);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.版本.ToString(), 90);
 
 			HSUnitManager.Init();
 			UI_Flush();
-			MyRestFul.Init();
+			MyRestFul.Init(ConfigurationManager.AppSettings["rest_url"]);
 		}
 		private void TickProcess(object sender, EventArgs e)
 		{
@@ -59,7 +58,7 @@ namespace HSCentric
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			timer1.Stop();
-			HSUnitManager.Release();
+			HSUnitManager.Release(); 
 		}
 		private void btn_add_Click(object sender, EventArgs e)
 		{
@@ -83,10 +82,6 @@ namespace HSCentric
 		{
 			List<HSUnit> listsHS = HSUnitManager.GetHSUnits();
 			listHS.Items.Clear();
-
-			FileVerison max_version = new FileVerison(0, 0, 0, 0);
-			foreach (HSUnit unit in listsHS)
-				max_version = max_version > unit.Version ? max_version : unit.Version;
 
 			foreach (HSUnit unit in listsHS)
 			{
@@ -121,18 +116,13 @@ namespace HSCentric
 									new List<Color>() { Color.White, default_color });
 							break;
 						case LIST_UNIT_COLUMN.成员:
-							subitem.Text = unit.NickName;
+							subitem.Text = unit.ID;
 							break;
 						case LIST_UNIT_COLUMN.当前模式:
-							subitem.Text = basicConfigValue.Mode;
+							subitem.Text = basicConfigValue.MercPluginEnable ? basicConfigValue.Mode : "非佣兵";
 							break;
 						case LIST_UNIT_COLUMN.预设模式:
 							subitem.Text = currentTask.Mode.ToString();
-							break;
-						case LIST_UNIT_COLUMN.版本:
-							subitem.Text = unit.Version.ToString();
-							if (unit.Version < max_version)
-								subitem.BackColor = Color.Yellow;
 							break;
 						case LIST_UNIT_COLUMN.启用时间段:
 							subitem.Text = currentTask.StartTime.ToString("T") + " - " + currentTask.StopTime.ToString("T");
@@ -171,27 +161,6 @@ namespace HSCentric
 					contextMenuStrip_RMenu.Show(listHS, new Point(e.X, e.Y));
 				}
 			}
-		}
-
-		private void 更新ToolStripMenuItem1_Click(object sender, EventArgs e)
-		{
-			if (listHS.SelectedItems.Count > 0)
-			{
-				int index = listHS.SelectedItems[0].Index;
-				if (listHS.Items[index].SubItems[(int)LIST_UNIT_COLUMN.成员].Text == "Hearthstone")
-				{
-					MessageBox.Show("成员：Hearthstone无法更新", "ERROR");
-					return;
-				}
-				if (false == HSUnitManager.UpdateGameFile(index))
-					MessageBox.Show(string.Format("成员：{0}，更新失败", listHS.Items[index].SubItems[(int)LIST_UNIT_COLUMN.成员].Text));
-				else
-					MessageBox.Show(string.Format("成员：{0}，更新完成", listHS.Items[index].SubItems[(int)LIST_UNIT_COLUMN.成员].Text));
-
-				UI_Flush();
-			}
-			else
-				MessageBox.Show("请选中一个成员", "ERROR");
 		}
 
 		private void listHS_MouseDoubleClick(object sender, MouseEventArgs e)

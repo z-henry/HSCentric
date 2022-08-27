@@ -1,8 +1,6 @@
 ﻿using HSCentric.Const;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace HSCentric
@@ -16,6 +14,9 @@ namespace HSCentric
 				m_unit = (HSUnit)unit.DeepClone();
 			checkbox_Enable.Checked = m_unit.Enable;
 			textbox_Path.Text = m_unit.Path;
+			textbox_HBPath.Text = m_unit.HBPath;
+			textbox_ID.Text = m_unit.ID;
+			textbox_Token.Text = m_unit.Token;
 
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.模式.ToString(), 80);
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.队伍.ToString(), 80);
@@ -39,6 +40,16 @@ namespace HSCentric
 				MessageBox.Show("请选择炉石路径", "Error");
 				return;
 			}
+			if (textbox_ID.Text.Length <= 0)
+			{
+				MessageBox.Show("请输入一个炉石ID", "Error");
+				return;
+			}
+			if (textbox_Token.Text.Length <= 0)
+			{
+				MessageBox.Show("请输入炉石Token", "Error");
+				return;
+			}
 			if (listTasks.Items.Count <= 0)
 			{
 				MessageBox.Show("请添加一个模式", "Error");
@@ -46,6 +57,9 @@ namespace HSCentric
 			}
 
 			m_unit.Path = textbox_Path.Text;
+			m_unit.HBPath = textbox_HBPath.Text;
+			m_unit.ID = textbox_ID.Text;
+			m_unit.Token = textbox_Token.Text;
 			m_unit.Enable = checkbox_Enable.Checked;
 			DialogResult = DialogResult.OK;
 			Close();
@@ -67,12 +81,29 @@ namespace HSCentric
 
 			textbox_Path.Text = openFileDialog.FileName;
 		}
+		private void btn_selecthbpath_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog openFileDialog = new OpenFileDialog();
+			openFileDialog.Filter = "炉石兄弟中控.exe|*.exe";
+			openFileDialog.DereferenceLinks = false;
+			openFileDialog.ShowDialog();
+			if (string.IsNullOrEmpty(openFileDialog.FileName))
+				return;
+
+			textbox_HBPath.Text = openFileDialog.FileName;
+		}
 
 		private void 添加ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			TaskForm dlg = new TaskForm();
 			if (dlg.ShowDialog() != DialogResult.OK)
 				return;
+			if (Common.IsBuddyMode(dlg.Task.Mode) &&
+				textbox_HBPath.Text.Length == 0)
+			{
+				MessageBox.Show("添加兄弟模式前先添加兄弟路径", "ERROR");
+				return;
+			}
 
 			if (!m_unit.Tasks.Add(dlg.Task))
 			{
@@ -106,6 +137,13 @@ namespace HSCentric
 				TaskForm dlg = new TaskForm((TaskUnit)m_unit.Tasks.GetTask(index));
 				if (dlg.ShowDialog() != DialogResult.OK)
 					return;
+
+				if (Common.IsBuddyMode(dlg.Task.Mode) &&
+					textbox_HBPath.Text.Length == 0)
+				{
+					MessageBox.Show("添加兄弟模式前先添加兄弟路径", "ERROR");
+					return;
+				}
 
 				if (!m_unit.Tasks.Modify(index, dlg.Task))
 				{
@@ -189,5 +227,6 @@ namespace HSCentric
 
 
 		private HSUnit m_unit = new HSUnit();
+
 	}
 }

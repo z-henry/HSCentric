@@ -43,7 +43,6 @@ namespace HSCentric
 			this.listHS = new System.Windows.Forms.ListView();
 			this.contextMenuStrip_RMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.启用ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.更新ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.启动ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.备份插件设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.label_currenttime = new System.Windows.Forms.Label();
@@ -92,37 +91,29 @@ namespace HSCentric
 			// 
 			this.contextMenuStrip_RMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.启用ToolStripMenuItem,
-            this.更新ToolStripMenuItem,
             this.启动ToolStripMenuItem,
             this.备份插件设置ToolStripMenuItem});
 			this.contextMenuStrip_RMenu.Name = "contextMenuStrip1";
-			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(149, 92);
+			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(181, 92);
 			// 
 			// 启用ToolStripMenuItem
 			// 
 			this.启用ToolStripMenuItem.Name = "启用ToolStripMenuItem";
-			this.启用ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+			this.启用ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.启用ToolStripMenuItem.Text = "启用";
 			this.启用ToolStripMenuItem.Click += new System.EventHandler(this.启用ToolStripMenuItem_Click);
-			// 
-			// 更新ToolStripMenuItem
-			// 
-			this.更新ToolStripMenuItem.Name = "更新ToolStripMenuItem";
-			this.更新ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
-			this.更新ToolStripMenuItem.Text = "更新";
-			this.更新ToolStripMenuItem.Click += new System.EventHandler(this.更新ToolStripMenuItem1_Click);
 			// 
 			// 启动ToolStripMenuItem
 			// 
 			this.启动ToolStripMenuItem.Name = "启动ToolStripMenuItem";
-			this.启动ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+			this.启动ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.启动ToolStripMenuItem.Text = "启动一次";
 			this.启动ToolStripMenuItem.Click += new System.EventHandler(this.启动ToolStripMenuItem_Click);
 			// 
 			// 备份插件设置ToolStripMenuItem
 			// 
 			this.备份插件设置ToolStripMenuItem.Name = "备份插件设置ToolStripMenuItem";
-			this.备份插件设置ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+			this.备份插件设置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.备份插件设置ToolStripMenuItem.Text = "备份插件设置";
 			this.备份插件设置ToolStripMenuItem.Click += new System.EventHandler(this.备份插件设置ToolStripMenuItem_Click);
 			// 
@@ -175,7 +166,7 @@ namespace HSCentric
 			this.Controls.Add(this.btn_del);
 			this.Controls.Add(this.btn_add);
 			this.Name = "MainForm";
-			this.Text = "炉石监控程序 4.2.1";
+			this.Text = "炉石监控程序 5.0.0";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -192,7 +183,6 @@ namespace HSCentric
 		private ListView listHS;
 		private ContextMenuStrip contextMenuStrip_RMenu;
 		private ToolStripMenuItem 启用ToolStripMenuItem;
-		private ToolStripMenuItem 更新ToolStripMenuItem;
 		private ToolStripMenuItem 启动ToolStripMenuItem;
 		private ToolStripMenuItem 备份插件设置ToolStripMenuItem;
 		private Label label_currenttime;

@@ -51,6 +51,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -68,6 +69,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common.cs" />
     <Compile Include="HSUnitManager.cs" />
     <Compile Include="RewardXP.cs" />
     <Compile Include="WebRestFul.cs" />
@@ -80,7 +82,6 @@
     </Compile>
     <Compile Include="UserInfoSection.cs" />
     <Compile Include="Const.cs" />
-    <Compile Include="FileVersion.cs" />
     <Compile Include="HSUnitForm.cs">
       <SubType>Form</SubType>
     </Compile>

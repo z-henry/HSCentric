@@ -16,11 +16,6 @@ namespace HSCentric
 		}
 		public static void Release()
 		{
-			lock (m_lockHS)
-			{
-				foreach (HSUnit hsUnit in m_listHS)
-					hsUnit.SwitchBepinEx(false);
-			}
 			SaveConfig();
 		}
 		public static List<HSUnit> GetHSUnits()
@@ -42,7 +37,9 @@ namespace HSCentric
 			{
 				for (int i = 0, ii = m_listHS.Count; i < ii; ++i)
 				{
-					HSUnit hsUnit = m_listHS[i];
+					HSUnit hsUnit = m_listHS[i]; 
+					var basicConfigValue = hsUnit.BasicConfigValue;
+					var currentTask = hsUnit.CurrentTask;
 
 					// 没启用就跳过
 					if (!hsUnit.Enable)
@@ -56,13 +53,11 @@ namespace HSCentric
 					{
 						if (hsUnit.IsProcessAlive())
 						{
-							Out.Log(string.Format("[{0}]未到启用时间", hsUnit.NickName));
+							Out.Log(string.Format("[{0}]未到启用时间", hsUnit.ID));
 							hsUnit.KillHS();
 						}
-						hsUnit.SwitchBepinEx(false);
 						continue;
 					}
-					hsUnit.SwitchBepinEx(true);
 
 
 					// 在运行就判断是否需要杀掉
@@ -83,8 +78,6 @@ namespace HSCentric
 					else
 					{
 						string msg_start_reason = "正常拽起";
-						var basicConfigValue = hsUnit.BasicConfigValue;
-						var currentTask = hsUnit.CurrentTask;
 						if (TASK_MODE.挂机收菜 == currentTask.Mode)
 						{
 							// 挂机收菜模式下，
@@ -98,13 +91,19 @@ namespace HSCentric
 							else
 								msg_start_reason = "";
 						}
-
 						if (msg_start_reason.Length > 0)
-							hsUnit.StartHS(msg_start_reason);
+						{
+							if (hsUnit.NeedAdjustMode())
+								hsUnit.AdjustMode();
+							hsUnit.InitHsMod();
+							hsUnit.StartHS(msg_start_reason); 
+							if (Common.IsBuddyMode(currentTask.Mode))
+								hsUnit.StartHB(msg_start_reason);
+						}
 					}
 				}
 			}
-			}
+		}
 		public static void CheckLog()
 		{
 			lock (m_lockHS)
@@ -114,6 +113,7 @@ namespace HSCentric
 					HSUnit hsUnit = m_listHS[i];
 					hsUnit.ReadLog();
 				}
+				SaveConfig();
 			}
 		}
 
@@ -130,7 +130,7 @@ namespace HSCentric
 			{
 				foreach(var iter in m_listHS)
 				{
-					if (iter.NickName == memberName)
+					if (iter.ID == memberName)
 						iter.Enable = flag;
 				}
 			}
@@ -170,20 +170,21 @@ namespace HSCentric
 				}
 				m_listHS.Add(new HSUnit()
 				{
+					ID = hs.ID,
 					Path = hs.Path,
-					Enable = true,
+					Enable = hs.Enable,
 					Tasks = new TaskManager(tasks),
-					XP = new RewardXP () { Level = hs.Level, ProgressXP = hs.XP }
+					XP = new RewardXP () { Level = hs.Level, ProgressXP = hs.XP },
+					Token = hs.Token,
+					HBPath = hs.HBPath,
 				});
 			}
-			// 			m_listHS = ConfigurationManager.GetSection("userinfo") as List<HSUnit>;
 		}
 		static void SaveConfig()
 		{
 			Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 			HSUnitSection section = config.GetSection("userinfo") as HSUnitSection;
 			section.HSUnit.Clear();
-			int index_hs = 0;
 			foreach (HSUnit hs in m_listHS)
 			{
 				int index_task = 0;
@@ -202,12 +203,14 @@ namespace HSCentric
 				}
 				section.HSUnit.Add(new HSUnitElement()
 				{
-					ID = ++index_hs,
+					ID = hs.ID,
 					Path = hs.Path,
 					Enable = hs.Enable,
 					Tasks = tasks,
 					Level = hs.XP.Level,
 					XP = hs.XP.ProgressXP,
+					HBPath = hs.HBPath,
+					Token = hs.Token,
 				});
 			}
 			config.Save();
@@ -216,45 +219,6 @@ namespace HSCentric
 
 		static List<HSUnit> m_listHS = new List<HSUnit>();
 		static object m_lockHS = new object();
-
-		internal static bool UpdateGameFile(int index)
-		{
-			lock (m_lockHS)
-			{
-				m_listHS[index].Enable = false;
-				if (m_listHS[index].IsProcessAlive())
-				{
-					m_listHS[index].KillHS("手动更新");
-					Delay(1000);
-				}
-
-				//运行备份更新bat
-				Process proc;
-				try
-				{
-					proc = new Process();
-					proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + @"script\backup\upgrade.bat";
-					proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_listHS[index].Path) + "\"";
-					proc.StartInfo.CreateNoWindow = false;
-					proc.Start();
-					proc.WaitForExit();
-					return true;
-				}
-				catch (Exception ex)
-				{
-					return false;
-				}
-			}
-
-		}
-		static void Delay(int mm)
-		{
-			DateTime timeInput = DateTime.Now;
-			while (timeInput.AddMilliseconds((double)mm) > DateTime.Now)
-			{
-				Application.DoEvents();
-			}
-		}
 
 		internal static void Modify(int index, HSUnit unit)
 		{
@@ -276,7 +240,10 @@ namespace HSCentric
 			lock (m_lockHS)
 			{
 				if (!m_listHS[index].IsProcessAlive())
+				{
+					m_listHS[index].InitHsMod();
 					m_listHS[index].StartHS("手动启动");
+				}
 			}
 		}
 		internal static void BackUpConfig(int index)
@@ -291,7 +258,6 @@ namespace HSCentric
 			proc.Start();
 			proc.WaitForExit();
 		}
-
 	}
 
 }

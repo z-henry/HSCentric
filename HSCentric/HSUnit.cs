@@ -14,9 +14,6 @@ namespace HSCentric
 	[Serializable]
 	public class HSUnit
 	{
-		[DllImport("kernel32.dll")]
-		public static extern int WinExec(string exeName, int operType);
-
 		public object DeepClone()
 		{
 			BinaryFormatter bf = new BinaryFormatter();
@@ -26,12 +23,12 @@ namespace HSCentric
 			return (bf.Deserialize(ms));
 		}
 
-		public (string Mode, DateTime AwakeTime, int AwakePeriod, string TeamName, string StrategyName) BasicConfigValue
+		public (string Mode, DateTime AwakeTime, int AwakePeriod, string TeamName, string StrategyName, bool MercPluginEnable) BasicConfigValue
 		{
 			get
 			{
 				ReadConfigValue();
-				return (m_mode, m_awakeTime, m_awakePeriod, m_teamName, m_strategyName);
+				return (m_mode, m_awakeTime, m_awakePeriod, m_teamName, m_strategyName, m_mercPluginEnable);
 			}
 		}
 		public bool Enable
@@ -39,32 +36,25 @@ namespace HSCentric
 			get { return m_enable; }
 			set { m_enable = value; }
 		}
-		public string NickName
+		public string ID
 		{
-			get
-			{
-				return m_hsPath.Length > 0 ? Directory.GetParent(m_hsPath).Name : ""; ;
-			}
+			get { return m_hsID; }
+			set { m_hsID = value; }
 		}
-		public FileVerison Version
+		public string Token
 		{
-			get
-			{
-				try
-				{
-					FileVersionInfo info = FileVersionInfo.GetVersionInfo(m_hsPath);
-					return new FileVerison(info.FileMajorPart, info.FileMinorPart, info.FileBuildPart, info.FilePrivatePart);
-				}
-				catch
-				{
-					return new FileVerison(0,0,0,0);
-				}
-			}
+			get { return m_token; }
+			set { m_token = value; }
 		}
 		public string Path
 		{
 			get { return m_hsPath; }
 			set { m_hsPath = value; }
+		}
+		public string HBPath
+		{
+			get { return m_hbPath; }
+			set { m_hbPath = value; }
 		}
 		public TaskUnit CurrentTask
 		{
@@ -82,20 +72,61 @@ namespace HSCentric
 		}
 
 
-		public bool SwitchBepinEx(bool _switch)
+		public void SwitchMercPlugin(bool _switch)
 		{
-			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath));
-			foreach (FileInfo logFile in rootHS.GetFiles("*winhttp*.dll", SearchOption.TopDirectoryOnly)) //查找文件
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			if (false == System.IO.File.Exists(pathConfig.ToString()))
+				return;
+			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
+			for (int i = 0, ii = fileLines.Length; i < ii; ++i)
 			{
-				if (true == _switch)
-					logFile.MoveTo(System.IO.Path.GetDirectoryName(m_hsPath) + "/winhttp.dll");
-				else
-					logFile.MoveTo(System.IO.Path.GetDirectoryName(m_hsPath) + "/autostop-winhttp.dll");
-
-				break;
+				if (fileLines[i].IndexOf("插件开关 = ") == 0)
+				{
+					fileLines[i] = "插件开关 = " + _switch.ToString();
+				}
 			}
-			return true;
+			File.WriteAllLines(pathConfig.ToString(), fileLines);
 		}
+		public void InitHsMod()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			if (false == System.IO.File.Exists(pathConfig.ToString()))
+				return;
+			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
+			for (int i = 0, ii = fileLines.Length; i < ii; ++i)
+			{
+				if (fileLines[i].IndexOf("自动开盒 = ") == 0)
+				{
+					fileLines[i] = "自动开盒 = true";
+				}
+				else if (fileLines[i].IndexOf("结算展示 = ") == 0)
+				{
+					fileLines[i] = "结算展示 = false";
+				}
+				else if (fileLines[i].IndexOf("应用焦点 = ") == 0)
+				{
+					fileLines[i] = "应用焦点 = false";
+				}
+				else if (fileLines[i].IndexOf("报错退出 = ") == 0)
+				{
+					fileLines[i] = "报错退出 = true";
+				}
+				else if (fileLines[i].IndexOf("弹出消息 = ") == 0)
+				{
+					fileLines[i] = "弹出消息 = false";
+				}
+				else if (fileLines[i].IndexOf("自动领奖 = ") == 0)
+				{
+					fileLines[i] = "自动领奖 = true";
+				}
+				else if (fileLines[i].IndexOf("HsMod状态 = ") == 0)
+				{
+					fileLines[i] = "HsMod状态 = true";
+				}
+			}
+			File.WriteAllLines(pathConfig.ToString(), fileLines);
+		}
+
 		public bool IsActive()
 		{
 			TaskUnit currentTask = CurrentTask;
@@ -104,12 +135,15 @@ namespace HSCentric
 		}
 		public bool IsProcessAlive()
 		{
-			List<Process> hearthstoneProcess = HearthstoneProcess();
-			if (hearthstoneProcess.Count <= 0)
+			if (HearthstoneProcess() != null)
 			{
+				return true;
+			}
+			else
+			{
+				m_pid = 0;
 				return false;
 			}
-			return true;
 		}
 		public bool IsLogUpdated()
 		{
@@ -128,67 +162,109 @@ namespace HSCentric
 		}
 		public void KillHS(string msg = "")
 		{
-			List<Process> hearthstoneProcess = HearthstoneProcess();
-			foreach (Process processHS in hearthstoneProcess)
-			{
-				processHS.Kill();
-				Out.Log(string.Format("[{0}]结束 {1}", NickName, msg));
-			}
+			HearthstoneProcess()?.Kill();
+			Out.Log(string.Format("[{0}]结束 {1}", ID, msg));
+			m_pid = 0;
 		}
 		public void StartHS(string msg = "")
 		{
-			if (NeedAdjustMode())
-				AdjustMode();
+			// 			WinExec(m_hsPath, 2);
+			Process process = new Process();
+			process.StartInfo.UseShellExecute = false;
+			process.StartInfo.FileName = m_hsPath;
+			process.StartInfo.Arguments += " " + m_token;
+			process.StartInfo.Arguments += " hsunitid:" + m_hsID;
+			process.Start();
+			process.WaitForInputIdle();
+			m_pid = process.Id;
 
-			WinExec(m_hsPath, 2);
-			Out.Log(string.Format("[{0}]启动 {1}", NickName, msg));
+			Out.Log(string.Format("[{0}]启动[pid:{1}][arg:{2}] {3}", ID, m_pid, process.StartInfo.Arguments, msg));
 		}
+		public void StartHB(string msg = "")
+		{
+			var currentTask = CurrentTask;
+			Process process = new Process();
+			process.StartInfo.UseShellExecute = false;
+			process.StartInfo.FileName = HBPath;
+			process.StartInfo.WorkingDirectory = System.IO.Path.GetDirectoryName(HBPath);
+			process.StartInfo.Arguments = "--autostart --config:Default";
+			process.StartInfo.Arguments += " --pid:" + m_pid.ToString();
+			process.StartInfo.Arguments += " --deck:" + currentTask.TeamName;
+			process.StartInfo.Arguments += " --behavior:" + ((int)(BEHAVIOR_MODE)Enum.Parse(typeof(BEHAVIOR_MODE), currentTask.StrategyName)).ToString();
+			process.StartInfo.Arguments += " --rule:" + ((int)currentTask.Mode - (int)TASK_MODE.狂野).ToString();
+			process.StartInfo.Arguments += " --os:10";
+			process.Start();
+
+			Out.Log(string.Format("[{0}]启动HB[arg:{1}] {2}", ID, process.StartInfo.Arguments, msg));
+		}
+
 		public bool NeedAdjustMode()
 		{
 			var basicConfigValue = BasicConfigValue;
 			TaskUnit currentTask = CurrentTask;
-			if (currentTask.Mode.ToString() != basicConfigValue.Mode ||
-				currentTask.TeamName != basicConfigValue.TeamName ||
-				currentTask.StrategyName != basicConfigValue.StrategyName)
+			if (Common.IsBuddyMode(currentTask.Mode))
 			{
-				return true;
+				if (basicConfigValue.MercPluginEnable == true)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
-			return false;
+			else
+			{
+				if (basicConfigValue.MercPluginEnable == false ||
+					currentTask.Mode.ToString() != basicConfigValue.Mode ||
+					currentTask.TeamName != basicConfigValue.TeamName ||
+					currentTask.StrategyName != basicConfigValue.StrategyName)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
 		}
 		public bool AdjustMode()
 		{
 			TaskUnit currentTask = CurrentTask;
-			WriteConfigValue(currentTask.Mode, currentTask.TeamName, currentTask.StrategyName);
-			Out.Log(string.Format("[{0}]切换模式[{1}][{2}][{3}]", NickName, currentTask.Mode.ToString(), currentTask.TeamName, currentTask.StrategyName));
+			if (Common.IsBuddyMode(currentTask.Mode))
+			{
+				WriteConfigValue(false);
+			}
+			else
+			{
+				WriteConfigValue(true, currentTask.Mode, currentTask.TeamName, currentTask.StrategyName);
+			}
+			Out.Log(string.Format("[{0}]切换模式[{1}][{2}][{3}]", ID, currentTask.Mode.ToString(), currentTask.TeamName, currentTask.StrategyName));
 			return true;
 		}
 
 
-		private List<Process> HearthstoneProcess()
+		private Process HearthstoneProcess()
 		{
-			List<Process> ps = new List<Process>(Process.GetProcessesByName("Hearthstone"));
-			for (int i = ps.Count - 1; i >= 0; --i)
-			{
-				string path = "";
-				try
-				{
-					path = ps[i].MainModule.FileName.ToString();
-				}
-				catch
-				{
-				}
-				finally
-				{
-					if (path != m_hsPath)
-						ps.RemoveAt(i);
-				}
+			if (m_pid == 0)
+				return null;
 
+			Process target = null;
+			try
+			{
+				target =Process.GetProcessById(m_pid);
 			}
-			return ps;
+			catch
+			{
+				return null;
+			}
+			return target;
 		}
 		private void ReadConfigValue()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			if (false == System.IO.File.Exists(pathConfig.ToString()))
+				return;
 			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
 			if (fileConfig.LastWriteTime <= m_configLastEdit)
 				return;
@@ -273,58 +349,124 @@ namespace HSCentric
 						m_strategyName = "";
 					}
 				}
+				else if (line.IndexOf("插件开关 = ") == 0)
+				{
+					try
+					{
+						int start_pos = "插件开关 = ".Length;
+						if (line.Length > start_pos)
+							m_mercPluginEnable = Convert.ToBoolean(line.Substring(start_pos));
+						else
+							m_mercPluginEnable = false;
+					}
+					catch
+					{
+						m_mercPluginEnable = false;
+					}
+				}
 				else
 					continue;
 			}
 		}
-		private void WriteConfigValue(TASK_MODE Mode, string TeamName, string StrategyName)
+		private void WriteConfigValue(bool Enable, TASK_MODE? Mode = null, string TeamName = null, string StrategyName = null)
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/io.github.jimowushuang.hs.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			if (false == System.IO.File.Exists(pathConfig.ToString()))
+				return;
 			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
 			for (int i = 0, ii = fileLines.Length; i < ii; ++i)
 			{
 				if (fileLines[i].IndexOf("插件运行模式 = ") == 0)
 				{
-					fileLines[i] = "插件运行模式 = " + Mode.ToString();
+					if (Mode != null)
+						fileLines[i] = "插件运行模式 = " + Mode.ToString();
 				}
 				else if (fileLines[i].IndexOf("使用的队伍名称 = ") == 0)
 				{
-					fileLines[i] = "使用的队伍名称 = " + TeamName;
+					if (TeamName != null)
+						fileLines[i] = "使用的队伍名称 = " + TeamName;
 				}
 				else if (fileLines[i].IndexOf("战斗策略 = ") == 0)
 				{
-					fileLines[i] = "战斗策略 = " + StrategyName;
+					if (StrategyName != null)
+						fileLines[i] = "战斗策略 = " + StrategyName;
 				}
+				else if (fileLines[i].IndexOf("插件开关 = ") == 0)
+				{
+					fileLines[i] = "插件开关 = " + Enable.ToString();
+				}
+
 			}
 			File.WriteAllLines(pathConfig.ToString(), fileLines);
 		}
 
 		public void ReadLog()
 		{
-			DirectoryInfo pathLog = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/Log/mercenarylog@" + DateTime.Today.ToString("yyyy-MM-dd") + ".log");
-			if (!File.Exists(pathLog.ToString()))
-				return;
 
-			foreach (string line in File.ReadLines(pathLog.ToString()).Reverse<string>())
+			//佣兵日志获取经验
+			RewardXP rewardXP_Merc = new RewardXP();
+			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID);
+			List<FileInfo> testList = rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly).ToList();
+			FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
+			if (targetFile != null)
 			{
-				if (line.IndexOf("战令信息") > 0)
+				foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
 				{
-					try
+					if (line.IndexOf("战令信息") > 0)
 					{
-						Regex regex = new Regex(@"^.*等级:([\d]*).*经验:([\d]*).*$");
-						Match match = regex.Match(line);
-						if (match.Groups.Count == 3)
+						try
 						{
-							m_rewardXP.Level = Convert.ToInt32(match.Groups[1].Value);
-							m_rewardXP.ProgressXP = Convert.ToInt32(match.Groups[2].Value);
+							Regex regex = new Regex(@"^.*等级:([\d]*).*经验:([\d]*).*$");
+							Match match = regex.Match(line);
+							if (match.Groups.Count == 3)
+							{
+								rewardXP_Merc.Level = Convert.ToInt32(match.Groups[1].Value);
+								rewardXP_Merc.ProgressXP = Convert.ToInt32(match.Groups[2].Value);
+								break;
+							}
 						}
+						catch
+						{
+						}
+						break;
 					}
-					catch
-					{
-					}
-					return;
 				}
 			}
+			m_rewardXP = m_rewardXP.TotalXP > rewardXP_Merc.TotalXP ? m_rewardXP : rewardXP_Merc;
+
+			//兄弟日志获取经验
+			RewardXP rewardXP_Buddy = new RewardXP();
+			rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs");
+			testList = rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly).ToList();
+			targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
+			if (targetFile != null)
+			{
+				System.Text.Encoding GB2312 = System.Text.Encoding.GetEncoding("GB2312");
+				foreach (string line in File.ReadLines(targetFile.FullName, System.Text.Encoding.GetEncoding("GB2312")).Reverse<string>())
+				{
+					if (line.IndexOf("[监控插件] 合计: 战令") > 0)
+					{
+						try
+						{
+							Regex regex = new Regex(@"^.*合计: 战令([\d]*)级\(([\d]*)/[\d]*\).*$");
+							Match match = regex.Match(line);
+							if (match.Groups.Count == 3)
+							{
+								rewardXP_Buddy.Level = Convert.ToInt32(match.Groups[1].Value);
+								rewardXP_Buddy.ProgressXP = Convert.ToInt32(match.Groups[2].Value);
+								break;
+							}
+						}
+						catch
+						{
+						}
+						break;
+					}
+				}
+			}
+			m_rewardXP = m_rewardXP.TotalXP > rewardXP_Buddy.TotalXP ? m_rewardXP : rewardXP_Buddy;
+
+
 		}
 
 
@@ -333,9 +475,14 @@ namespace HSCentric
 		private int m_awakePeriod = 25;
 		private string m_teamName = "";
 		private string m_strategyName = "";
+		private bool m_mercPluginEnable = false;
 		private RewardXP m_rewardXP = new RewardXP();
 
 		private string m_hsPath = "";//炉石路径
+		private string m_hbPath = "";//hb路径
+		private string m_token = "";//token
+		private int m_pid = 0;//进程id
+		private string m_hsID = "";//自定id
 		private bool m_enable = false;//启用状态
 		private DateTime m_configLastEdit = new DateTime(2000,1,1);
 		private TaskManager m_taskManager = new TaskManager();
