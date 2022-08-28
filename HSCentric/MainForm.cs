@@ -18,7 +18,6 @@ namespace HSCentric
 			this.InitializeComponent();
 			this.timer1.Interval = 100;
 			this.timer1.Tick += this.TickProcess;
-			this.timer1.Start();
 
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用.ToString(), 40);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.成员.ToString(), 120);
@@ -30,11 +29,13 @@ namespace HSCentric
 			HSUnitManager.Init();
 			UI_Flush();
 			MyRestFul.Init(ConfigurationManager.AppSettings["rest_url"]);
+			textbox_Path.Text = ConfigurationManager.AppSettings["hs_path"];
+			this.timer1.Start();
 		}
 		private void TickProcess(object sender, EventArgs e)
 		{
 			//检测重启
-			TimeSpan timespan_checkpriod = new TimeSpan(0, 0, 10);//检测间隔
+			TimeSpan timespan_checkpriod = new TimeSpan(0, 0, 30);//检测间隔
 			if (DateTime.Now > m_CheckTime_runinfo)
 			{
 				m_CheckTime_runinfo = DateTime.Now.AddSeconds(timespan_checkpriod.TotalSeconds);
@@ -58,7 +59,10 @@ namespace HSCentric
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			timer1.Stop();
-			HSUnitManager.Release(); 
+			HSUnitManager.Release();
+			Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+			config.AppSettings.Settings["hs_path"].Value = textbox_Path.Text;
+			config.Save();
 		}
 		private void btn_add_Click(object sender, EventArgs e)
 		{
@@ -247,6 +251,13 @@ namespace HSCentric
 				return;
 
 			textbox_Path.Text = openFileDialog.FileName;
+
+			if (MessageBox.Show("设置保存成功，下次启动时生效，是否马上重启软件？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+			{
+				Application.Exit();
+				System.Diagnostics.Process.Start(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+			}
 		}
 	}
 }

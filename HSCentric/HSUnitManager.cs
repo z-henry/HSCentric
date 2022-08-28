@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows.Forms;
+using System.Management;
 
 namespace HSCentric
 {
@@ -13,6 +13,7 @@ namespace HSCentric
 		public static void Init()
 		{
 			LoadConfig();
+			KillHSAndHB();
 		}
 		public static void Release()
 		{
@@ -255,6 +256,28 @@ namespace HSCentric
 			proc.StartInfo.UseShellExecute = false;   //不使用shell壳运行
 			proc.Start();
 			proc.WaitForExit();
+		}
+
+		internal static void KillHSAndHB()
+		{
+			foreach(var process_iter in Process.GetProcessesByName("Hearthstone"))
+			{
+				Out.Log(string.Format("炉石残留[pid:{0}]", process_iter.Id));
+				using (var searcher = new ManagementObjectSearcher(
+					"SELECT CommandLine FROM Win32_Process WHERE ProcessId = " + process_iter.Id))
+				using (var objects = searcher.Get())
+				{
+					var @object = objects.Cast<ManagementBaseObject>().SingleOrDefault();
+					string commandline = @object?["CommandLine"]?.ToString();
+					if (commandline != null &&
+						commandline.IndexOf("startmethod:hscentric") != -1)
+					{
+						process_iter.Kill();
+						Out.Log(string.Format("关闭炉石残留[pid:{0}]", process_iter.Id));
+						Common.Delay(5000);
+					}
+				}
+			}
 		}
 	}
 
