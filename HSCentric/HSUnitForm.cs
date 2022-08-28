@@ -13,7 +13,6 @@ namespace HSCentric
 			if (unit != null)
 				m_unit = (HSUnit)unit.DeepClone();
 			checkbox_Enable.Checked = m_unit.Enable;
-			textbox_Path.Text = m_unit.Path;
 			textbox_HBPath.Text = m_unit.HBPath;
 			textbox_ID.Text = m_unit.ID;
 			textbox_Token.Text = m_unit.Token;
@@ -35,11 +34,6 @@ namespace HSCentric
 
 		private void btn_ok_Click(object sender, EventArgs e)
 		{
-			if (textbox_Path.Text.Length <= 0)
-			{
-				MessageBox.Show("请选择炉石路径", "Error");
-				return;
-			}
 			if (textbox_ID.Text.Length <= 0)
 			{
 				MessageBox.Show("请输入一个炉石ID", "Error");
@@ -56,7 +50,6 @@ namespace HSCentric
 				return;
 			}
 
-			m_unit.Path = textbox_Path.Text;
 			m_unit.HBPath = textbox_HBPath.Text;
 			m_unit.ID = textbox_ID.Text;
 			m_unit.Token = textbox_Token.Text;
@@ -70,17 +63,6 @@ namespace HSCentric
 			Close();
 		}
 
-		private void btn_selectpath_Click(object sender, EventArgs e)
-		{
-			OpenFileDialog openFileDialog = new OpenFileDialog();
-			openFileDialog.Filter = "Hearthstone.exe|*.exe";
-			openFileDialog.DereferenceLinks = false;
-			openFileDialog.ShowDialog();
-			if (string.IsNullOrEmpty(openFileDialog.FileName))
-				return;
-
-			textbox_Path.Text = openFileDialog.FileName;
-		}
 		private void btn_selecthbpath_Click(object sender, EventArgs e)
 		{
 			OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -227,6 +209,5 @@ namespace HSCentric
 
 
 		private HSUnit m_unit = new HSUnit();
-
 	}
 }

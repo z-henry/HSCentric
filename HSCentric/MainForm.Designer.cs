@@ -49,6 +49,9 @@ namespace HSCentric
 			this.label_checktime = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
+			this.btn_selectpath = new System.Windows.Forms.Button();
+			this.textbox_Path = new System.Windows.Forms.TextBox();
+			this.label3 = new System.Windows.Forms.Label();
 			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -77,10 +80,10 @@ namespace HSCentric
 			this.listHS.FullRowSelect = true;
 			this.listHS.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.listHS.HideSelection = false;
-			this.listHS.Location = new System.Drawing.Point(12, 13);
+			this.listHS.Location = new System.Drawing.Point(12, 35);
 			this.listHS.MultiSelect = false;
 			this.listHS.Name = "listHS";
-			this.listHS.Size = new System.Drawing.Size(666, 255);
+			this.listHS.Size = new System.Drawing.Size(666, 233);
 			this.listHS.TabIndex = 10;
 			this.listHS.UseCompatibleStateImageBehavior = false;
 			this.listHS.View = System.Windows.Forms.View.Details;
@@ -94,26 +97,26 @@ namespace HSCentric
             this.启动ToolStripMenuItem,
             this.备份插件设置ToolStripMenuItem});
 			this.contextMenuStrip_RMenu.Name = "contextMenuStrip1";
-			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(181, 92);
+			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(149, 70);
 			// 
 			// 启用ToolStripMenuItem
 			// 
 			this.启用ToolStripMenuItem.Name = "启用ToolStripMenuItem";
-			this.启用ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.启用ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
 			this.启用ToolStripMenuItem.Text = "启用";
 			this.启用ToolStripMenuItem.Click += new System.EventHandler(this.启用ToolStripMenuItem_Click);
 			// 
 			// 启动ToolStripMenuItem
 			// 
 			this.启动ToolStripMenuItem.Name = "启动ToolStripMenuItem";
-			this.启动ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.启动ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
 			this.启动ToolStripMenuItem.Text = "启动一次";
 			this.启动ToolStripMenuItem.Click += new System.EventHandler(this.启动ToolStripMenuItem_Click);
 			// 
 			// 备份插件设置ToolStripMenuItem
 			// 
 			this.备份插件设置ToolStripMenuItem.Name = "备份插件设置ToolStripMenuItem";
-			this.备份插件设置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.备份插件设置ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
 			this.备份插件设置ToolStripMenuItem.Text = "备份插件设置";
 			this.备份插件设置ToolStripMenuItem.Click += new System.EventHandler(this.备份插件设置ToolStripMenuItem_Click);
 			// 
@@ -153,11 +156,40 @@ namespace HSCentric
 			this.label2.TabIndex = 14;
 			this.label2.Text = "下次检测时间：";
 			// 
+			// btn_selectpath
+			// 
+			this.btn_selectpath.Location = new System.Drawing.Point(363, 6);
+			this.btn_selectpath.Name = "btn_selectpath";
+			this.btn_selectpath.Size = new System.Drawing.Size(40, 23);
+			this.btn_selectpath.TabIndex = 17;
+			this.btn_selectpath.Text = "...";
+			this.btn_selectpath.UseVisualStyleBackColor = true;
+			this.btn_selectpath.Click += new System.EventHandler(this.btn_selectpath_Click);
+			// 
+			// textbox_Path
+			// 
+			this.textbox_Path.Location = new System.Drawing.Point(70, 6);
+			this.textbox_Path.Name = "textbox_Path";
+			this.textbox_Path.Size = new System.Drawing.Size(287, 21);
+			this.textbox_Path.TabIndex = 16;
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(11, 11);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(53, 12);
+			this.label3.TabIndex = 15;
+			this.label3.Text = "炉石路径";
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(690, 309);
+			this.Controls.Add(this.btn_selectpath);
+			this.Controls.Add(this.textbox_Path);
+			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.label_checktime);
@@ -166,7 +198,7 @@ namespace HSCentric
 			this.Controls.Add(this.btn_del);
 			this.Controls.Add(this.btn_add);
 			this.Name = "MainForm";
-			this.Text = "炉石监控程序 5.0.0";
+			this.Text = "炉石监控程序 5.0.1";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -189,6 +221,9 @@ namespace HSCentric
 		private Label label_checktime;
 		private Label label1;
 		private Label label2;
+		private Button btn_selectpath;
+		private TextBox textbox_Path;
+		private Label label3;
 	}
 }
 

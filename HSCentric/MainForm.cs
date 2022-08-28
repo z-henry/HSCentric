@@ -62,6 +62,11 @@ namespace HSCentric
 		}
 		private void btn_add_Click(object sender, EventArgs e)
 		{
+			if (string.IsNullOrEmpty(HSUnitManager.m_hsPath))
+			{
+				MessageBox.Show("请先设置炉石路径", "ERROR");
+				return;
+			}
 			HSUnitForm dlg = new HSUnitForm();
 			if (dlg.ShowDialog() != DialogResult.OK)
 				return;
@@ -191,24 +196,15 @@ namespace HSCentric
 
 		private void 备份插件设置ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			if (listHS.SelectedItems.Count > 0)
+			try
 			{
-				int index = listHS.SelectedItems[0].Index;
-
-				try
-				{
-					HSUnitManager.BackUpConfig(index);
-					MessageBox.Show(string.Format("成员：{0}，备份完成", listHS.Items[index].SubItems[(int)LIST_UNIT_COLUMN.成员].Text));
-				}
-				catch (Exception ex)
-				{
-					MessageBox.Show(string.Format("Exception Occurred :{0},{1}", ex.Message, ex.StackTrace.ToString()), "ERROR");
-				}
-
-				UI_Flush();
+				HSUnitManager.BackUpConfig();
+				MessageBox.Show(string.Format("备份完成"));
 			}
-			else
-				MessageBox.Show("请选中一个成员", "ERROR");
+			catch (Exception ex)
+			{
+				MessageBox.Show(string.Format("Exception Occurred :{0},{1}", ex.Message, ex.StackTrace.ToString()), "ERROR");
+			}
 		}
 
 		private Color GetColor(double period, double val, List<Color> colors)
@@ -239,6 +235,18 @@ namespace HSCentric
 			g = Math.Min(Math.Max(0, g), 255);
 			b = Math.Min(Math.Max(0, b), 255);
 			return Color.FromArgb(r, g, b);
+		}
+
+		private void btn_selectpath_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog openFileDialog = new OpenFileDialog();
+			openFileDialog.Filter = "Hearthstone.exe|*.exe";
+			openFileDialog.DereferenceLinks = false;
+			openFileDialog.ShowDialog();
+			if (string.IsNullOrEmpty(openFileDialog.FileName))
+				return;
+
+			textbox_Path.Text = openFileDialog.FileName;
 		}
 	}
 }

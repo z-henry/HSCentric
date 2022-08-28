@@ -30,10 +30,7 @@ namespace HSCentric
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.textbox_Path = new System.Windows.Forms.TextBox();
-			this.btn_selectpath = new System.Windows.Forms.Button();
 			this.btn_ok = new System.Windows.Forms.Button();
 			this.label8 = new System.Windows.Forms.Label();
 			this.checkbox_Enable = new System.Windows.Forms.CheckBox();
@@ -53,40 +50,14 @@ namespace HSCentric
 			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// label1
-			// 
-			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(12, 45);
-			this.label1.Name = "label1";
-			this.label1.Size = new System.Drawing.Size(53, 12);
-			this.label1.TabIndex = 0;
-			this.label1.Text = "炉石路径";
-			// 
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(12, 134);
+			this.label2.Location = new System.Drawing.Point(12, 95);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(53, 12);
 			this.label2.TabIndex = 1;
 			this.label2.Text = "模式设置";
-			// 
-			// textbox_Path
-			// 
-			this.textbox_Path.Location = new System.Drawing.Point(71, 40);
-			this.textbox_Path.Name = "textbox_Path";
-			this.textbox_Path.Size = new System.Drawing.Size(287, 21);
-			this.textbox_Path.TabIndex = 2;
-			// 
-			// btn_selectpath
-			// 
-			this.btn_selectpath.Location = new System.Drawing.Point(364, 40);
-			this.btn_selectpath.Name = "btn_selectpath";
-			this.btn_selectpath.Size = new System.Drawing.Size(40, 23);
-			this.btn_selectpath.TabIndex = 13;
-			this.btn_selectpath.Text = "...";
-			this.btn_selectpath.UseVisualStyleBackColor = true;
-			this.btn_selectpath.Click += new System.EventHandler(this.btn_selectpath_Click);
 			// 
 			// btn_ok
 			// 
@@ -131,10 +102,10 @@ namespace HSCentric
 			this.listTasks.FullRowSelect = true;
 			this.listTasks.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.listTasks.HideSelection = false;
-			this.listTasks.Location = new System.Drawing.Point(14, 149);
+			this.listTasks.Location = new System.Drawing.Point(14, 110);
 			this.listTasks.MultiSelect = false;
 			this.listTasks.Name = "listTasks";
-			this.listTasks.Size = new System.Drawing.Size(390, 178);
+			this.listTasks.Size = new System.Drawing.Size(390, 217);
 			this.listTasks.TabIndex = 18;
 			this.listTasks.UseCompatibleStateImageBehavior = false;
 			this.listTasks.View = System.Windows.Forms.View.Details;
@@ -173,7 +144,7 @@ namespace HSCentric
 			// 
 			// textbox_Token
 			// 
-			this.textbox_Token.Location = new System.Drawing.Point(71, 94);
+			this.textbox_Token.Location = new System.Drawing.Point(71, 67);
 			this.textbox_Token.Name = "textbox_Token";
 			this.textbox_Token.Size = new System.Drawing.Size(287, 21);
 			this.textbox_Token.TabIndex = 20;
@@ -181,7 +152,7 @@ namespace HSCentric
 			// label3
 			// 
 			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(30, 97);
+			this.label3.Location = new System.Drawing.Point(30, 70);
 			this.label3.Name = "label3";
 			this.label3.Size = new System.Drawing.Size(35, 12);
 			this.label3.TabIndex = 19;
@@ -205,7 +176,7 @@ namespace HSCentric
 			// 
 			// btn_selecthbpath
 			// 
-			this.btn_selecthbpath.Location = new System.Drawing.Point(364, 67);
+			this.btn_selecthbpath.Location = new System.Drawing.Point(364, 40);
 			this.btn_selecthbpath.Name = "btn_selecthbpath";
 			this.btn_selecthbpath.Size = new System.Drawing.Size(40, 23);
 			this.btn_selecthbpath.TabIndex = 25;
@@ -215,7 +186,7 @@ namespace HSCentric
 			// 
 			// textbox_HBPath
 			// 
-			this.textbox_HBPath.Location = new System.Drawing.Point(71, 67);
+			this.textbox_HBPath.Location = new System.Drawing.Point(71, 40);
 			this.textbox_HBPath.Name = "textbox_HBPath";
 			this.textbox_HBPath.Size = new System.Drawing.Size(287, 21);
 			this.textbox_HBPath.TabIndex = 24;
@@ -223,7 +194,7 @@ namespace HSCentric
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(12, 72);
+			this.label5.Location = new System.Drawing.Point(12, 45);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(53, 12);
 			this.label5.TabIndex = 23;
@@ -246,10 +217,7 @@ namespace HSCentric
 			this.Controls.Add(this.checkbox_Enable);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.btn_ok);
-			this.Controls.Add(this.btn_selectpath);
-			this.Controls.Add(this.textbox_Path);
 			this.Controls.Add(this.label2);
-			this.Controls.Add(this.label1);
 			this.Name = "HSUnitForm";
 			this.Text = "HSUnitForm";
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
@@ -259,11 +227,7 @@ namespace HSCentric
 		}
 
 		#endregion
-
-		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.TextBox textbox_Path;
-		private System.Windows.Forms.Button btn_selectpath;
 		private System.Windows.Forms.Button btn_ok;
 		private System.Windows.Forms.Label label8;
 		private System.Windows.Forms.CheckBox checkbox_Enable;

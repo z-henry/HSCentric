@@ -45,9 +45,6 @@ namespace HSCentric
 					if (!hsUnit.Enable)
 						continue;
 
-					// 备份配置
-					BackUpConfig(i);
-
 					// 不在启用时间段,启动了就干掉
 					if (!hsUnit.IsActive())
 					{
@@ -59,7 +56,6 @@ namespace HSCentric
 						continue;
 					}
 
-
 					// 在运行就判断是否需要杀掉
 					if (hsUnit.IsProcessAlive())
 					{
@@ -69,7 +65,7 @@ namespace HSCentric
 							msg_kill_reason = "切换模式";
 						// 不更新日志就滚蛋
 						else if (!hsUnit.IsLogUpdated())
-							msg_kill_reason = "炉石进程日志不更新";
+							msg_kill_reason = "日志不更新";
 
 						if (msg_kill_reason.Length > 0)
 							hsUnit.KillHS(msg_kill_reason);
@@ -114,6 +110,7 @@ namespace HSCentric
 					hsUnit.ReadLog();
 				}
 				SaveConfig();
+				BackUpConfig();
 			}
 		}
 
@@ -171,7 +168,6 @@ namespace HSCentric
 				m_listHS.Add(new HSUnit()
 				{
 					ID = hs.ID,
-					Path = hs.Path,
 					Enable = hs.Enable,
 					Tasks = new TaskManager(tasks),
 					XP = new RewardXP () { Level = hs.Level, ProgressXP = hs.XP },
@@ -179,6 +175,7 @@ namespace HSCentric
 					HBPath = hs.HBPath,
 				});
 			}
+			m_hsPath = ConfigurationManager.AppSettings["hs_path"];
 		}
 		static void SaveConfig()
 		{
@@ -204,7 +201,6 @@ namespace HSCentric
 				section.HSUnit.Add(new HSUnitElement()
 				{
 					ID = hs.ID,
-					Path = hs.Path,
 					Enable = hs.Enable,
 					Tasks = tasks,
 					Level = hs.XP.Level,
@@ -213,12 +209,14 @@ namespace HSCentric
 					Token = hs.Token,
 				});
 			}
+			config.AppSettings.Settings["hs_path"].Value = m_hsPath;
 			config.Save();
-			ConfigurationManager.RefreshSection("userinfo");
+// 			ConfigurationManager.RefreshSection("userinfo");
 		}
 
 		static List<HSUnit> m_listHS = new List<HSUnit>();
 		static object m_lockHS = new object();
+		static public string m_hsPath = "";
 
 		internal static void Modify(int index, HSUnit unit)
 		{
@@ -246,13 +244,13 @@ namespace HSCentric
 				}
 			}
 		}
-		internal static void BackUpConfig(int index)
+		internal static void BackUpConfig()
 		{
 			//运行备份更新bat
 			Process proc;
 			proc = new Process();
 			proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + @"script\backup\backup.bat";
-			proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_listHS[index].Path) + "\"";
+			proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_hsPath) + "\"";
 			proc.StartInfo.CreateNoWindow = true;   //不创建该进程的窗口
 			proc.StartInfo.UseShellExecute = false;   //不使用shell壳运行
 			proc.Start();

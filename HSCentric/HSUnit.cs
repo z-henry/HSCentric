@@ -46,11 +46,6 @@ namespace HSCentric
 			get { return m_token; }
 			set { m_token = value; }
 		}
-		public string Path
-		{
-			get { return m_hsPath; }
-			set { m_hsPath = value; }
-		}
 		public string HBPath
 		{
 			get { return m_hbPath; }
@@ -74,7 +69,7 @@ namespace HSCentric
 
 		public void SwitchMercPlugin(bool _switch)
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
@@ -89,7 +84,7 @@ namespace HSCentric
 		}
 		public void InitHsMod()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
@@ -147,38 +142,59 @@ namespace HSCentric
 		}
 		public bool IsLogUpdated()
 		{
-			//检查炉石日志, 5分钟没更新
-			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/Logs");
-			foreach (FileInfo logFile in rootHS.GetFiles("hearthstone_*.log", SearchOption.TopDirectoryOnly)) //查找文件
+			//5min不更新
+			if (BasicConfigValue.MercPluginEnable)
 			{
-				double inteval = 5f;
-				TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
-				if (timeSpan.TotalMinutes < inteval)
+				//检查佣兵
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/Log/" + ID);
+				foreach (FileInfo logFile in rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly)) //查找文件
 				{
-					return true;
+					double inteval = 5f;
+					TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
+					if (timeSpan.TotalMinutes < inteval)
+					{
+						return true;
+					}
 				}
+				return false;
 			}
-			return false;
+			else
+			{
+				//检查兄弟
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HBPath) + "/Logs");
+				foreach (FileInfo logFile in rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly)) //查找文件
+				{
+					double inteval = 5f;
+					TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
+					if (timeSpan.TotalMinutes < inteval)
+					{
+						return true;
+					}
+				}
+				return false;
+			}
 		}
 		public void KillHS(string msg = "")
 		{
 			HearthstoneProcess()?.Kill();
 			Out.Log(string.Format("[{0}]结束 {1}", ID, msg));
 			m_pid = 0;
+			Common.Delay(5 * 1000);
 		}
 		public void StartHS(string msg = "")
 		{
 			// 			WinExec(m_hsPath, 2);
 			Process process = new Process();
 			process.StartInfo.UseShellExecute = false;
-			process.StartInfo.FileName = m_hsPath;
+			process.StartInfo.FileName = HSUnitManager.m_hsPath;
 			process.StartInfo.Arguments += " " + m_token;
 			process.StartInfo.Arguments += " hsunitid:" + m_hsID;
 			process.Start();
 			process.WaitForInputIdle();
 			m_pid = process.Id;
 
-			Out.Log(string.Format("[{0}]启动[pid:{1}][arg:{2}] {3}", ID, m_pid, process.StartInfo.Arguments, msg));
+			Out.Log(string.Format("[{0}]启动 {1} [pid:{2}]", ID, msg, m_pid));
+			Common.Delay(5 * 1000);
 		}
 		public void StartHB(string msg = "")
 		{
@@ -194,8 +210,11 @@ namespace HSCentric
 			process.StartInfo.Arguments += " --rule:" + ((int)currentTask.Mode - (int)TASK_MODE.狂野).ToString();
 			process.StartInfo.Arguments += " --os:10";
 			process.Start();
+			process.WaitForInputIdle();
+			int pid = process.Id;
 
-			Out.Log(string.Format("[{0}]启动HB[arg:{1}] {2}", ID, process.StartInfo.Arguments, msg));
+			Out.Log(string.Format("[{0}]启动HB {1} [pid:{2}] [arg:{3}]", ID, msg, pid, process.StartInfo.Arguments));
+			Common.Delay(5 * 1000);
 		}
 
 		public bool NeedAdjustMode()
@@ -239,7 +258,9 @@ namespace HSCentric
 			{
 				WriteConfigValue(true, currentTask.Mode, currentTask.TeamName, currentTask.StrategyName);
 			}
-			Out.Log(string.Format("[{0}]切换模式[{1}][{2}][{3}]", ID, currentTask.Mode.ToString(), currentTask.TeamName, currentTask.StrategyName));
+			var basicConfigValue = BasicConfigValue;
+			Out.Log(string.Format("[{0}]切换模式 [enable:{1}] [mode:{2}] [team:{3}] [strategy:{4}]",
+				ID, basicConfigValue.MercPluginEnable, basicConfigValue.Mode, basicConfigValue.TeamName, basicConfigValue.StrategyName));
 			return true;
 		}
 
@@ -262,7 +283,7 @@ namespace HSCentric
 		}
 		private void ReadConfigValue()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
@@ -370,7 +391,7 @@ namespace HSCentric
 		}
 		private void WriteConfigValue(bool Enable, TASK_MODE? Mode = null, string TeamName = null, string StrategyName = null)
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
@@ -395,7 +416,6 @@ namespace HSCentric
 				{
 					fileLines[i] = "插件开关 = " + Enable.ToString();
 				}
-
 			}
 			File.WriteAllLines(pathConfig.ToString(), fileLines);
 		}
@@ -405,7 +425,7 @@ namespace HSCentric
 
 			//佣兵日志获取经验
 			RewardXP rewardXP_Merc = new RewardXP();
-			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID);
+			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepinEx/Log/" + ID);
 			List<FileInfo> testList = rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly).ToList();
 			FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
 			if (targetFile != null)
@@ -478,7 +498,6 @@ namespace HSCentric
 		private bool m_mercPluginEnable = false;
 		private RewardXP m_rewardXP = new RewardXP();
 
-		private string m_hsPath = "";//炉石路径
 		private string m_hbPath = "";//hb路径
 		private string m_token = "";//token
 		private int m_pid = 0;//进程id
