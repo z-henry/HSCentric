@@ -11,6 +11,7 @@
 | 报错退出  | true |
 | 弹出消息  | false |
 | 自动领奖  | true |
+| 游戏内消息  | false |
 | HsMod状态  | true |
 2. 佣兵部分，需要配合Mercenary使用
 3. 传统对战部分，需要配合HearthBuddy(author:琴弦上的宇宙)使用

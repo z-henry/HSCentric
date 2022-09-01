@@ -114,6 +114,10 @@ namespace HSCentric
 				{
 					fileLines[i] = "自动领奖 = true";
 				}
+				else if (fileLines[i].IndexOf("游戏内消息 = ") == 0)
+				{
+					fileLines[i] = "游戏内消息 = false";
+				}
 				else if (fileLines[i].IndexOf("HsMod状态 = ") == 0)
 				{
 					fileLines[i] = "HsMod状态 = true";
