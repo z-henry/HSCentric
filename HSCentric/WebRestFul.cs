@@ -41,6 +41,12 @@ namespace HSCentric
 		public string level { set; get; }
 		[DataMember]
 		public int xp { set; get; }
+		[DataMember]
+		public int pvp_rate { set; get; }
+
+		[DataMember]
+		public string classic_rate { set; get; }
+
 	}
 	[DataContract]
 	public class ResultInfo
@@ -76,6 +82,8 @@ namespace HSCentric
 							name = iter.ID,
 							level = string.Format("等级:{0} 经验{1}", iter.XP.Level, iter.XP.ProgressXP),
 							xp = iter.XP.TotalXP,
+							pvp_rate = iter.MercPvpRate,
+							classic_rate = iter.ClassicRate,
 						});
 					}
 					break;

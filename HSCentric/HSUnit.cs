@@ -38,8 +38,8 @@ namespace HSCentric
 		}
 		public string ID
 		{
-			get { return m_hsID; }
-			set { m_hsID = value; }
+			get { return m_ID; }
+			set { m_ID = value; }
 		}
 		public string Token
 		{
@@ -65,6 +65,17 @@ namespace HSCentric
 			get { return m_rewardXP; }
 			set { m_rewardXP = value; }
 		}
+		public string ClassicRate
+		{
+			get { return m_classicRate; }
+			set { m_classicRate = value; }
+		}
+		public int MercPvpRate
+		{
+			get { return m_pvpRate; }
+			set { m_pvpRate = value; }
+		}
+
 
 
 		public void SwitchMercPlugin(bool _switch)
@@ -192,7 +203,7 @@ namespace HSCentric
 			process.StartInfo.UseShellExecute = false;
 			process.StartInfo.FileName = HSUnitManager.m_hsPath;
 			process.StartInfo.Arguments += " " + m_token;
-			process.StartInfo.Arguments += " hsunitid:" + m_hsID;
+			process.StartInfo.Arguments += " hsunitid:" + m_ID;
 			process.StartInfo.Arguments += " startmethod:hscentric";
 			process.Start();
 			process.WaitForInputIdle();
@@ -292,10 +303,10 @@ namespace HSCentric
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
-			if (fileConfig.LastWriteTime <= m_configLastEdit)
+			if (fileConfig.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.主进程日志])
 				return;
 
-			m_configLastEdit = fileConfig.LastWriteTime;
+			m_fileLastEdit[(int)FILE_TYPE.主进程日志] = fileConfig.LastWriteTime;
 			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
 			foreach (string line in fileLines)
 			{
@@ -425,73 +436,110 @@ namespace HSCentric
 			File.WriteAllLines(pathConfig.ToString(), fileLines);
 		}
 
-		public void ReadLog()
+		public void ReadMercLog()
 		{
-
 			//佣兵日志获取经验
-			RewardXP rewardXP_Merc = new RewardXP();
 			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepinEx/Log/" + ID);
+			if (false == System.IO.Directory.Exists(rootHS.ToString()))
+				return;
 			List<FileInfo> testList = rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly).ToList();
 			FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
-			if (targetFile != null)
+			if (targetFile == null)
+				return;
+			if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵日志])
+				return;
+			m_fileLastEdit[(int)FILE_TYPE.佣兵日志] = targetFile.LastWriteTime;
+			foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
 			{
-				foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
+				if (line.IndexOf("战令信息") > 0)
 				{
-					if (line.IndexOf("战令信息") > 0)
+					try
 					{
-						try
+						Regex regex = new Regex(@"^.*等级:([\d]*).*经验:([\d]*).*$");
+						Match match = regex.Match(line);
+						if (match.Groups.Count == 3)
 						{
-							Regex regex = new Regex(@"^.*等级:([\d]*).*经验:([\d]*).*$");
-							Match match = regex.Match(line);
-							if (match.Groups.Count == 3)
+
+							RewardXP rewardXP = new RewardXP()
 							{
-								rewardXP_Merc.Level = Convert.ToInt32(match.Groups[1].Value);
-								rewardXP_Merc.ProgressXP = Convert.ToInt32(match.Groups[2].Value);
-								break;
-							}
+								Level = Convert.ToInt32(match.Groups[1].Value),
+								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
+							};
+							m_rewardXP = m_rewardXP.TotalXP > rewardXP.TotalXP ? m_rewardXP : rewardXP;
 						}
-						catch
-						{
-						}
-						break;
 					}
+					catch
+					{
+					}
+					break;
 				}
 			}
-			m_rewardXP = m_rewardXP.TotalXP > rewardXP_Merc.TotalXP ? m_rewardXP : rewardXP_Merc;
+		}
+		public void ReadMercRecordLog()
+		{
+			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepinEx/Log/" + ID);
+			if (false == System.IO.Directory.Exists(rootHS.ToString()))
+				return;
+			List<FileInfo> testList = rootHS.GetFiles("gamerecord@*.log", SearchOption.TopDirectoryOnly).ToList();
+			FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
+			if (targetFile == null)
+				return;
+			if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵对局日志])
+				return;
+			m_fileLastEdit[(int)FILE_TYPE.佣兵对局日志] = targetFile.LastWriteTime;
+			string[] lines = File.ReadAllLines(targetFile.FullName);
+			if (lines.Length == 0)
+				return;
 
-			//兄弟日志获取经验
-			RewardXP rewardXP_Buddy = new RewardXP();
-			rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs");
-			testList = rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly).ToList();
-			targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
-			if (targetFile != null)
+			string[] lineSplit = lines.Last().Split('\t');
+			try
 			{
-				System.Text.Encoding GB2312 = System.Text.Encoding.GetEncoding("GB2312");
-				foreach (string line in File.ReadLines(targetFile.FullName, System.Text.Encoding.GetEncoding("GB2312")).Reverse<string>())
+				m_pvpRate = int.Parse(lineSplit[2]);
+			}
+			catch { }
+		}
+
+
+		public void ReadHBLog()
+		{
+			if (string.IsNullOrEmpty(m_hbPath))
+				return;
+			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs");
+			if (false == System.IO.Directory.Exists(rootHS.ToString()))
+				return;
+			List<FileInfo> testList = rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly).ToList();
+			FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
+			if (targetFile == null)
+				return;
+			if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.兄弟日志])
+				return;
+			m_fileLastEdit[(int)FILE_TYPE.兄弟日志] = targetFile.LastWriteTime;
+			System.Text.Encoding GB2312 = System.Text.Encoding.GetEncoding("GB2312");
+			foreach (string line in File.ReadLines(targetFile.FullName, System.Text.Encoding.GetEncoding("GB2312")).Reverse<string>())
+			{
+				if (line.IndexOf("[监控插件] 合计: 战令") > 0)
 				{
-					if (line.IndexOf("[监控插件] 合计: 战令") > 0)
+					try
 					{
-						try
+						Regex regex = new Regex(@"^.*合计: 战令([\d]*)级\(([\d]*)/[\d]*\)\([\d]*/小时\)\s(.*)\s[\d]*/[\d]*.*$");
+						Match match = regex.Match(line);
+						if (match.Groups.Count == 4)
 						{
-							Regex regex = new Regex(@"^.*合计: 战令([\d]*)级\(([\d]*)/[\d]*\).*$");
-							Match match = regex.Match(line);
-							if (match.Groups.Count == 3)
+							RewardXP rewardXP = new RewardXP()
 							{
-								rewardXP_Buddy.Level = Convert.ToInt32(match.Groups[1].Value);
-								rewardXP_Buddy.ProgressXP = Convert.ToInt32(match.Groups[2].Value);
-								break;
-							}
+								Level = Convert.ToInt32(match.Groups[1].Value),
+								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
+							};
+							m_rewardXP = m_rewardXP.TotalXP > rewardXP.TotalXP ? m_rewardXP : rewardXP;
 						}
-						catch
-						{
-						}
-						break;
+						m_classicRate = match.Groups[3].Value;
 					}
+					catch
+					{
+					}
+					return;
 				}
 			}
-			m_rewardXP = m_rewardXP.TotalXP > rewardXP_Buddy.TotalXP ? m_rewardXP : rewardXP_Buddy;
-
-
 		}
 
 
@@ -502,13 +550,20 @@ namespace HSCentric
 		private string m_strategyName = "";
 		private bool m_mercPluginEnable = false;
 		private RewardXP m_rewardXP = new RewardXP();
-
+		private int m_pvpRate = 0;
+		private string m_classicRate = "";
 		private string m_hbPath = "";//hb路径
 		private string m_token = "";//token
 		private int m_pid = 0;//进程id
-		private string m_hsID = "";//自定id
+		private string m_ID = "";//自定id
 		private bool m_enable = false;//启用状态
 		private DateTime m_configLastEdit = new DateTime(2000,1,1);
 		private TaskManager m_taskManager = new TaskManager();
+		private DateTime[] m_fileLastEdit = new DateTime[(int)FILE_TYPE.Total]{
+			new DateTime(2000,1,1),
+			new DateTime(2000,1,1),
+			new DateTime(2000,1,1),
+			new DateTime(2000,1,1)
+		};
 	}
 }

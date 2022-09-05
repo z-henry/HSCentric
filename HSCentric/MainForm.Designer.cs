@@ -57,7 +57,7 @@ namespace HSCentric
 			// 
 			// btn_add
 			// 
-			this.btn_add.Location = new System.Drawing.Point(522, 274);
+			this.btn_add.Location = new System.Drawing.Point(409, 6);
 			this.btn_add.Name = "btn_add";
 			this.btn_add.Size = new System.Drawing.Size(75, 23);
 			this.btn_add.TabIndex = 8;
@@ -67,7 +67,7 @@ namespace HSCentric
 			// 
 			// btn_del
 			// 
-			this.btn_del.Location = new System.Drawing.Point(603, 274);
+			this.btn_del.Location = new System.Drawing.Point(490, 6);
 			this.btn_del.Name = "btn_del";
 			this.btn_del.Size = new System.Drawing.Size(75, 23);
 			this.btn_del.TabIndex = 9;
@@ -83,7 +83,7 @@ namespace HSCentric
 			this.listHS.Location = new System.Drawing.Point(12, 35);
 			this.listHS.MultiSelect = false;
 			this.listHS.Name = "listHS";
-			this.listHS.Size = new System.Drawing.Size(666, 233);
+			this.listHS.Size = new System.Drawing.Size(967, 233);
 			this.listHS.TabIndex = 10;
 			this.listHS.UseCompatibleStateImageBehavior = false;
 			this.listHS.View = System.Windows.Forms.View.Details;
@@ -123,7 +123,7 @@ namespace HSCentric
 			// label_currenttime
 			// 
 			this.label_currenttime.AutoSize = true;
-			this.label_currenttime.Location = new System.Drawing.Point(83, 279);
+			this.label_currenttime.Location = new System.Drawing.Point(640, 11);
 			this.label_currenttime.Name = "label_currenttime";
 			this.label_currenttime.Size = new System.Drawing.Size(29, 12);
 			this.label_currenttime.TabIndex = 11;
@@ -132,7 +132,7 @@ namespace HSCentric
 			// label_checktime
 			// 
 			this.label_checktime.AutoSize = true;
-			this.label_checktime.Location = new System.Drawing.Point(303, 279);
+			this.label_checktime.Location = new System.Drawing.Point(860, 11);
 			this.label_checktime.Name = "label_checktime";
 			this.label_checktime.Size = new System.Drawing.Size(29, 12);
 			this.label_checktime.TabIndex = 12;
@@ -141,7 +141,7 @@ namespace HSCentric
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(12, 279);
+			this.label1.Location = new System.Drawing.Point(569, 11);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(65, 12);
 			this.label1.TabIndex = 13;
@@ -150,7 +150,7 @@ namespace HSCentric
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(208, 279);
+			this.label2.Location = new System.Drawing.Point(765, 11);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(89, 12);
 			this.label2.TabIndex = 14;
@@ -186,7 +186,7 @@ namespace HSCentric
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(690, 309);
+			this.ClientSize = new System.Drawing.Size(991, 279);
 			this.Controls.Add(this.btn_selectpath);
 			this.Controls.Add(this.textbox_Path);
 			this.Controls.Add(this.label3);
@@ -198,7 +198,7 @@ namespace HSCentric
 			this.Controls.Add(this.btn_del);
 			this.Controls.Add(this.btn_add);
 			this.Name = "MainForm";
-			this.Text = "大话家来帮你监控 5.0.3";
+			this.Text = "大话家来帮你监控 5.0.4";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);

@@ -17,6 +17,10 @@ namespace HSCentric.Const
 		预设模式,
 		唤醒时间,
 		启用时间段,
+		等级,
+		经验,
+		PVP分数,
+		传统模式等级,
 	}
 	enum R_TASK_MENU
 	{
@@ -63,4 +67,14 @@ namespace HSCentric.Const
 		防战,
 		骑士,
 	}
+
+	public enum FILE_TYPE
+	{
+		主进程日志,
+		佣兵日志,
+		佣兵对局日志,
+		兄弟日志,
+		Total,
+	}
+
 }

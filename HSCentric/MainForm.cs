@@ -25,6 +25,10 @@ namespace HSCentric
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.预设模式.ToString(), 80);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 120);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 140);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.等级.ToString(), 120);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.经验.ToString(), 60);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.PVP分数.ToString(), 60);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.传统模式等级.ToString(), 140);
 
 			HSUnitManager.Init();
 			UI_Flush();
@@ -35,7 +39,7 @@ namespace HSCentric
 		private void TickProcess(object sender, EventArgs e)
 		{
 			//检测重启
-			TimeSpan timespan_checkpriod = new TimeSpan(0, 0, 30);//检测间隔
+			TimeSpan timespan_checkpriod = new TimeSpan(0, 0, 10);//检测间隔
 			if (DateTime.Now > m_CheckTime_runinfo)
 			{
 				m_CheckTime_runinfo = DateTime.Now.AddSeconds(timespan_checkpriod.TotalSeconds);
@@ -135,6 +139,18 @@ namespace HSCentric
 							break;
 						case LIST_UNIT_COLUMN.启用时间段:
 							subitem.Text = currentTask.StartTime.ToString("T") + " - " + currentTask.StopTime.ToString("T");
+							break;
+						case LIST_UNIT_COLUMN.等级:
+							subitem.Text = string.Format("等级:{0} 经验{1}", unit.XP.Level, unit.XP.ProgressXP);
+							break;
+						case LIST_UNIT_COLUMN.经验:
+							subitem.Text = unit.XP.TotalXP.ToString();
+							break;
+						case LIST_UNIT_COLUMN.PVP分数:
+							subitem.Text = unit.MercPvpRate.ToString();
+							break;
+						case LIST_UNIT_COLUMN.传统模式等级:
+							subitem.Text = unit.ClassicRate;
 							break;
 						default:
 							break;

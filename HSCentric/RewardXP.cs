@@ -41,9 +41,9 @@ namespace HSCentric
 			{
 				int total;
 				if (m_Level > 130)
-					total = allNeedXp[129] + (m_Level - 130) * 1500 + m_ProgressXP;
+					total = allNeedXp[129] + (m_Level - 131) * 1500 + m_ProgressXP;
 				else 
-					total = allNeedXp[m_Level - 1] + m_ProgressXP;
+					total = allNeedXp[m_Level - 2] + m_ProgressXP;
 
 				return total; 
 			}

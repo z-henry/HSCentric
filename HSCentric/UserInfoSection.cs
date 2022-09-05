@@ -51,12 +51,6 @@ namespace HSCentric
 			get { return (string)this["id"]; }
 			set { this["id"] = value; }
 		}
-		[ConfigurationProperty("path", IsRequired = true)]
-		public string Path
-		{
-			get { return (string)this["path"]; }
-			set { this["path"] = value; }
-		}
 		[ConfigurationProperty("enable", IsRequired = true)]
 		public bool Enable
 		{
@@ -69,19 +63,19 @@ namespace HSCentric
 			get { return (TaskCollection)base["tasks"]; }
 			set { base["tasks"] = value; }
 		}
-		[ConfigurationProperty("level", IsRequired = true)]
+		[ConfigurationProperty("level", IsRequired = false, DefaultValue = 2)]
 		public int Level
 		{
 			get { return (int)this["level"]; }
 			set { this["level"] = value; }
 		}
-		[ConfigurationProperty("xp", IsRequired = true)]
+		[ConfigurationProperty("xp", IsRequired = false, DefaultValue = 0)]
 		public int XP
 		{
 			get { return (int)this["xp"]; }
 			set { this["xp"] = value; }
 		}
-		[ConfigurationProperty("hbpath")]
+		[ConfigurationProperty("hbpath", IsRequired = false, DefaultValue = "")]
 		public string HBPath
 		{
 			get { return (string)this["hbpath"]; }
@@ -93,6 +87,19 @@ namespace HSCentric
 			get { return (string)this["token"]; }
 			set { this["token"] = value; }
 		}
+		[ConfigurationProperty("pvp_rate", IsRequired = false, DefaultValue = 0)]
+		public int PvpRate
+		{
+			get { return (int)this["pvp_rate"]; }
+			set { this["pvp_rate"] = value; }
+		}
+		[ConfigurationProperty("classic_rate", IsRequired = false, DefaultValue = "")]
+		public string ClassicRate
+		{
+			get { return (string)this["classic_rate"]; }
+			set { this["classic_rate"] = value; }
+		}
+
 	}
 	public class TaskCollection : ConfigurationElementCollection
 	{

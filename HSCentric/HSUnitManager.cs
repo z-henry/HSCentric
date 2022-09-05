@@ -13,7 +13,12 @@ namespace HSCentric
 		public static void Init()
 		{
 			LoadConfig();
-			KillHSAndHB();
+			foreach(var process in HSProcess())
+			{
+				process.Kill();
+				Out.Log(string.Format("关闭炉石残留[pid:{0}]", process.Id));
+				Common.Delay(5000);
+			}
 		}
 		public static void Release()
 		{
@@ -88,7 +93,8 @@ namespace HSCentric
 							else
 								msg_start_reason = "";
 						}
-						if (msg_start_reason.Length > 0)
+						if (msg_start_reason.Length > 0 &&
+							HSProcess().Count < 2)
 						{
 							if (hsUnit.NeedAdjustMode())
 								hsUnit.AdjustMode();
@@ -108,7 +114,9 @@ namespace HSCentric
 				for (int i = 0, ii = m_listHS.Count; i < ii; ++i)
 				{
 					HSUnit hsUnit = m_listHS[i];
-					hsUnit.ReadLog();
+					hsUnit.ReadMercLog();
+					hsUnit.ReadMercRecordLog();
+					hsUnit.ReadHBLog();
 				}
 				SaveConfig();
 				BackUpConfig();
@@ -157,6 +165,7 @@ namespace HSCentric
 				List<TaskUnit> tasks = new List<TaskUnit>();
 				foreach (TaskElement task in hs.Tasks.Cast<TaskElement>().ToList())
 				{
+
 					tasks.Add(new TaskUnit()
 					{
 						Mode = (TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.Mode),
@@ -174,6 +183,8 @@ namespace HSCentric
 					XP = new RewardXP () { Level = hs.Level, ProgressXP = hs.XP },
 					Token = hs.Token,
 					HBPath = hs.HBPath,
+					MercPvpRate = hs.PvpRate,
+					ClassicRate = hs.ClassicRate,
 				});
 			}
 			m_hsPath = ConfigurationManager.AppSettings["hs_path"];
@@ -208,16 +219,14 @@ namespace HSCentric
 					XP = hs.XP.ProgressXP,
 					HBPath = hs.HBPath,
 					Token = hs.Token,
+					ClassicRate = hs.ClassicRate,
+					PvpRate = hs.MercPvpRate,
 				});
 			}
 			config.AppSettings.Settings["hs_path"].Value = m_hsPath;
 			config.Save();
 // 			ConfigurationManager.RefreshSection("userinfo");
 		}
-
-		static List<HSUnit> m_listHS = new List<HSUnit>();
-		static object m_lockHS = new object();
-		static public string m_hsPath = "";
 
 		internal static void Modify(int index, HSUnit unit)
 		{
@@ -240,7 +249,7 @@ namespace HSCentric
 			{
 				if (!m_listHS[index].IsProcessAlive())
 				{
-					m_listHS[index].InitHsMod();
+// 					m_listHS[index].InitHsMod();
 					m_listHS[index].StartHS("手动启动");
 				}
 			}
@@ -258,8 +267,9 @@ namespace HSCentric
 			proc.WaitForExit();
 		}
 
-		internal static void KillHSAndHB()
+		internal static List<Process> HSProcess()
 		{
+			List<Process> listProcess = new List<Process>();
 			foreach(var process_iter in Process.GetProcessesByName("Hearthstone"))
 			{
 				Out.Log(string.Format("炉石残留[pid:{0}]", process_iter.Id));
@@ -272,13 +282,20 @@ namespace HSCentric
 					if (commandline != null &&
 						commandline.IndexOf("startmethod:hscentric") != -1)
 					{
-						process_iter.Kill();
-						Out.Log(string.Format("关闭炉石残留[pid:{0}]", process_iter.Id));
-						Common.Delay(5000);
+						listProcess.Add(process_iter);
 					}
 				}
 			}
+			return listProcess;
 		}
+
+
+
+
+		static List<HSUnit> m_listHS = new List<HSUnit>();
+		static object m_lockHS = new object();
+		static public string m_hsPath = "";
+
 	}
 
 }
