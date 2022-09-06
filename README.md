@@ -2,7 +2,7 @@
 
 ### 说明
 
-1. 需要配合HsMod(author:Pik-4)使用，HsMod配置如下
+1. 需要配合[HsMod(author:Pik-4)](https://github.com/Pik-4/HsMod)使用，HsMod配置如下
 
 |  key   | value  |
 |  ----  | ----  |
@@ -15,7 +15,7 @@
 | HsMod状态  | true |
 
 2. 佣兵部分，需要配合Mercenary使用，工作在[推荐方式]下
-3. 传统对战部分，需要配合HearthBuddy(author:琴弦上的宇宙)使用
+3. 传统对战部分，需要配合[HearthBuddy(author:琴弦上的宇宙)](https://gitee.com/UniverseString/Hearthstone-myHearthbuddy)使用
 
 ### 切换原理
 切换`io.github.jimowushuang.hs.cfg`配置，启动炉石、HearthBuddy
@@ -26,9 +26,9 @@
 |  key   | value  |
 |  ----  | ----  |
 | 插件开关  | `true` |
-| 插件运行模式  | `false` |
-| 使用的队伍名称  | `false` |
-| 战斗策略  | `true` |
+| 插件运行模式  | `挂机收菜、刷图等` |
+| 使用的队伍名称  | `你的佣兵队伍` |
+| 战斗策略  | `你的佣兵策略` |
 
 启动炉石
 
@@ -38,9 +38,9 @@
 |  key   | value  |
 |  ----  | ----  |
 | 插件开关  | `true` |
-| 插件运行模式  | `false` |
-| 使用的队伍名称  | `false` |
-| 战斗策略  | `true` |
+| 插件运行模式  | `挂机收菜、刷图等` |
+| 使用的队伍名称  | `你的佣兵队伍` |
+| 战斗策略  | `你的佣兵策略` |
 
 启动炉石
 
