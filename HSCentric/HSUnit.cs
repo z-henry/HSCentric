@@ -133,6 +133,18 @@ namespace HSCentric
 				{
 					fileLines[i] = "HsMod状态 = true";
 				}
+				else if (fileLines[i].IndexOf("对手卡牌特效 = ") == 0)
+				{
+					fileLines[i] = "对手卡牌特效 = false";
+				}
+				else if (fileLines[i].IndexOf("金卡特效 = ") == 0)
+				{
+					fileLines[i] = "金卡特效 = Disabled";
+				}
+				else if (fileLines[i].IndexOf("钻石卡特效 = ") == 0)
+				{
+					fileLines[i] = "钻石卡特效 = Disabled";
+				}
 			}
 			File.WriteAllLines(pathConfig.ToString(), fileLines);
 		}

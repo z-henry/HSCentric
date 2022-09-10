@@ -101,7 +101,10 @@ namespace HSCentric
 							hsUnit.InitHsMod();
 							hsUnit.StartHS(msg_start_reason); 
 							if (Common.IsBuddyMode(currentTask.Mode))
+							{
+								Common.Delay(5 * 1000);
 								hsUnit.StartHB(msg_start_reason);
+							}
 						}
 					}
 				}

@@ -13,6 +13,9 @@
 | 弹出消息  | false |
 | 自动领奖  | true |
 | HsMod状态  | true |
+| 对手卡牌特效  | false |
+| 金卡特效  | Disabled |
+| 钻石卡特效  | Disabled |
 
 2. 佣兵部分，需要配合Mercenary使用，工作在[推荐方式]下
 3. 传统对战部分，需要配合[HearthBuddy(author:琴弦上的宇宙)](https://gitee.com/UniverseString/Hearthstone-myHearthbuddy)使用
