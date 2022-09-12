@@ -275,7 +275,7 @@ namespace HSCentric
 			List<Process> listProcess = new List<Process>();
 			foreach(var process_iter in Process.GetProcessesByName("Hearthstone"))
 			{
-				Out.Log(string.Format("炉石残留[pid:{0}]", process_iter.Id));
+// 				Out.Log(string.Format("炉石残留[pid:{0}]", process_iter.Id));
 				using (var searcher = new ManagementObjectSearcher(
 					"SELECT CommandLine FROM Win32_Process WHERE ProcessId = " + process_iter.Id))
 				using (var objects = searcher.Get())

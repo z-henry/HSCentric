@@ -169,37 +169,19 @@ namespace HSCentric
 		}
 		public bool IsLogUpdated()
 		{
-			//5min不更新
-			if (BasicConfigValue.MercPluginEnable)
+			//检查佣兵
+			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/Logs");
+			foreach (FileInfo logFile in rootHS.GetFiles("hearthstone_*.log", SearchOption.TopDirectoryOnly)) //查找文件
 			{
-				//检查佣兵
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/Log/" + ID);
-				foreach (FileInfo logFile in rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly)) //查找文件
+				double inteval = 5f;
+				TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
+				if (timeSpan.TotalMinutes < inteval)
 				{
-					double inteval = 5f;
-					TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
-					if (timeSpan.TotalMinutes < inteval)
-					{
-						return true;
-					}
+					return true;
 				}
-				return false;
 			}
-			else
-			{
-				//检查兄弟
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HBPath) + "/Logs");
-				foreach (FileInfo logFile in rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly)) //查找文件
-				{
-					double inteval = 5f;
-					TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
-					if (timeSpan.TotalMinutes < inteval)
-					{
-						return true;
-					}
-				}
-				return false;
-			}
+			return false;
+
 		}
 		public void KillHS(string msg = "")
 		{
