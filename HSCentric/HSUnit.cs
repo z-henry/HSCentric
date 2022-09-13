@@ -101,50 +101,54 @@ namespace HSCentric
 			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
 			for (int i = 0, ii = fileLines.Length; i < ii; ++i)
 			{
-				if (fileLines[i].IndexOf("自动开盒 = ") == 0)
-				{
-					fileLines[i] = "自动开盒 = true";
-				}
-				else if (fileLines[i].IndexOf("结算展示 = ") == 0)
-				{
-					fileLines[i] = "结算展示 = false";
-				}
-				else if (fileLines[i].IndexOf("应用焦点 = ") == 0)
-				{
-					fileLines[i] = "应用焦点 = false";
-				}
-				else if (fileLines[i].IndexOf("报错退出 = ") == 0)
-				{
-					fileLines[i] = "报错退出 = true";
-				}
-				else if (fileLines[i].IndexOf("弹出消息 = ") == 0)
-				{
-					fileLines[i] = "弹出消息 = false";
-				}
-				else if (fileLines[i].IndexOf("自动领奖 = ") == 0)
-				{
-					fileLines[i] = "自动领奖 = true";
-				}
-				else if (fileLines[i].IndexOf("游戏内消息 = ") == 0)
-				{
-					fileLines[i] = "游戏内消息 = false";
-				}
-				else if (fileLines[i].IndexOf("HsMod状态 = ") == 0)
+				if (fileLines[i].IndexOf("HsMod状态 = ") == 0)
 				{
 					fileLines[i] = "HsMod状态 = true";
 				}
-				else if (fileLines[i].IndexOf("对手卡牌特效 = ") == 0)
+				else if(fileLines[i].IndexOf("设置模板 = ") == 0)
 				{
-					fileLines[i] = "对手卡牌特效 = false";
+					fileLines[i] = "设置模板 = AwayFromKeyboard";
 				}
-				else if (fileLines[i].IndexOf("金卡特效 = ") == 0)
-				{
-					fileLines[i] = "金卡特效 = Disabled";
-				}
-				else if (fileLines[i].IndexOf("钻石卡特效 = ") == 0)
-				{
-					fileLines[i] = "钻石卡特效 = Disabled";
-				}
+				// 				else if(fileLines[i].IndexOf("自动开盒 = ") == 0)
+				// 				{
+				// 					fileLines[i] = "自动开盒 = true";
+				// 				}
+				// 				else if (fileLines[i].IndexOf("结算展示 = ") == 0)
+				// 				{
+				// 					fileLines[i] = "结算展示 = false";
+				// 				}
+				// 				else if (fileLines[i].IndexOf("应用焦点 = ") == 0)
+				// 				{
+				// 					fileLines[i] = "应用焦点 = false";
+				// 				}
+				// 				else if (fileLines[i].IndexOf("报错退出 = ") == 0)
+				// 				{
+				// 					fileLines[i] = "报错退出 = true";
+				// 				}
+				// 				else if (fileLines[i].IndexOf("弹出消息 = ") == 0)
+				// 				{
+				// 					fileLines[i] = "弹出消息 = false";
+				// 				}
+				// 				else if (fileLines[i].IndexOf("自动领奖 = ") == 0)
+				// 				{
+				// 					fileLines[i] = "自动领奖 = true";
+				// 				}
+				// 				else if (fileLines[i].IndexOf("游戏内消息 = ") == 0)
+				// 				{
+				// 					fileLines[i] = "游戏内消息 = false";
+				// 				}
+				// 				else if (fileLines[i].IndexOf("对手卡牌特效 = ") == 0)
+				// 				{
+				// 					fileLines[i] = "对手卡牌特效 = false";
+				// 				}
+				// 				else if (fileLines[i].IndexOf("金卡特效 = ") == 0)
+				// 				{
+				// 					fileLines[i] = "金卡特效 = Disabled";
+				// 				}
+				// 				else if (fileLines[i].IndexOf("钻石卡特效 = ") == 0)
+				// 				{
+				// 					fileLines[i] = "钻石卡特效 = Disabled";
+				// 				}
 			}
 			File.WriteAllLines(pathConfig.ToString(), fileLines);
 		}
