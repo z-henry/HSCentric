@@ -7,6 +7,8 @@ using HSCentric.Const;
 using System.Runtime.InteropServices;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace HSCentric
 {
@@ -105,7 +107,7 @@ namespace HSCentric
 				{
 					fileLines[i] = "HsMod状态 = true";
 				}
-				else if(fileLines[i].IndexOf("设置模板 = ") == 0)
+				else if (fileLines[i].IndexOf("设置模板 = ") == 0)
 				{
 					fileLines[i] = "设置模板 = AwayFromKeyboard";
 				}
@@ -173,16 +175,19 @@ namespace HSCentric
 		}
 		public bool IsLogUpdated()
 		{
-			//检查佣兵
-			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/Logs");
-			foreach (FileInfo logFile in rootHS.GetFiles("hearthstone_*.log", SearchOption.TopDirectoryOnly)) //查找文件
+			if (string.IsNullOrEmpty (m_hsLogFile))
+				return true;
+
+			string rootPath = System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + '/' + m_hsLogFile;
+			if (false == System.IO.File.Exists(rootPath))
+				return false;
+
+			FileInfo logFile = new FileInfo(rootPath);
+			double inteval = 5f;
+			TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
+			if (timeSpan.TotalMinutes < inteval)
 			{
-				double inteval = 5f;
-				TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
-				if (timeSpan.TotalMinutes < inteval)
-				{
-					return true;
-				}
+				return true;
 			}
 			return false;
 
@@ -192,11 +197,11 @@ namespace HSCentric
 			HearthstoneProcess()?.Kill();
 			Out.Log(string.Format("[{0}]结束 {1}", ID, msg));
 			m_pid = 0;
+			m_hsLogFile = "";
 			Common.Delay(5 * 1000);
 		}
-		public void StartHS(string msg = "")
+		public async void StartHS(string msg = "")
 		{
-			// 			WinExec(m_hsPath, 2);
 			Process process = new Process();
 			process.StartInfo.UseShellExecute = false;
 			process.StartInfo.FileName = HSUnitManager.m_hsPath;
@@ -206,9 +211,9 @@ namespace HSCentric
 			process.Start();
 			process.WaitForInputIdle();
 			m_pid = process.Id;
-
 			Out.Log(string.Format("[{0}]启动 {1} [pid:{2}]", ID, msg, m_pid));
-			Common.Delay(5 * 1000);
+			m_hsLogFile = await GetHSLogPath();
+			Out.Log(string.Format("[{0}]记录炉石日志路径 {1}", ID, m_hsLogFile));
 		}
 		public void StartHB(string msg = "")
 		{
@@ -228,7 +233,6 @@ namespace HSCentric
 			int pid = process.Id;
 
 			Out.Log(string.Format("[{0}]启动HB {1} [pid:{2}] [arg:{3}]", ID, msg, pid, process.StartInfo.Arguments));
-			Common.Delay(5 * 1000);
 		}
 
 		public bool NeedAdjustMode()
@@ -287,7 +291,7 @@ namespace HSCentric
 			Process target = null;
 			try
 			{
-				target =Process.GetProcessById(m_pid);
+				target = Process.GetProcessById(m_pid);
 			}
 			catch
 			{
@@ -540,6 +544,30 @@ namespace HSCentric
 			}
 		}
 
+		public Task<string> GetHSLogPath()
+		{
+			var task = Task.Run(() => {
+				Thread.Sleep(15*1000);
+				DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+				if (false == System.IO.File.Exists(pathConfig.ToString()))
+					return "";
+				string[] fileLines = File.ReadAllLines(pathConfig.ToString());
+				foreach (var line in fileLines)
+				{
+					if (line.IndexOf("炉石日志 = ") == 0)
+					{
+						int start_pos = "炉石日志 = ".Length;
+						if (line.Length > start_pos)
+							return line.Substring(start_pos);
+						else
+							return "";
+					}
+				}
+				return "";
+			});
+			return task;
+		}
+
 
 		private string m_mode = "";
 		private DateTime m_awakeTime = new DateTime(2000, 1, 1);
@@ -553,9 +581,10 @@ namespace HSCentric
 		private string m_hbPath = "";//hb路径
 		private string m_token = "";//token
 		private int m_pid = 0;//进程id
+		private string m_hsLogFile = "";//炉石进程对应的日志
 		private string m_ID = "";//自定id
 		private bool m_enable = false;//启用状态
-		private DateTime m_configLastEdit = new DateTime(2000,1,1);
+		private DateTime m_configLastEdit = new DateTime(2000, 1, 1);
 		private TaskManager m_taskManager = new TaskManager();
 		private DateTime[] m_fileLastEdit = new DateTime[(int)FILE_TYPE.Total]{
 			new DateTime(2000,1,1),

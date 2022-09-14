@@ -2,20 +2,12 @@
 
 ### 说明
 
-1. 需要配合[HsMod(author:Pik-4)](https://github.com/Pik-4/HsMod)使用，HsMod配置如下
+1. 需要配合[HsMod(author:Pik-4)](https://github.com/Pik-4/HsMod)使用，HsMod配置如下（用中控拽起会自动设置）
 
 |  key   | value  |
 |  ----  | ----  |
-| 自动开盒  | true |
-| 结算展示  | false |
-| 应用焦点  | false |
-| 报错退出  | true |
-| 弹出消息  | false |
-| 自动领奖  | true |
 | HsMod状态  | true |
-| 对手卡牌特效  | false |
-| 金卡特效  | Disabled |
-| 钻石卡特效  | Disabled |
+| 设置模板  | AwayFromKeyboard |
 
 2. 佣兵部分，需要配合Mercenary使用，工作在[推荐方式]下
 3. 传统对战部分，需要配合[HearthBuddy(author:琴弦上的宇宙)](https://gitee.com/UniverseString/Hearthstone-myHearthbuddy)使用
@@ -61,8 +53,8 @@
 
 ### 已知问题
 1. 无法进行传统对战之间的相邻切换（经典、休闲、标准、狂野）
-2. 多个炉石同时启动不delay，插件可能无法加载（目前delay 5秒）
+2. [挺好的不改了]~~多个炉石同时启动不delay，插件可能无法加载（目前delay 5秒）~~
 3. [进行中]兄弟不识别佣兵模式，所以在挂传统模式前，挂pvp，并且间隔10分钟左右（pve不操作就不会结算，而pvp超时对手就把你解决了）
 3. [已解决]~~佣兵插件不识别传统模式，所以在挂佣兵模式前，挂传统需要间隔10分钟左右（超时对手就把你解决了）~~
 4. 日志无法定时清理
-5. 多实例炉石，共通监控`Logs/hearthstone_日期.log`的日志更新时间，这导致无法判断某个炉石卡死的情况（绑定炉石实例与日志启动时间点）
+5. [已解决，搭配最新版hsmod食用]~~多实例炉石，共通监控`Logs/hearthstone_日期.log`的日志更新时间，这导致无法判断某个炉石卡死的情况（绑定炉石实例与日志启动时间点）~~
