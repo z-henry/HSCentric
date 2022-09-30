@@ -45,6 +45,8 @@ namespace HSCentric.Const
 		自动解锁地图,
 		Pvp,
 		挂机收菜,
+		自动解锁装备,
+		自动主线,
 		狂野,
 		标准,
 		经典,

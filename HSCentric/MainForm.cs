@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Configuration;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using HSCentric.Const;
+using System.Net.Sockets;
+using MimeKit;
 
 namespace HSCentric
 {
@@ -15,6 +14,17 @@ namespace HSCentric
 	{
 		public MainForm()
 		{
+// 			TcpClient client = new TcpClient("cn.version.battle.net", 1119);
+// 			using (NetworkStream stream = client.GetStream())
+// 			{
+// 				byte[] req = Encoding.UTF8.GetBytes("v1/products/hsb/versions\r\n");
+// 
+// 				stream.Write(req, 0, req.Length);
+// 
+// 				var message = MimeMessage.Load(stream);
+// 				int a = 0;
+// 			}
+
 			this.InitializeComponent();
 			this.timer1.Interval = 100;
 			this.timer1.Tick += this.TickProcess;

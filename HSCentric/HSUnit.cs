@@ -211,6 +211,7 @@ namespace HSCentric
 			process.Start();
 			process.WaitForInputIdle();
 			m_pid = process.Id;
+			m_hsLogFile = "";
 			Out.Log(string.Format("[{0}]启动 {1} [pid:{2}]", ID, msg, m_pid));
 			m_hsLogFile = await GetHSLogPath();
 			Out.Log(string.Format("[{0}]记录炉石日志路径 {1}", ID, m_hsLogFile));
