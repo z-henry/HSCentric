@@ -41,6 +41,7 @@ namespace HSCentric
 			this.btn_cancel = new System.Windows.Forms.Button();
 			this.textBox_strategy = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
+			this.checkBoxScale = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -112,7 +113,7 @@ namespace HSCentric
 			// 
 			// btn_ok
 			// 
-			this.btn_ok.Location = new System.Drawing.Point(32, 151);
+			this.btn_ok.Location = new System.Drawing.Point(35, 169);
 			this.btn_ok.Name = "btn_ok";
 			this.btn_ok.Size = new System.Drawing.Size(75, 23);
 			this.btn_ok.TabIndex = 8;
@@ -122,7 +123,7 @@ namespace HSCentric
 			// 
 			// btn_cancel
 			// 
-			this.btn_cancel.Location = new System.Drawing.Point(113, 151);
+			this.btn_cancel.Location = new System.Drawing.Point(116, 169);
 			this.btn_cancel.Name = "btn_cancel";
 			this.btn_cancel.Size = new System.Drawing.Size(75, 23);
 			this.btn_cancel.TabIndex = 9;
@@ -146,11 +147,22 @@ namespace HSCentric
 			this.label5.TabIndex = 10;
 			this.label5.Text = "策略名称";
 			// 
+			// checkBoxScale
+			// 
+			this.checkBoxScale.AutoSize = true;
+			this.checkBoxScale.Location = new System.Drawing.Point(12, 144);
+			this.checkBoxScale.Name = "checkBoxScale";
+			this.checkBoxScale.Size = new System.Drawing.Size(72, 16);
+			this.checkBoxScale.TabIndex = 12;
+			this.checkBoxScale.Text = "启用齿轮";
+			this.checkBoxScale.UseVisualStyleBackColor = true;
+			// 
 			// TaskForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(202, 183);
+			this.ClientSize = new System.Drawing.Size(202, 204);
+			this.Controls.Add(this.checkBoxScale);
 			this.Controls.Add(this.textBox_strategy);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.btn_cancel);
@@ -184,5 +196,6 @@ namespace HSCentric
 		private System.Windows.Forms.Button btn_cancel;
 		private System.Windows.Forms.TextBox textBox_strategy;
 		private System.Windows.Forms.Label label5;
+		private System.Windows.Forms.CheckBox checkBoxScale;
 	}
 }

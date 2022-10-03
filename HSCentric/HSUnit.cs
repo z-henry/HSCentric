@@ -25,12 +25,12 @@ namespace HSCentric
 			return (bf.Deserialize(ms));
 		}
 
-		public (string Mode, DateTime AwakeTime, int AwakePeriod, string TeamName, string StrategyName, bool MercPluginEnable) BasicConfigValue
+		public (string Mode, DateTime AwakeTime, int AwakePeriod, string TeamName, string StrategyName, bool MercPluginEnable, bool Scale) BasicConfigValue
 		{
 			get
 			{
 				ReadConfigValue();
-				return (m_mode, m_awakeTime, m_awakePeriod, m_teamName, m_strategyName, m_mercPluginEnable);
+				return (m_mode, m_awakeTime, m_awakePeriod, m_teamName, m_strategyName, m_mercPluginEnable, m_scale);
 			}
 		}
 		public bool Enable
@@ -256,7 +256,8 @@ namespace HSCentric
 				if (basicConfigValue.MercPluginEnable == false ||
 					currentTask.Mode.ToString() != basicConfigValue.Mode ||
 					currentTask.TeamName != basicConfigValue.TeamName ||
-					currentTask.StrategyName != basicConfigValue.StrategyName)
+					currentTask.StrategyName != basicConfigValue.StrategyName ||
+					currentTask.Scale != basicConfigValue.Scale)
 				{
 					return true;
 				}
@@ -275,7 +276,7 @@ namespace HSCentric
 			}
 			else
 			{
-				WriteConfigValue(true, currentTask.Mode, currentTask.TeamName, currentTask.StrategyName);
+				WriteConfigValue(true, currentTask.Mode, currentTask.TeamName, currentTask.StrategyName, currentTask.Scale);
 			}
 			var basicConfigValue = BasicConfigValue;
 			Out.Log(string.Format("[{0}]切换模式 [enable:{1}] [mode:{2}] [team:{3}] [strategy:{4}]",
@@ -404,11 +405,26 @@ namespace HSCentric
 						m_mercPluginEnable = false;
 					}
 				}
+				else if (line.IndexOf("自动齿轮加速 = ") == 0)
+				{
+					try
+					{
+						int start_pos = "自动齿轮加速 = ".Length;
+						if (line.Length > start_pos)
+							m_scale = Convert.ToBoolean(line.Substring(start_pos));
+						else
+							m_scale = false;
+					}
+					catch
+					{
+						m_scale = false;
+					}
+				}
 				else
 					continue;
 			}
 		}
-		private void WriteConfigValue(bool Enable, TASK_MODE? Mode = null, string TeamName = null, string StrategyName = null)
+		private void WriteConfigValue(bool Enable, TASK_MODE? Mode = null, string TeamName = null, string StrategyName = null, bool Scale = false)
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
@@ -434,6 +450,10 @@ namespace HSCentric
 				else if (fileLines[i].IndexOf("插件开关 = ") == 0)
 				{
 					fileLines[i] = "插件开关 = " + Enable.ToString();
+				}
+				else if (fileLines[i].IndexOf("自动齿轮加速 = ") == 0)
+				{
+					fileLines[i] = "自动齿轮加速 = " + Scale.ToString();
 				}
 			}
 			File.WriteAllLines(pathConfig.ToString(), fileLines);
@@ -576,6 +596,7 @@ namespace HSCentric
 		private string m_teamName = "";
 		private string m_strategyName = "";
 		private bool m_mercPluginEnable = false;
+		private bool m_scale = false;
 		private RewardXP m_rewardXP = new RewardXP();
 		private int m_pvpRate = 0;
 		private string m_classicRate = "";

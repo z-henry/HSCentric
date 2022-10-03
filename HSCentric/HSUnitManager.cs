@@ -178,6 +178,7 @@ namespace HSCentric
 						StopTime = Convert.ToDateTime(task.StopTime),
 						StrategyName = task.StrategyName,
 						TeamName = task.TeamName,
+						Scale = task.Scale,
 					});
 				}
 				m_listHS.Add(new HSUnit()
@@ -213,6 +214,7 @@ namespace HSCentric
 						StrategyName = task.StrategyName,
 						StartTime = task.StartTime.ToString("G"),
 						StopTime = task.StopTime.ToString("G"),
+						Scale = task.Scale,
 					});
 				}
 				section.HSUnit.Add(new HSUnitElement()

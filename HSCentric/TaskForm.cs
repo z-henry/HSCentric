@@ -1,12 +1,5 @@
 ﻿using HSCentric.Const;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace HSCentric
@@ -27,6 +20,7 @@ namespace HSCentric
 			textBox_strategy.Text = Task.StrategyName;
 			dateTimePicker_start.Value = Task.StartTime;
 			dateTimePicker_stop.Value = Task.StopTime;
+			checkBoxScale.Checked = Task.Scale;
 		}
 
 		public TaskUnit Task
@@ -64,6 +58,7 @@ namespace HSCentric
 				MessageBox.Show("请填写正确的时间段");
 				return;
 			}
+			Task.Scale = checkBoxScale.Checked;
 			DialogResult = DialogResult.OK;
 			Close();
 		}

@@ -18,10 +18,11 @@ namespace HSCentric
 			textbox_Token.Text = m_unit.Token;
 
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.模式.ToString(), 80);
-			this.listTasks.Columns.Add(LIST_TASK_COLUMN.队伍.ToString(), 80);
-			this.listTasks.Columns.Add(LIST_TASK_COLUMN.策略.ToString(), 80);
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.队伍.ToString(), 40);
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.策略.ToString(), 40);
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.启动时间.ToString(), 80);
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.停止时间.ToString(), 80);
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.齿轮.ToString(), 40);
 
 			UI_Flush();
 		}
@@ -197,6 +198,9 @@ namespace HSCentric
 							break;
 						case LIST_TASK_COLUMN.启动时间:
 							subitem.Text = task.StartTime.ToString("T");
+							break;
+						case LIST_TASK_COLUMN.齿轮:
+							subitem.Text = task.Scale.ToString();
 							break;
 						default:
 							break;

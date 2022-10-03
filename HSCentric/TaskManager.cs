@@ -130,6 +130,12 @@ namespace HSCentric
 			set { m_strategyName = value; }
 		}
 
+		public bool Scale
+		{
+			set { m_scale = value; }
+			get { return m_scale; }
+		}
+
 		public bool IsTimeLegal()
 		{
 			return m_startTime.TimeOfDay < m_stopTime.TimeOfDay;
@@ -153,5 +159,6 @@ namespace HSCentric
 		private TASK_MODE m_mode = TASK_MODE.挂机收菜;
 		private string m_teamName ="";
 		private string m_strategyName = "";
+		private bool m_scale = false;
 	}
 }

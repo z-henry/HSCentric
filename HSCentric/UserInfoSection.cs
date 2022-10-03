@@ -165,5 +165,12 @@ namespace HSCentric
 			get { return (string)this["stoptime"]; }
 			set { this["stoptime"] = value; }
 		}
+		[ConfigurationProperty("scale", IsRequired = false, DefaultValue = false)]
+		public bool Scale
+		{
+			get { return (bool)this["scale"]; }
+			set { this["scale"] = value; }
+		}
+
 	}
 }
