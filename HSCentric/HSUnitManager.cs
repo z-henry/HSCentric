@@ -287,7 +287,7 @@ namespace HSCentric
 					var @object = objects.Cast<ManagementBaseObject>().SingleOrDefault();
 					string commandline = @object?["CommandLine"]?.ToString();
 					if (commandline != null &&
-						commandline.IndexOf("startmethod:hscentric") != -1)
+						commandline.IndexOf("--startmethod:hscentric") != -1)
 					{
 						listProcess.Add(process_iter);
 					}

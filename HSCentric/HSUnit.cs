@@ -206,8 +206,8 @@ namespace HSCentric
 			process.StartInfo.UseShellExecute = false;
 			process.StartInfo.FileName = HSUnitManager.m_hsPath;
 			process.StartInfo.Arguments += " " + m_token;
-			process.StartInfo.Arguments += " hsunitid:" + m_ID;
-			process.StartInfo.Arguments += " startmethod:hscentric";
+			process.StartInfo.Arguments += " --hsunitid:" + m_ID;
+			process.StartInfo.Arguments += " --startmethod:hscentric";
 			process.Start();
 			process.WaitForInputIdle();
 			m_pid = process.Id;
