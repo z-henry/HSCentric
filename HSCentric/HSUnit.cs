@@ -461,28 +461,27 @@ namespace HSCentric
 
 		public void ReadMercLog()
 		{
-			//佣兵日志获取经验
-			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepinEx/Log/" + ID);
-			if (false == System.IO.Directory.Exists(rootHS.ToString()))
-				return;
-			List<FileInfo> testList = rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly).ToList();
-			FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
-			if (targetFile == null)
-				return;
-			if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵日志])
-				return;
-			m_fileLastEdit[(int)FILE_TYPE.佣兵日志] = targetFile.LastWriteTime;
-			foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
+			try
 			{
-				if (line.IndexOf("战令信息") > 0)
+				//佣兵日志获取经验
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepinEx/Log/" + ID);
+				if (false == System.IO.Directory.Exists(rootHS.ToString()))
+					return;
+				List<FileInfo> testList = rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly).ToList();
+				FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
+				if (targetFile == null)
+					return;
+				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵日志])
+					return;
+				m_fileLastEdit[(int)FILE_TYPE.佣兵日志] = targetFile.LastWriteTime;
+				foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
 				{
-					try
+					if (line.IndexOf("战令信息") > 0)
 					{
 						Regex regex = new Regex(@"^.*等级:([\d]*).*经验:([\d]*).*$");
 						Match match = regex.Match(line);
 						if (match.Groups.Count == 3)
 						{
-
 							RewardXP rewardXP = new RewardXP()
 							{
 								Level = Convert.ToInt32(match.Groups[1].Value),
@@ -490,59 +489,60 @@ namespace HSCentric
 							};
 							m_rewardXP = m_rewardXP.TotalXP > rewardXP.TotalXP ? m_rewardXP : rewardXP;
 						}
+						break;
 					}
-					catch
-					{
-					}
-					break;
 				}
+			}
+			catch
+			{
 			}
 		}
 		public void ReadMercRecordLog()
 		{
-			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepinEx/Log/" + ID);
-			if (false == System.IO.Directory.Exists(rootHS.ToString()))
-				return;
-			List<FileInfo> testList = rootHS.GetFiles("gamerecord@*.log", SearchOption.TopDirectoryOnly).ToList();
-			FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
-			if (targetFile == null)
-				return;
-			if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵对局日志])
-				return;
-			m_fileLastEdit[(int)FILE_TYPE.佣兵对局日志] = targetFile.LastWriteTime;
-			string[] lines = File.ReadAllLines(targetFile.FullName);
-			if (lines.Length == 0)
-				return;
-
-			string[] lineSplit = lines.Last().Split('\t');
 			try
 			{
-				m_pvpRate = int.Parse(lineSplit[2]);
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepinEx/Log/" + ID);
+				if (false == System.IO.Directory.Exists(rootHS.ToString()))
+					return;
+				List<FileInfo> testList = rootHS.GetFiles("gamerecord@*.log", SearchOption.TopDirectoryOnly).ToList();
+				FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
+				if (targetFile == null)
+					return;
+				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵对局日志])
+					return;
+				m_fileLastEdit[(int)FILE_TYPE.佣兵对局日志] = targetFile.LastWriteTime;
+				string[] lines = File.ReadAllLines(targetFile.FullName);
+				if (lines.Length == 0)
+					return;
+
+				string[] lineSplit = lines.Last().Split('\t');
 			}
-			catch { }
+			catch
+			{
+			}
 		}
 
 
 		public void ReadHBLog()
 		{
-			if (string.IsNullOrEmpty(m_hbPath))
-				return;
-			DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs");
-			if (false == System.IO.Directory.Exists(rootHS.ToString()))
-				return;
-			List<FileInfo> testList = rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly).ToList();
-			FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
-			if (targetFile == null)
-				return;
-			if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.兄弟日志])
-				return;
-			m_fileLastEdit[(int)FILE_TYPE.兄弟日志] = targetFile.LastWriteTime;
-			System.Text.Encoding GB2312 = System.Text.Encoding.GetEncoding("GB2312");
-			foreach (string line in File.ReadLines(targetFile.FullName, System.Text.Encoding.GetEncoding("GB2312")).Reverse<string>())
+			try
 			{
-				if (line.IndexOf("[监控插件] 合计: 战令") > 0)
+				if (string.IsNullOrEmpty(m_hbPath))
+					return;
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs");
+				if (false == System.IO.Directory.Exists(rootHS.ToString()))
+					return;
+				List<FileInfo> testList = rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly).ToList();
+				FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
+				if (targetFile == null)
+					return;
+				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.兄弟日志])
+					return;
+				m_fileLastEdit[(int)FILE_TYPE.兄弟日志] = targetFile.LastWriteTime;
+				System.Text.Encoding GB2312 = System.Text.Encoding.GetEncoding("GB2312");
+				foreach (string line in File.ReadLines(targetFile.FullName, System.Text.Encoding.GetEncoding("GB2312")).Reverse<string>())
 				{
-					try
+					if (line.IndexOf("[监控插件] 合计: 战令") > 0)
 					{
 						Regex regex = new Regex(@"^.*合计: 战令([\d]*)级\(([\d]*)/[\d]*\)\([\d]*/小时\)\s(.*)\s[\d]*/[\d]*.*$");
 						Match match = regex.Match(line);
@@ -556,12 +556,12 @@ namespace HSCentric
 							m_rewardXP = m_rewardXP.TotalXP > rewardXP.TotalXP ? m_rewardXP : rewardXP;
 						}
 						m_classicRate = match.Groups[3].Value;
+						return;
 					}
-					catch
-					{
-					}
-					return;
 				}
+			}
+			catch
+			{
 			}
 		}
 
