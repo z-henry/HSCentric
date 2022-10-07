@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using HSCentric.Const;
 using System.Net.Sockets;
-using MimeKit;
+// using MimeKit;
 
 namespace HSCentric
 {
