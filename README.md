@@ -9,8 +9,14 @@
 | HsMod状态  | true |
 | 设置模板  | AwayFromKeyboard |
 
-2. 佣兵部分，需要配合Mercenary使用，工作在[推荐方式]下
+2. 佣兵部分，需要配合[Mercenary](https://github.com/z-henry/Mercenary)使用，工作在[推荐方式]下
 3. 传统对战部分，需要配合[HearthBuddy(author:琴弦上的宇宙)](https://gitee.com/UniverseString/Hearthstone-myHearthbuddy)使用
+4. 佣兵插件部分（含1和2的二进制文件），可以直接拷贝
+`default_runtime/BepinEXPlugin`到`你的炉石根目录/BepInEx/plugins`
+5. 中控运行环境，可以直接使用
+`default_runtime\HSCentric`
+6. 配置好账号后，使用中控自动拉起一次游戏后关掉，既可完成配置
+
 
 ### 切换原理
 切换`io.github.jimowushuang.hs.cfg`配置，启动炉石、HearthBuddy
