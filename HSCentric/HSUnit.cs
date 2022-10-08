@@ -516,6 +516,7 @@ namespace HSCentric
 					return;
 
 				string[] lineSplit = lines.Last().Split('\t');
+				m_pvpRate = int.Parse(lineSplit[2]);
 			}
 			catch
 			{
