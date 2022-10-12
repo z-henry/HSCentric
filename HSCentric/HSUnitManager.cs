@@ -94,7 +94,7 @@ namespace HSCentric
 								msg_start_reason = "";
 						}
 						if (msg_start_reason.Length > 0 &&
-							HSProcess().Count < 2)
+							HSProcess().Count < 999)
 						{
 							if (hsUnit.NeedAdjustMode())
 								hsUnit.AdjustMode();
