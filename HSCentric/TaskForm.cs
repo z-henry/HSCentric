@@ -9,6 +9,9 @@ namespace HSCentric
 		public TaskForm(TaskUnit task = null)
 		{
 			InitializeComponent();
+			foreach (var iter in Enum.GetValues(typeof(Const.BEHAVIOR_MODE)))
+				comboBox_strategy.Items.Add(iter.ToString());
+
 			if (task != null)
 				m_task = (TaskUnit)task.DeepClone();
 
@@ -17,7 +20,7 @@ namespace HSCentric
 
 			comboBox_mode.SelectedIndex = (int)Task.Mode;
 			textBox_team.Text = Task.TeamName;
-			textBox_strategy.Text = Task.StrategyName;
+			comboBox_strategy.Text = Task.StrategyName;
 			dateTimePicker_start.Value = Task.StartTime;
 			dateTimePicker_stop.Value = Task.StopTime;
 			checkBoxScale.Checked = Task.Scale;
@@ -44,12 +47,12 @@ namespace HSCentric
 			}
 			Task.TeamName = textBox_team.Text;
 
-			if (textBox_strategy.Text.Length <= 0)
+			if (comboBox_strategy.Text.Length <= 0)
 			{
 				MessageBox.Show("请填写策略名称");
 				return;
 			}
-			Task.StrategyName = textBox_strategy.Text;
+			Task.StrategyName = comboBox_strategy.Text;
 
 			Task.StartTime = dateTimePicker_start.Value;
 			Task.StopTime = dateTimePicker_stop.Value;

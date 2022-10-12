@@ -39,9 +39,9 @@ namespace HSCentric
 			this.dateTimePicker_stop = new System.Windows.Forms.DateTimePicker();
 			this.btn_ok = new System.Windows.Forms.Button();
 			this.btn_cancel = new System.Windows.Forms.Button();
-			this.textBox_strategy = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.checkBoxScale = new System.Windows.Forms.CheckBox();
+			this.comboBox_strategy = new System.Windows.Forms.ComboBox();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -131,13 +131,6 @@ namespace HSCentric
 			this.btn_cancel.UseVisualStyleBackColor = true;
 			this.btn_cancel.Click += new System.EventHandler(this.btn_cancel_Click);
 			// 
-			// textBox_strategy
-			// 
-			this.textBox_strategy.Location = new System.Drawing.Point(69, 63);
-			this.textBox_strategy.Name = "textBox_strategy";
-			this.textBox_strategy.Size = new System.Drawing.Size(120, 21);
-			this.textBox_strategy.TabIndex = 11;
-			// 
 			// label5
 			// 
 			this.label5.AutoSize = true;
@@ -157,13 +150,21 @@ namespace HSCentric
 			this.checkBoxScale.Text = "启用齿轮";
 			this.checkBoxScale.UseVisualStyleBackColor = true;
 			// 
+			// comboBox_strategy
+			// 
+			this.comboBox_strategy.FormattingEnabled = true;
+			this.comboBox_strategy.Location = new System.Drawing.Point(67, 63);
+			this.comboBox_strategy.Name = "comboBox_strategy";
+			this.comboBox_strategy.Size = new System.Drawing.Size(121, 20);
+			this.comboBox_strategy.TabIndex = 13;
+			// 
 			// TaskForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(202, 204);
+			this.Controls.Add(this.comboBox_strategy);
 			this.Controls.Add(this.checkBoxScale);
-			this.Controls.Add(this.textBox_strategy);
 			this.Controls.Add(this.label5);
 			this.Controls.Add(this.btn_cancel);
 			this.Controls.Add(this.btn_ok);
@@ -194,8 +195,8 @@ namespace HSCentric
 		private System.Windows.Forms.DateTimePicker dateTimePicker_stop;
 		private System.Windows.Forms.Button btn_ok;
 		private System.Windows.Forms.Button btn_cancel;
-		private System.Windows.Forms.TextBox textBox_strategy;
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.CheckBox checkBoxScale;
+		private System.Windows.Forms.ComboBox comboBox_strategy;
 	}
 }
