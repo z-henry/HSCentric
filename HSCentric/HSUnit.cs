@@ -99,6 +99,7 @@ namespace HSCentric
 				return; 
 			Common.IniWriteValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
 			Common.IniWriteValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
+			Common.IniWriteValue("全局", "游戏帧率", "15", pathConfig.ToString());
 		}
 
 		public bool IsActive()
