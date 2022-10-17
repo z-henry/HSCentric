@@ -11,9 +11,9 @@ namespace HSCentric
 			InitializeComponent();
 			foreach (var iter in Enum.GetValues(typeof(Const.BEHAVIOR_MODE)))
 				comboBox_strategy.Items.Add(iter.ToString());
-			for (int iter = 0; iter < 6; iter++)
+			for (int iter = 0; iter <= 6; iter++)
 				comboBox_numCore.Items.Add(iter.ToString());
-			for (int iter = 1; iter < 6; iter++)
+			for (int iter = 1; iter <= 6; iter++)
 				comboBox_numTotal.Items.Add(iter.ToString());
 
 			if (task != null)
@@ -28,6 +28,7 @@ namespace HSCentric
 			dateTimePicker_start.Value = Task.StartTime;
 			dateTimePicker_stop.Value = Task.StopTime;
 			checkBoxScale.Checked = Task.Scale;
+			textBox_map.Text = task.Map;
 			comboBox_numCore.SelectedIndex = Task.MercTeamNumCore;
 			comboBox_numTotal.SelectedIndex = Task.MercTeamNumTotal-1;
 		}
@@ -71,6 +72,7 @@ namespace HSCentric
 			Task.Scale = checkBoxScale.Checked;
 			Task.MercTeamNumTotal = comboBox_numTotal.SelectedIndex + 1;
 			Task.MercTeamNumCore = comboBox_numCore.SelectedIndex;
+			Task.Map = textBox_map.Text;
 			DialogResult = DialogResult.OK;
 			Close();
 		}

@@ -73,10 +73,10 @@ namespace HSCentric.Const
 
 	public enum FILE_TYPE
 	{
-		主进程日志,
 		佣兵日志,
 		佣兵对局日志,
 		兄弟日志,
+		佣兵配置,
 		Total,
 	}
 

@@ -34,8 +34,8 @@ namespace HSCentric
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.当前模式.ToString(), 70);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.预设模式.ToString(), 70);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 130);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 120);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.等级.ToString(), 60);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 95);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.等级.ToString(), 40);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.经验.ToString(), 50);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.PVP分数.ToString(), 60);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.传统模式等级.ToString(), 140);
@@ -133,25 +133,25 @@ namespace HSCentric
 					switch (list_item)
 					{
 						case LIST_UNIT_COLUMN.唤醒时间:
-							subitem.Text = basicConfigValue.AwakeTime.ToString("G");
-							if (unit.Enable && basicConfigValue.Mode == TASK_MODE.挂机收菜.ToString())
-								subitem.BackColor = GetColor(basicConfigValue.AwakePeriod, new TimeSpan(basicConfigValue.AwakeTime.Ticks - DateTime.Now.Ticks).TotalSeconds,
+							subitem.Text = basicConfigValue.awakeTime.ToString("G");
+							if (unit.Enable && basicConfigValue.mode == TASK_MODE.挂机收菜.ToString())
+								subitem.BackColor = GetColor(basicConfigValue.awakePeriod, new TimeSpan(basicConfigValue.awakeTime.Ticks - DateTime.Now.Ticks).TotalSeconds,
 									new List<Color>() { Color.White, default_color });
 							break;
 						case LIST_UNIT_COLUMN.成员:
 							subitem.Text = unit.ID;
 							break;
 						case LIST_UNIT_COLUMN.当前模式:
-							subitem.Text = basicConfigValue.MercPluginEnable ? basicConfigValue.Mode : "非佣兵";
+							subitem.Text = basicConfigValue.mercPluginEnable ? basicConfigValue.mode : "非佣兵";
 							break;
 						case LIST_UNIT_COLUMN.预设模式:
 							subitem.Text = currentTask.Mode.ToString();
 							break;
 						case LIST_UNIT_COLUMN.启用时间段:
-							subitem.Text = currentTask.StartTime.ToString("T") + " - " + currentTask.StopTime.ToString("T");
+							subitem.Text = currentTask.StartTime.ToString("HH:mm") + "-" + currentTask.StopTime.ToString("HH:mm");
 							break;
 						case LIST_UNIT_COLUMN.等级:
-							subitem.Text = $"等级:{unit.XP.Level}";
+							subitem.Text = unit.XP.Level.ToString();
 							break;
 						case LIST_UNIT_COLUMN.经验:
 							subitem.Text = unit.XP.TotalXP.ToString();

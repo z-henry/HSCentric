@@ -15,6 +15,19 @@ namespace HSCentric
 	[Serializable]
 	public class HSUnit
 	{
+		public class CacheConfig
+		{
+			public string mode = "";
+			public DateTime awakeTime = new DateTime(2000, 1, 1);
+			public int awakePeriod = 25;
+			public string teamName = "";
+			public string strategyName = "";
+			public bool mercPluginEnable = false;
+			public bool scale = false;
+			public string map = "2-5";
+			public int numCore = 0;
+			public int numTotal = 6;
+		}
 		public object DeepClone()
 		{
 			BinaryFormatter bf = new BinaryFormatter();
@@ -24,12 +37,12 @@ namespace HSCentric
 			return (bf.Deserialize(ms));
 		}
 
-		public (string Mode, DateTime AwakeTime, int AwakePeriod, string TeamName, string StrategyName, bool MercPluginEnable, bool Scale, string Map, int NumCore, int NumTotal) BasicConfigValue
+		public CacheConfig BasicConfigValue
 		{
 			get
 			{
-				ReadConfigValue();
-				return (m_CacheMode, m_CacheAwakeTime, m_CacheAwakePeriod, m_CacheTeamName, m_CacheStrategyName, m_CacheMercPluginEnable, m_CacheScale, m_CacheMap, m_CacheNumCore, m_CachNumTotal);
+				m_cacheConfig = ReadConfigValue() ?? m_cacheConfig;
+				return m_cacheConfig;
 			}
 		}
 		public bool Enable
@@ -241,7 +254,7 @@ namespace HSCentric
 			TaskUnit currentTask = CurrentTask;
 			if (Common.IsBuddyMode(currentTask.Mode))
 			{
-				if (basicConfigValue.MercPluginEnable == true)
+				if (basicConfigValue.mercPluginEnable == true)
 				{
 					return true;
 				}
@@ -252,14 +265,14 @@ namespace HSCentric
 			}
 			else
 			{
-				if (basicConfigValue.MercPluginEnable == false ||
-					currentTask.Mode.ToString() != basicConfigValue.Mode ||
-					currentTask.TeamName != basicConfigValue.TeamName ||
-					currentTask.StrategyName != basicConfigValue.StrategyName ||
-					currentTask.Scale != basicConfigValue.Scale ||
-					currentTask.Map != basicConfigValue.Map ||
-					currentTask.MercTeamNumCore != basicConfigValue.NumCore ||
-					currentTask.MercTeamNumTotal != basicConfigValue.NumTotal)
+				if (basicConfigValue.mercPluginEnable == false ||
+					currentTask.Mode.ToString() != basicConfigValue.mode ||
+					currentTask.TeamName != basicConfigValue.teamName ||
+					currentTask.StrategyName != basicConfigValue.strategyName ||
+					currentTask.Scale != basicConfigValue.scale ||
+					currentTask.Map != basicConfigValue.map ||
+					currentTask.MercTeamNumCore != basicConfigValue.numCore ||
+					currentTask.MercTeamNumTotal != basicConfigValue.numTotal)
 				{
 					return true;
 				}
@@ -274,15 +287,15 @@ namespace HSCentric
 			TaskUnit currentTask = CurrentTask;
 			if (Common.IsBuddyMode(currentTask.Mode))
 			{
-				WriteConfigValue(false);
+				WriteConfigValue(false, null);
 			}
 			else
 			{
-				WriteConfigValue(true, currentTask.Mode, currentTask.TeamName, currentTask.StrategyName, currentTask.Scale);
+				WriteConfigValue(true, currentTask);
 			}
 			var basicConfigValue = BasicConfigValue;
 			Out.Log(string.Format("[{0}]切换模式 [enable:{1}] [mode:{2}] [team:{3}] [strategy:{4}]",
-				ID, basicConfigValue.MercPluginEnable, basicConfigValue.Mode, basicConfigValue.TeamName, basicConfigValue.StrategyName));
+				ID, basicConfigValue.mercPluginEnable, basicConfigValue.mode, basicConfigValue.teamName, basicConfigValue.strategyName));
 			return true;
 		}
 
@@ -303,162 +316,47 @@ namespace HSCentric
 			}
 			return target;
 		}
-		private void ReadConfigValue()
+		private CacheConfig ReadConfigValue()
+		{
+			CacheConfig resultConfig = new CacheConfig();
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			if (false == File.Exists(pathConfig.ToString()))
+				return null;
+			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
+			if (fileConfig.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵配置])
+				return null;
+
+			m_fileLastEdit[(int)FILE_TYPE.佣兵配置] = fileConfig.LastWriteTime;
+			resultConfig.awakeTime = Common.IniReadValue<DateTime>("配置", "唤醒时间", new DateTime(2000, 1, 1), pathConfig.ToString());
+			resultConfig.awakePeriod = 60 * Common.IniReadValue<int>("配置", "唤醒时间间隔", 22, pathConfig.ToString());
+			resultConfig.mode = Common.IniReadValue<string>("配置", "插件运行模式", "", pathConfig.ToString());
+			resultConfig.teamName = Common.IniReadValue<string>("配置", "使用的队伍名称", "", pathConfig.ToString());
+			resultConfig.strategyName = Common.IniReadValue<string>("配置", "战斗策略", "", pathConfig.ToString());
+			resultConfig.mercPluginEnable = Common.IniReadValue<bool>("配置", "插件开关", false, pathConfig.ToString());
+			resultConfig.scale = Common.IniReadValue<bool>("配置", "自动齿轮加速", false, pathConfig.ToString());
+			resultConfig.map = Common.IniReadValue<string>("配置", "要刷的地图", "2-5", pathConfig.ToString());
+			resultConfig.numCore = Common.IniReadValue<int>("配置", "队伍核心人数", 0, pathConfig.ToString());
+			resultConfig.numTotal = Common.IniReadValue<int>("配置", "总队伍人数", 6, pathConfig.ToString());
+			return resultConfig;
+		}
+
+		private void WriteConfigValue(bool Enable, TaskUnit task)
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
-				return;
-			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
-			if (fileConfig.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.主进程日志])
 				return;
 
-			m_fileLastEdit[(int)FILE_TYPE.主进程日志] = fileConfig.LastWriteTime;
-			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
-			foreach (string line in fileLines)
+			Common.IniWriteValue("配置", "插件开关", Enable.ToString(), pathConfig.ToString());
+			if (task != null)
 			{
-				if (line.IndexOf("唤醒时间 = ") == 0)
-				{
-					try
-					{
-						int start_pos = "唤醒时间 = ".Length;
-						if (line.Length > start_pos)
-							m_CacheAwakeTime = Convert.ToDateTime(line.Substring(start_pos));
-						else
-							m_CacheAwakeTime = new DateTime(2000, 1, 1);
-					}
-					catch
-					{
-						m_CacheAwakeTime = new DateTime(2000, 1, 1);
-					}
-				}
-				else if (line.IndexOf("唤醒时间间隔 = ") == 0)
-				{
-					try
-					{
-						int start_pos = "唤醒时间间隔 = ".Length;
-						if (line.Length > start_pos)
-							m_CacheAwakePeriod = Convert.ToInt32(line.Substring(start_pos)) * 60;
-						else
-							m_CacheAwakePeriod = 22 * 60;
-					}
-					catch
-					{
-						m_CacheAwakePeriod = 22 * 60;
-					}
-					continue;
-				}
-				else if (line.IndexOf("插件运行模式 = ") == 0)
-				{
-					try
-					{
-						int start_pos = "插件运行模式 = ".Length;
-						if (line.Length > start_pos)
-							m_CacheMode = line.Substring(start_pos);
-						else
-							m_CacheMode = "";
-					}
-					catch
-					{
-						m_CacheMode = "";
-					}
-				}
-				else if (line.IndexOf("使用的队伍名称 = ") == 0)
-				{
-					try
-					{
-						int start_pos = "使用的队伍名称 = ".Length;
-						if (line.Length > start_pos)
-							m_CacheTeamName = line.Substring(start_pos);
-						else
-							m_CacheTeamName = "";
-					}
-					catch
-					{
-						m_CacheTeamName = "";
-					}
-				}
-				else if (line.IndexOf("战斗策略 = ") == 0)
-				{
-					try
-					{
-						int start_pos = "战斗策略 = ".Length;
-						if (line.Length > start_pos)
-							m_CacheStrategyName = line.Substring(start_pos);
-						else
-							m_CacheStrategyName = "";
-					}
-					catch
-					{
-						m_CacheStrategyName = "";
-					}
-				}
-				else if (line.IndexOf("插件开关 = ") == 0)
-				{
-					try
-					{
-						int start_pos = "插件开关 = ".Length;
-						if (line.Length > start_pos)
-							m_CacheMercPluginEnable = Convert.ToBoolean(line.Substring(start_pos));
-						else
-							m_CacheMercPluginEnable = false;
-					}
-					catch
-					{
-						m_CacheMercPluginEnable = false;
-					}
-				}
-				else if (line.IndexOf("自动齿轮加速 = ") == 0)
-				{
-					try
-					{
-						int start_pos = "自动齿轮加速 = ".Length;
-						if (line.Length > start_pos)
-							m_CacheScale = Convert.ToBoolean(line.Substring(start_pos));
-						else
-							m_CacheScale = false;
-					}
-					catch
-					{
-						m_CacheScale = false;
-					}
-				}
-				else
-					continue;
+				Common.IniWriteValue("配置", "插件运行模式", task.Mode.ToString(), pathConfig.ToString());
+				Common.IniWriteValue("配置", "使用的队伍名称", task.TeamName.ToString(), pathConfig.ToString());
+				Common.IniWriteValue("配置", "战斗策略", task.StrategyName.ToString(), pathConfig.ToString());
+				Common.IniWriteValue("配置", "自动齿轮加速", task.Scale.ToString(), pathConfig.ToString());
+				Common.IniWriteValue("配置", "要刷的地图", task.Map.ToString(), pathConfig.ToString());
+				Common.IniWriteValue("配置", "总队伍人数", task.MercTeamNumTotal.ToString(), pathConfig.ToString());
+				Common.IniWriteValue("配置", "队伍核心人数", task.MercTeamNumCore.ToString(), pathConfig.ToString());
 			}
-		}
-		private void WriteConfigValue(bool Enable, TASK_MODE? Mode = null, string TeamName = null, string StrategyName = null, bool Scale = false)
-		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
-			if (false == System.IO.File.Exists(pathConfig.ToString()))
-				return;
-			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
-			for (int i = 0, ii = fileLines.Length; i < ii; ++i)
-			{
-				if (fileLines[i].IndexOf("插件运行模式 = ") == 0)
-				{
-					if (Mode != null)
-						fileLines[i] = "插件运行模式 = " + Mode.ToString();
-				}
-				else if (fileLines[i].IndexOf("使用的队伍名称 = ") == 0)
-				{
-					if (TeamName != null)
-						fileLines[i] = "使用的队伍名称 = " + TeamName;
-				}
-				else if (fileLines[i].IndexOf("战斗策略 = ") == 0)
-				{
-					if (StrategyName != null)
-						fileLines[i] = "战斗策略 = " + StrategyName;
-				}
-				else if (fileLines[i].IndexOf("插件开关 = ") == 0)
-				{
-					fileLines[i] = "插件开关 = " + Enable.ToString();
-				}
-				else if (fileLines[i].IndexOf("自动齿轮加速 = ") == 0)
-				{
-					fileLines[i] = "自动齿轮加速 = " + Scale.ToString();
-				}
-			}
-			File.WriteAllLines(pathConfig.ToString(), fileLines);
 		}
 
 		public void ReadMercLog()
@@ -592,18 +490,6 @@ namespace HSCentric
 			return task;
 		}
 
-		//到时候弄成结构体
-		private string m_CacheMode = "";
-		private DateTime m_CacheAwakeTime = new DateTime(2000, 1, 1);
-		private int m_CacheAwakePeriod = 25;
-		private string m_CacheTeamName = "";
-		private string m_CacheStrategyName = "";
-		private bool m_CacheMercPluginEnable = false;
-		private bool m_CacheScale = false;
-		private string m_CacheMap = "2-5";
-		private int m_CacheNumCore = 0;
-		private int m_CachNumTotal = 6;
-
 		private RewardXP m_rewardXP = new RewardXP();
 		private int m_pvpRate = 0;
 		private string m_classicRate = "";
@@ -620,5 +506,6 @@ namespace HSCentric
 			new DateTime(2000,1,1),
 			new DateTime(2000,1,1)
 		};
+		private CacheConfig m_cacheConfig = new CacheConfig();
 	}
 }
