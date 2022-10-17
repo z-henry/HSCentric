@@ -33,7 +33,7 @@ namespace HSCentric
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.成员.ToString(), 80);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.当前模式.ToString(), 70);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.预设模式.ToString(), 70);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 125);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 130);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 120);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.等级.ToString(), 60);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.经验.ToString(), 50);

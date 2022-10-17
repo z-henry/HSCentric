@@ -206,19 +206,19 @@ namespace HSCentric
 							subitem.Text = task.Scale? "√":"";
 							break;
 						case LIST_TASK_COLUMN.地图:
-							if (Common.IsBuddyMode((TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.StrategyName)))
+							if (Common.IsBuddyMode(task.Mode))
 								subitem.Text = "--";
 							else
 								subitem.Text = task.Map;
 							break;
 						case LIST_TASK_COLUMN.核心:
-							if (Common.IsBuddyMode((TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.StrategyName)))
+							if (Common.IsBuddyMode(task.Mode))
 								subitem.Text = "--";
 							else
 								subitem.Text = task.MercTeamNumCore.ToString();
 							break;
 						case LIST_TASK_COLUMN.总数:
-							if (Common.IsBuddyMode((TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.StrategyName)))
+							if (Common.IsBuddyMode(task.Mode))
 								subitem.Text = "--";
 							else
 								subitem.Text = task.MercTeamNumTotal.ToString();
