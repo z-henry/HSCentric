@@ -15,6 +15,7 @@ namespace HSCentric
 	[Serializable]
 	public class HSUnit
 	{
+		[Serializable]
 		public class CacheConfig
 		{
 			public string mode = "";
@@ -91,80 +92,13 @@ namespace HSCentric
 		}
 
 
-
-		public void SwitchMercPlugin(bool _switch)
-		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
-			if (false == System.IO.File.Exists(pathConfig.ToString()))
-				return;
-			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
-			for (int i = 0, ii = fileLines.Length; i < ii; ++i)
-			{
-				if (fileLines[i].IndexOf("插件开关 = ") == 0)
-				{
-					fileLines[i] = "插件开关 = " + _switch.ToString();
-				}
-			}
-			File.WriteAllLines(pathConfig.ToString(), fileLines);
-		}
 		public void InitHsMod()
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
-				return;
-			string[] fileLines = File.ReadAllLines(pathConfig.ToString());
-			for (int i = 0, ii = fileLines.Length; i < ii; ++i)
-			{
-				if (fileLines[i].IndexOf("HsMod状态 = ") == 0)
-				{
-					fileLines[i] = "HsMod状态 = true";
-				}
-				else if (fileLines[i].IndexOf("设置模板 = ") == 0)
-				{
-					fileLines[i] = "设置模板 = AwayFromKeyboard";
-				}
-				// 				else if(fileLines[i].IndexOf("自动开盒 = ") == 0)
-				// 				{
-				// 					fileLines[i] = "自动开盒 = true";
-				// 				}
-				// 				else if (fileLines[i].IndexOf("结算展示 = ") == 0)
-				// 				{
-				// 					fileLines[i] = "结算展示 = false";
-				// 				}
-				// 				else if (fileLines[i].IndexOf("应用焦点 = ") == 0)
-				// 				{
-				// 					fileLines[i] = "应用焦点 = false";
-				// 				}
-				// 				else if (fileLines[i].IndexOf("报错退出 = ") == 0)
-				// 				{
-				// 					fileLines[i] = "报错退出 = true";
-				// 				}
-				// 				else if (fileLines[i].IndexOf("弹出消息 = ") == 0)
-				// 				{
-				// 					fileLines[i] = "弹出消息 = false";
-				// 				}
-				// 				else if (fileLines[i].IndexOf("自动领奖 = ") == 0)
-				// 				{
-				// 					fileLines[i] = "自动领奖 = true";
-				// 				}
-				// 				else if (fileLines[i].IndexOf("游戏内消息 = ") == 0)
-				// 				{
-				// 					fileLines[i] = "游戏内消息 = false";
-				// 				}
-				// 				else if (fileLines[i].IndexOf("对手卡牌特效 = ") == 0)
-				// 				{
-				// 					fileLines[i] = "对手卡牌特效 = false";
-				// 				}
-				// 				else if (fileLines[i].IndexOf("金卡特效 = ") == 0)
-				// 				{
-				// 					fileLines[i] = "金卡特效 = Disabled";
-				// 				}
-				// 				else if (fileLines[i].IndexOf("钻石卡特效 = ") == 0)
-				// 				{
-				// 					fileLines[i] = "钻石卡特效 = Disabled";
-				// 				}
-			}
-			File.WriteAllLines(pathConfig.ToString(), fileLines);
+				return; 
+			Common.IniWriteValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
+			Common.IniWriteValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
 		}
 
 		public bool IsActive()
@@ -294,8 +228,6 @@ namespace HSCentric
 				WriteConfigValue(true, currentTask);
 			}
 			var basicConfigValue = BasicConfigValue;
-			Out.Log(string.Format("[{0}]切换模式 [enable:{1}] [mode:{2}] [team:{3}] [strategy:{4}]",
-				ID, basicConfigValue.mercPluginEnable, basicConfigValue.mode, basicConfigValue.teamName, basicConfigValue.strategyName));
 			return true;
 		}
 
@@ -325,8 +257,8 @@ namespace HSCentric
 			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
 			if (fileConfig.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵配置])
 				return null;
-
 			m_fileLastEdit[(int)FILE_TYPE.佣兵配置] = fileConfig.LastWriteTime;
+
 			resultConfig.awakeTime = Common.IniReadValue<DateTime>("配置", "唤醒时间", new DateTime(2000, 1, 1), pathConfig.ToString());
 			resultConfig.awakePeriod = 60 * Common.IniReadValue<int>("配置", "唤醒时间间隔", 22, pathConfig.ToString());
 			resultConfig.mode = Common.IniReadValue<string>("配置", "插件运行模式", "", pathConfig.ToString());
@@ -337,6 +269,12 @@ namespace HSCentric
 			resultConfig.map = Common.IniReadValue<string>("配置", "要刷的地图", "2-5", pathConfig.ToString());
 			resultConfig.numCore = Common.IniReadValue<int>("配置", "队伍核心人数", 0, pathConfig.ToString());
 			resultConfig.numTotal = Common.IniReadValue<int>("配置", "总队伍人数", 6, pathConfig.ToString());
+
+// 			Out.Log($"[{ID}]更新缓存 awakeTime:{resultConfig.awakeTime} awakePeriod:{resultConfig.awakePeriod} " +
+// 				$"mode:{resultConfig.mode} teamName:{resultConfig.teamName} strategyName:{resultConfig.strategyName} " +
+// 				$"mercPluginEnable:{resultConfig.mercPluginEnable} scale:{resultConfig.scale} map:{resultConfig.map} " +
+// 				$"numCore:{resultConfig.numCore} numTotal:{resultConfig.numTotal}"
+// 				);
 			return resultConfig;
 		}
 
@@ -357,7 +295,26 @@ namespace HSCentric
 				Common.IniWriteValue("配置", "总队伍人数", task.MercTeamNumTotal.ToString(), pathConfig.ToString());
 				Common.IniWriteValue("配置", "队伍核心人数", task.MercTeamNumCore.ToString(), pathConfig.ToString());
 			}
+			Out.Log($"[{ID}]写入配置 mode:{task.Mode} teamName:{task.TeamName} strategyName:{task.StrategyName} " +
+				$"Enable:{Enable} Scale:{task.Scale} Map:{task.Map} " +
+				$"MercTeamNumTotal:{task.MercTeamNumTotal} MercTeamNumCore:{task.MercTeamNumCore}"
+				);
 		}
+
+		public Task<string> GetHSLogPath()
+		{
+			var task = Task.Run(() =>
+			{
+				Thread.Sleep(15 * 1000);
+				DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+				if (false == System.IO.File.Exists(pathConfig.ToString()))
+					return "";
+
+				return Common.IniReadValue<string>("开发", "炉石日志", "", pathConfig.ToString());
+			});
+			return task;
+		}
+
 
 		public void ReadMercLog()
 		{
@@ -423,7 +380,6 @@ namespace HSCentric
 			}
 		}
 
-
 		public void ReadHBLog()
 		{
 			try
@@ -464,30 +420,6 @@ namespace HSCentric
 			catch
 			{
 			}
-		}
-
-		public Task<string> GetHSLogPath()
-		{
-			var task = Task.Run(() => {
-				Thread.Sleep(15*1000);
-				DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
-				if (false == System.IO.File.Exists(pathConfig.ToString()))
-					return "";
-				string[] fileLines = File.ReadAllLines(pathConfig.ToString());
-				foreach (var line in fileLines)
-				{
-					if (line.IndexOf("炉石日志 = ") == 0)
-					{
-						int start_pos = "炉石日志 = ".Length;
-						if (line.Length > start_pos)
-							return line.Substring(start_pos);
-						else
-							return "";
-					}
-				}
-				return "";
-			});
-			return task;
 		}
 
 		private RewardXP m_rewardXP = new RewardXP();

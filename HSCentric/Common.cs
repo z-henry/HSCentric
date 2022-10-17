@@ -21,24 +21,28 @@ namespace HSCentric
 		}
 
 		[DllImport("kernel32")]
-		private static extern long WritePrivateProfileString(string section, string key,string val, string filePath);
-
+		public static extern bool WritePrivateProfileString(byte[] section, byte[] key, byte[] val, string filePath);
 		[DllImport("kernel32")]
-		private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
+		public static extern int GetPrivateProfileString(byte[] section, byte[] key, byte[] def, byte[] retVal, int size, string filePath);
 
-		public static void IniWriteValue(string Section, string Key, string Value, string path)
+		private static byte[] getBytes(string s, string encodingName)
 		{
-			WritePrivateProfileString(Section, Key, Value, path);
+			return null == s ? null : Encoding.GetEncoding(encodingName).GetBytes(s);
+		}
+		public static void IniWriteValue(string Section, string Key, string Value, string path, string encodingName = "utf-8")
+		{
+			WritePrivateProfileString(getBytes(Section, encodingName), getBytes(Key, encodingName), getBytes(Value, encodingName), path);
 		}
 
-		public static T IniReadValue<T>(string Section, string Key, T Default, string path)
+		public static T IniReadValue<T>(string Section, string Key, T Default, string path, string encodingName = "utf-8")
 		{
-			StringBuilder temp = new StringBuilder(255);
-			GetPrivateProfileString(Section, Key, "", temp, 255, path);
-			if (temp.Length == 0)
+			byte[] buffer = new byte[256];
+			int count = GetPrivateProfileString(getBytes(Section, encodingName), getBytes(Key, encodingName), getBytes("", encodingName), buffer, 255, path);
+			string result = Encoding.GetEncoding(encodingName).GetString(buffer, 0, count).Trim();
+			if (result.Length == 0)
 				return Default;
 			else
-				return (T)Convert.ChangeType(temp.ToString(), typeof(T));
+				return (T)Convert.ChangeType(result.ToString(), typeof(T));
 		}
 	}
 }

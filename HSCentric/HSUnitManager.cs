@@ -269,15 +269,20 @@ namespace HSCentric
 		}
 		internal static void BackUpConfig()
 		{
-			//运行备份更新bat
-			Process proc;
-			proc = new Process();
-			proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + @"script\backup\backup.bat";
-			proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_hsPath) + "\"";
-			proc.StartInfo.CreateNoWindow = true;   //不创建该进程的窗口
-			proc.StartInfo.UseShellExecute = false;   //不使用shell壳运行
-			proc.Start();
-			proc.WaitForExit();
+			try
+			{
+				//运行备份更新bat
+				Process proc;
+				proc = new Process();
+				proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + @"script\backup\backup.bat";
+				proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_hsPath) + "\"";
+				proc.StartInfo.CreateNoWindow = true;   //不创建该进程的窗口
+				proc.StartInfo.UseShellExecute = false;   //不使用shell壳运行
+				proc.Start();
+				proc.WaitForExit();
+			}
+			catch
+			{ }
 		}
 
 		internal static List<Process> HSProcess()

@@ -28,7 +28,7 @@ namespace HSCentric
 			dateTimePicker_start.Value = Task.StartTime;
 			dateTimePicker_stop.Value = Task.StopTime;
 			checkBoxScale.Checked = Task.Scale;
-			textBox_map.Text = task.Map;
+			textBox_map.Text = Task.Map;
 			comboBox_numCore.SelectedIndex = Task.MercTeamNumCore;
 			comboBox_numTotal.SelectedIndex = Task.MercTeamNumTotal-1;
 		}
