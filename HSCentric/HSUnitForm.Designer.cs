@@ -61,7 +61,7 @@ namespace HSCentric
 			// 
 			// btn_ok
 			// 
-			this.btn_ok.Location = new System.Drawing.Point(232, 333);
+			this.btn_ok.Location = new System.Drawing.Point(396, 333);
 			this.btn_ok.Name = "btn_ok";
 			this.btn_ok.Size = new System.Drawing.Size(75, 23);
 			this.btn_ok.TabIndex = 14;
@@ -89,7 +89,7 @@ namespace HSCentric
 			// 
 			// btn_cancel
 			// 
-			this.btn_cancel.Location = new System.Drawing.Point(325, 333);
+			this.btn_cancel.Location = new System.Drawing.Point(477, 333);
 			this.btn_cancel.Name = "btn_cancel";
 			this.btn_cancel.Size = new System.Drawing.Size(75, 23);
 			this.btn_cancel.TabIndex = 17;
@@ -105,7 +105,7 @@ namespace HSCentric
 			this.listTasks.Location = new System.Drawing.Point(14, 110);
 			this.listTasks.MultiSelect = false;
 			this.listTasks.Name = "listTasks";
-			this.listTasks.Size = new System.Drawing.Size(390, 217);
+			this.listTasks.Size = new System.Drawing.Size(538, 217);
 			this.listTasks.TabIndex = 18;
 			this.listTasks.UseCompatibleStateImageBehavior = false;
 			this.listTasks.View = System.Windows.Forms.View.Details;
@@ -204,7 +204,7 @@ namespace HSCentric
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(412, 368);
+			this.ClientSize = new System.Drawing.Size(564, 368);
 			this.Controls.Add(this.btn_selecthbpath);
 			this.Controls.Add(this.textbox_HBPath);
 			this.Controls.Add(this.label5);

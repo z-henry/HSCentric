@@ -42,6 +42,12 @@ namespace HSCentric
 			this.label5 = new System.Windows.Forms.Label();
 			this.checkBoxScale = new System.Windows.Forms.CheckBox();
 			this.comboBox_strategy = new System.Windows.Forms.ComboBox();
+			this.textBox_map = new System.Windows.Forms.TextBox();
+			this.label6 = new System.Windows.Forms.Label();
+			this.label7 = new System.Windows.Forms.Label();
+			this.comboBox_numCore = new System.Windows.Forms.ComboBox();
+			this.comboBox_numTotal = new System.Windows.Forms.ComboBox();
+			this.label8 = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -113,7 +119,7 @@ namespace HSCentric
 			// 
 			// btn_ok
 			// 
-			this.btn_ok.Location = new System.Drawing.Point(35, 169);
+			this.btn_ok.Location = new System.Drawing.Point(35, 239);
 			this.btn_ok.Name = "btn_ok";
 			this.btn_ok.Size = new System.Drawing.Size(75, 23);
 			this.btn_ok.TabIndex = 8;
@@ -123,7 +129,7 @@ namespace HSCentric
 			// 
 			// btn_cancel
 			// 
-			this.btn_cancel.Location = new System.Drawing.Point(116, 169);
+			this.btn_cancel.Location = new System.Drawing.Point(116, 239);
 			this.btn_cancel.Name = "btn_cancel";
 			this.btn_cancel.Size = new System.Drawing.Size(75, 23);
 			this.btn_cancel.TabIndex = 9;
@@ -143,7 +149,7 @@ namespace HSCentric
 			// checkBoxScale
 			// 
 			this.checkBoxScale.AutoSize = true;
-			this.checkBoxScale.Location = new System.Drawing.Point(12, 144);
+			this.checkBoxScale.Location = new System.Drawing.Point(116, 201);
 			this.checkBoxScale.Name = "checkBoxScale";
 			this.checkBoxScale.Size = new System.Drawing.Size(72, 16);
 			this.checkBoxScale.TabIndex = 12;
@@ -158,11 +164,69 @@ namespace HSCentric
 			this.comboBox_strategy.Size = new System.Drawing.Size(121, 20);
 			this.comboBox_strategy.TabIndex = 13;
 			// 
+			// textBox_map
+			// 
+			this.textBox_map.Location = new System.Drawing.Point(68, 146);
+			this.textBox_map.Name = "textBox_map";
+			this.textBox_map.Size = new System.Drawing.Size(120, 21);
+			this.textBox_map.TabIndex = 15;
+			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(9, 149);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(53, 12);
+			this.label6.TabIndex = 14;
+			this.label6.Text = "佣兵地图";
+			// 
+			// label7
+			// 
+			this.label7.AutoSize = true;
+			this.label7.Location = new System.Drawing.Point(12, 178);
+			this.label7.Name = "label7";
+			this.label7.Size = new System.Drawing.Size(29, 12);
+			this.label7.TabIndex = 16;
+			this.label7.Text = "核心";
+			// 
+			// comboBox_numCore
+			// 
+			this.comboBox_numCore.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboBox_numCore.FormattingEnabled = true;
+			this.comboBox_numCore.Location = new System.Drawing.Point(43, 175);
+			this.comboBox_numCore.Name = "comboBox_numCore";
+			this.comboBox_numCore.Size = new System.Drawing.Size(54, 20);
+			this.comboBox_numCore.TabIndex = 17;
+			// 
+			// comboBox_numTotal
+			// 
+			this.comboBox_numTotal.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.comboBox_numTotal.FormattingEnabled = true;
+			this.comboBox_numTotal.Location = new System.Drawing.Point(129, 175);
+			this.comboBox_numTotal.Name = "comboBox_numTotal";
+			this.comboBox_numTotal.Size = new System.Drawing.Size(59, 20);
+			this.comboBox_numTotal.TabIndex = 19;
+			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Location = new System.Drawing.Point(99, 178);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(29, 12);
+			this.label8.TabIndex = 18;
+			this.label8.Text = "总数";
+			// 
 			// TaskForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(202, 204);
+			this.ClientSize = new System.Drawing.Size(202, 274);
+			this.Controls.Add(this.comboBox_numTotal);
+			this.Controls.Add(this.label8);
+			this.Controls.Add(this.comboBox_numCore);
+			this.Controls.Add(this.label7);
+			this.Controls.Add(this.textBox_map);
+			this.Controls.Add(this.label6);
 			this.Controls.Add(this.comboBox_strategy);
 			this.Controls.Add(this.checkBoxScale);
 			this.Controls.Add(this.label5);
@@ -198,5 +262,11 @@ namespace HSCentric
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.CheckBox checkBoxScale;
 		private System.Windows.Forms.ComboBox comboBox_strategy;
+		private System.Windows.Forms.TextBox textBox_map;
+		private System.Windows.Forms.Label label6;
+		private System.Windows.Forms.Label label7;
+		private System.Windows.Forms.ComboBox comboBox_numCore;
+		private System.Windows.Forms.ComboBox comboBox_numTotal;
+		private System.Windows.Forms.Label label8;
 	}
 }

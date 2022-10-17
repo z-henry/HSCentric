@@ -135,6 +135,21 @@ namespace HSCentric
 			set { m_scale = value; }
 			get { return m_scale; }
 		}
+		public string Map
+		{
+			set { m_map = value; }
+			get { return m_map; }
+		}
+		public int MercTeamNumCore
+		{
+			set { m_numCore = value; }
+			get { return m_numCore; }
+		}
+		public int MercTeamNumTotal
+		{
+			set { m_numTotal = value; }
+			get { return m_numTotal; }
+		}
 
 		public bool IsTimeLegal()
 		{
@@ -157,8 +172,11 @@ namespace HSCentric
 		private DateTime m_startTime = DateTime.Now;
 		private DateTime m_stopTime = DateTime.Now;
 		private TASK_MODE m_mode = TASK_MODE.挂机收菜;
-		private string m_teamName ="";
-		private string m_strategyName = "";
+		private string m_teamName ="test";
+		private string m_strategyName = "PVE策略";
 		private bool m_scale = false;
+		private string m_map = "2-5";
+		private int m_numCore = 0;
+		private int m_numTotal = 6;
 	}
 }

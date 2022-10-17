@@ -11,6 +11,10 @@ namespace HSCentric
 			InitializeComponent();
 			foreach (var iter in Enum.GetValues(typeof(Const.BEHAVIOR_MODE)))
 				comboBox_strategy.Items.Add(iter.ToString());
+			for (int iter = 0; iter < 6; iter++)
+				comboBox_numCore.Items.Add(iter.ToString());
+			for (int iter = 1; iter < 6; iter++)
+				comboBox_numTotal.Items.Add(iter.ToString());
 
 			if (task != null)
 				m_task = (TaskUnit)task.DeepClone();
@@ -24,6 +28,8 @@ namespace HSCentric
 			dateTimePicker_start.Value = Task.StartTime;
 			dateTimePicker_stop.Value = Task.StopTime;
 			checkBoxScale.Checked = Task.Scale;
+			comboBox_numCore.SelectedIndex = Task.MercTeamNumCore;
+			comboBox_numTotal.SelectedIndex = Task.MercTeamNumTotal-1;
 		}
 
 		public TaskUnit Task
@@ -61,7 +67,10 @@ namespace HSCentric
 				MessageBox.Show("请填写正确的时间段");
 				return;
 			}
+
 			Task.Scale = checkBoxScale.Checked;
+			Task.MercTeamNumTotal = comboBox_numTotal.SelectedIndex + 1;
+			Task.MercTeamNumCore = comboBox_numCore.SelectedIndex;
 			DialogResult = DialogResult.OK;
 			Close();
 		}

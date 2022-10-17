@@ -23,6 +23,9 @@ namespace HSCentric
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.启动时间.ToString(), 80);
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.停止时间.ToString(), 80);
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.齿轮.ToString(), 40);
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.地图.ToString(), 40);
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.核心.ToString(), 40);
+			this.listTasks.Columns.Add(LIST_TASK_COLUMN.总数.ToString(), 40);
 
 			UI_Flush();
 		}
@@ -200,7 +203,25 @@ namespace HSCentric
 							subitem.Text = task.StartTime.ToString("T");
 							break;
 						case LIST_TASK_COLUMN.齿轮:
-							subitem.Text = task.Scale.ToString();
+							subitem.Text = task.Scale? "√":"";
+							break;
+						case LIST_TASK_COLUMN.地图:
+							if (Common.IsBuddyMode((TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.StrategyName)))
+								subitem.Text = "--";
+							else
+								subitem.Text = task.Map;
+							break;
+						case LIST_TASK_COLUMN.核心:
+							if (Common.IsBuddyMode((TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.StrategyName)))
+								subitem.Text = "--";
+							else
+								subitem.Text = task.MercTeamNumCore.ToString();
+							break;
+						case LIST_TASK_COLUMN.总数:
+							if (Common.IsBuddyMode((TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.StrategyName)))
+								subitem.Text = "--";
+							else
+								subitem.Text = task.MercTeamNumTotal.ToString();
 							break;
 						default:
 							break;

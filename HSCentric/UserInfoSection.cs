@@ -171,6 +171,24 @@ namespace HSCentric
 			get { return (bool)this["scale"]; }
 			set { this["scale"] = value; }
 		}
+		[ConfigurationProperty("map", IsRequired = false, DefaultValue = "2-5")]
+		public string Map
+		{
+			get { return (string)this["map"]; }
+			set { this["map"] = value; }
+		}
+		[ConfigurationProperty("numtotal", IsRequired = false, DefaultValue = 6)]
+		public int NumTotal
+		{
+			get { return (int)this["numtotal"]; }
+			set { this["numtotal"] = value; }
+		}
+		[ConfigurationProperty("numcore", IsRequired = false, DefaultValue = 0)]
+		public int NumCore
+		{
+			get { return (int)this["numcore"]; }
+			set { this["numcore"] = value; }
+		}
 
 	}
 }

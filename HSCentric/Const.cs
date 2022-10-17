@@ -36,6 +36,9 @@ namespace HSCentric.Const
 		启动时间,
 		停止时间,
 		齿轮,
+		地图,
+		核心,
+		总数,
 	}
 
 	public enum TASK_MODE

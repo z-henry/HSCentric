@@ -4,7 +4,6 @@ using System.IO;
 using System;
 using System.Runtime.Serialization.Formatters.Binary;
 using HSCentric.Const;
-using System.Runtime.InteropServices;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -25,12 +24,12 @@ namespace HSCentric
 			return (bf.Deserialize(ms));
 		}
 
-		public (string Mode, DateTime AwakeTime, int AwakePeriod, string TeamName, string StrategyName, bool MercPluginEnable, bool Scale) BasicConfigValue
+		public (string Mode, DateTime AwakeTime, int AwakePeriod, string TeamName, string StrategyName, bool MercPluginEnable, bool Scale, string Map, int NumCore, int NumTotal) BasicConfigValue
 		{
 			get
 			{
 				ReadConfigValue();
-				return (m_mode, m_awakeTime, m_awakePeriod, m_teamName, m_strategyName, m_mercPluginEnable, m_scale);
+				return (m_CacheMode, m_CacheAwakeTime, m_CacheAwakePeriod, m_CacheTeamName, m_CacheStrategyName, m_CacheMercPluginEnable, m_CacheScale, m_CacheMap, m_CacheNumCore, m_CachNumTotal);
 			}
 		}
 		public bool Enable
@@ -257,7 +256,10 @@ namespace HSCentric
 					currentTask.Mode.ToString() != basicConfigValue.Mode ||
 					currentTask.TeamName != basicConfigValue.TeamName ||
 					currentTask.StrategyName != basicConfigValue.StrategyName ||
-					currentTask.Scale != basicConfigValue.Scale)
+					currentTask.Scale != basicConfigValue.Scale ||
+					currentTask.Map != basicConfigValue.Map ||
+					currentTask.MercTeamNumCore != basicConfigValue.NumCore ||
+					currentTask.MercTeamNumTotal != basicConfigValue.NumTotal)
 				{
 					return true;
 				}
@@ -320,13 +322,13 @@ namespace HSCentric
 					{
 						int start_pos = "唤醒时间 = ".Length;
 						if (line.Length > start_pos)
-							m_awakeTime = Convert.ToDateTime(line.Substring(start_pos));
+							m_CacheAwakeTime = Convert.ToDateTime(line.Substring(start_pos));
 						else
-							m_awakeTime = new DateTime(2000, 1, 1);
+							m_CacheAwakeTime = new DateTime(2000, 1, 1);
 					}
 					catch
 					{
-						m_awakeTime = new DateTime(2000, 1, 1);
+						m_CacheAwakeTime = new DateTime(2000, 1, 1);
 					}
 				}
 				else if (line.IndexOf("唤醒时间间隔 = ") == 0)
@@ -335,13 +337,13 @@ namespace HSCentric
 					{
 						int start_pos = "唤醒时间间隔 = ".Length;
 						if (line.Length > start_pos)
-							m_awakePeriod = Convert.ToInt32(line.Substring(start_pos)) * 60;
+							m_CacheAwakePeriod = Convert.ToInt32(line.Substring(start_pos)) * 60;
 						else
-							m_awakePeriod = 22 * 60;
+							m_CacheAwakePeriod = 22 * 60;
 					}
 					catch
 					{
-						m_awakePeriod = 22 * 60;
+						m_CacheAwakePeriod = 22 * 60;
 					}
 					continue;
 				}
@@ -351,13 +353,13 @@ namespace HSCentric
 					{
 						int start_pos = "插件运行模式 = ".Length;
 						if (line.Length > start_pos)
-							m_mode = line.Substring(start_pos);
+							m_CacheMode = line.Substring(start_pos);
 						else
-							m_mode = "";
+							m_CacheMode = "";
 					}
 					catch
 					{
-						m_mode = "";
+						m_CacheMode = "";
 					}
 				}
 				else if (line.IndexOf("使用的队伍名称 = ") == 0)
@@ -366,13 +368,13 @@ namespace HSCentric
 					{
 						int start_pos = "使用的队伍名称 = ".Length;
 						if (line.Length > start_pos)
-							m_teamName = line.Substring(start_pos);
+							m_CacheTeamName = line.Substring(start_pos);
 						else
-							m_teamName = "";
+							m_CacheTeamName = "";
 					}
 					catch
 					{
-						m_teamName = "";
+						m_CacheTeamName = "";
 					}
 				}
 				else if (line.IndexOf("战斗策略 = ") == 0)
@@ -381,13 +383,13 @@ namespace HSCentric
 					{
 						int start_pos = "战斗策略 = ".Length;
 						if (line.Length > start_pos)
-							m_strategyName = line.Substring(start_pos);
+							m_CacheStrategyName = line.Substring(start_pos);
 						else
-							m_strategyName = "";
+							m_CacheStrategyName = "";
 					}
 					catch
 					{
-						m_strategyName = "";
+						m_CacheStrategyName = "";
 					}
 				}
 				else if (line.IndexOf("插件开关 = ") == 0)
@@ -396,13 +398,13 @@ namespace HSCentric
 					{
 						int start_pos = "插件开关 = ".Length;
 						if (line.Length > start_pos)
-							m_mercPluginEnable = Convert.ToBoolean(line.Substring(start_pos));
+							m_CacheMercPluginEnable = Convert.ToBoolean(line.Substring(start_pos));
 						else
-							m_mercPluginEnable = false;
+							m_CacheMercPluginEnable = false;
 					}
 					catch
 					{
-						m_mercPluginEnable = false;
+						m_CacheMercPluginEnable = false;
 					}
 				}
 				else if (line.IndexOf("自动齿轮加速 = ") == 0)
@@ -411,13 +413,13 @@ namespace HSCentric
 					{
 						int start_pos = "自动齿轮加速 = ".Length;
 						if (line.Length > start_pos)
-							m_scale = Convert.ToBoolean(line.Substring(start_pos));
+							m_CacheScale = Convert.ToBoolean(line.Substring(start_pos));
 						else
-							m_scale = false;
+							m_CacheScale = false;
 					}
 					catch
 					{
-						m_scale = false;
+						m_CacheScale = false;
 					}
 				}
 				else
@@ -590,14 +592,18 @@ namespace HSCentric
 			return task;
 		}
 
+		//到时候弄成结构体
+		private string m_CacheMode = "";
+		private DateTime m_CacheAwakeTime = new DateTime(2000, 1, 1);
+		private int m_CacheAwakePeriod = 25;
+		private string m_CacheTeamName = "";
+		private string m_CacheStrategyName = "";
+		private bool m_CacheMercPluginEnable = false;
+		private bool m_CacheScale = false;
+		private string m_CacheMap = "2-5";
+		private int m_CacheNumCore = 0;
+		private int m_CachNumTotal = 6;
 
-		private string m_mode = "";
-		private DateTime m_awakeTime = new DateTime(2000, 1, 1);
-		private int m_awakePeriod = 25;
-		private string m_teamName = "";
-		private string m_strategyName = "";
-		private bool m_mercPluginEnable = false;
-		private bool m_scale = false;
 		private RewardXP m_rewardXP = new RewardXP();
 		private int m_pvpRate = 0;
 		private string m_classicRate = "";
@@ -607,7 +613,6 @@ namespace HSCentric
 		private string m_hsLogFile = "";//炉石进程对应的日志
 		private string m_ID = "";//自定id
 		private bool m_enable = false;//启用状态
-		private DateTime m_configLastEdit = new DateTime(2000, 1, 1);
 		private TaskManager m_taskManager = new TaskManager();
 		private DateTime[] m_fileLastEdit = new DateTime[(int)FILE_TYPE.Total]{
 			new DateTime(2000,1,1),

@@ -179,6 +179,9 @@ namespace HSCentric
 						StrategyName = task.StrategyName,
 						TeamName = task.TeamName,
 						Scale = task.Scale,
+						Map = task.Map,
+						MercTeamNumCore = task.NumCore,
+						MercTeamNumTotal = task.NumTotal,
 					});
 				}
 				m_listHS.Add(new HSUnit()
@@ -215,6 +218,9 @@ namespace HSCentric
 						StartTime = task.StartTime.ToString("G"),
 						StopTime = task.StopTime.ToString("G"),
 						Scale = task.Scale,
+						Map = task.Map,
+						NumTotal = task.MercTeamNumTotal,
+						NumCore =task.MercTeamNumCore,
 					});
 				}
 				section.HSUnit.Add(new HSUnitElement()
