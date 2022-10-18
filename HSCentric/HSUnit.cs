@@ -90,16 +90,23 @@ namespace HSCentric
 			get { return m_pvpRate; }
 			set { m_pvpRate = value; }
 		}
+		public int HSModPort
+		{
+			get { return m_hsmodPort; }
+			set { m_hsmodPort = value; }
+		}
 
 
 		public void InitHsMod()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
-			if (false == System.IO.File.Exists(pathConfig.ToString()))
+			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			if (false == File.Exists(pathConfig.ToString()))
 				return; 
 			Common.IniWriteValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
 			Common.IniWriteValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
 			Common.IniWriteValue("全局", "游戏帧率", "15", pathConfig.ToString());
+			Common.IniWriteValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
+			Common.IniWriteValue("Dev", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
 		}
 
 		public bool IsActive()
@@ -306,12 +313,25 @@ namespace HSCentric
 		{
 			var task = Task.Run(() =>
 			{
-				Thread.Sleep(15 * 1000);
-				DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
-				if (false == System.IO.File.Exists(pathConfig.ToString()))
+				Thread.Sleep(20 * 1000);
+				DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+				if (false == File.Exists(pathConfig.ToString()))
 					return "";
 
-				return Common.IniReadValue<string>("开发", "炉石日志", "", pathConfig.ToString());
+				return Common.IniReadValue<string>("Dev", "炉石日志", "", pathConfig.ToString());
+// 				string[] fileLines = File.ReadAllLines(pathConfig.ToString());
+// 				foreach (var line in fileLines)
+// 				{
+// 					if (line.IndexOf("炉石日志 = ") == 0)
+// 					{
+// 						int start_pos = "炉石日志 = ".Length;
+// 						if (line.Length > start_pos)
+// 							return line.Substring(start_pos);
+// 						else
+// 							return "";
+// 					}
+// 				}
+// 				return "";
 			});
 			return task;
 		}
@@ -432,6 +452,7 @@ namespace HSCentric
 		private string m_hsLogFile = "";//炉石进程对应的日志
 		private string m_ID = "";//自定id
 		private bool m_enable = false;//启用状态
+		private int m_hsmodPort = 58744;//hsmod端口
 		private TaskManager m_taskManager = new TaskManager();
 		private DateTime[] m_fileLastEdit = new DateTime[(int)FILE_TYPE.Total]{
 			new DateTime(2000,1,1),

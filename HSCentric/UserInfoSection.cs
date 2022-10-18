@@ -99,6 +99,12 @@ namespace HSCentric
 			get { return (string)this["classic_rate"]; }
 			set { this["classic_rate"] = value; }
 		}
+		[ConfigurationProperty("hsmod_port", IsRequired = false, DefaultValue = 58744)]
+		public int HSModPort
+		{
+			get { return (int)this["hsmod_port"]; }
+			set { this["hsmod_port"] = value; }
+		}
 
 	}
 	public class TaskCollection : ConfigurationElementCollection

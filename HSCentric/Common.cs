@@ -36,8 +36,8 @@ namespace HSCentric
 
 		public static T IniReadValue<T>(string Section, string Key, T Default, string path, string encodingName = "utf-8")
 		{
-			byte[] buffer = new byte[256];
-			int count = GetPrivateProfileString(getBytes(Section, encodingName), getBytes(Key, encodingName), getBytes("", encodingName), buffer, 255, path);
+			byte[] buffer = new byte[8192];
+			int count = GetPrivateProfileString(getBytes(Section, encodingName), getBytes(Key, encodingName), getBytes("", encodingName), buffer, 8192, path);
 			string result = Encoding.GetEncoding(encodingName).GetString(buffer, 0, count).Trim();
 			if (result.Length == 0)
 				return Default;

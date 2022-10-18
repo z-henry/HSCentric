@@ -194,6 +194,7 @@ namespace HSCentric
 					HBPath = hs.HBPath,
 					MercPvpRate = hs.PvpRate,
 					ClassicRate = hs.ClassicRate,
+					HSModPort = hs.HSModPort,
 				});
 			}
 			m_hsPath = ConfigurationManager.AppSettings["hs_path"];
@@ -234,6 +235,7 @@ namespace HSCentric
 					Token = hs.Token,
 					ClassicRate = hs.ClassicRate,
 					PvpRate = hs.MercPvpRate,
+					HSModPort = hs.HSModPort,
 				});
 			}
 			config.AppSettings.Settings["hs_path"].Value = m_hsPath;

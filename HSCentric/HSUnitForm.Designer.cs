@@ -47,6 +47,8 @@ namespace HSCentric
 			this.btn_selecthbpath = new System.Windows.Forms.Button();
 			this.textbox_HBPath = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
+			this.textBox_hsmodPort = new System.Windows.Forms.TextBox();
+			this.label1 = new System.Windows.Forms.Label();
 			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -146,7 +148,7 @@ namespace HSCentric
 			// 
 			this.textbox_Token.Location = new System.Drawing.Point(71, 67);
 			this.textbox_Token.Name = "textbox_Token";
-			this.textbox_Token.Size = new System.Drawing.Size(287, 21);
+			this.textbox_Token.Size = new System.Drawing.Size(473, 21);
 			this.textbox_Token.TabIndex = 20;
 			// 
 			// label3
@@ -176,7 +178,7 @@ namespace HSCentric
 			// 
 			// btn_selecthbpath
 			// 
-			this.btn_selecthbpath.Location = new System.Drawing.Point(364, 40);
+			this.btn_selecthbpath.Location = new System.Drawing.Point(504, 38);
 			this.btn_selecthbpath.Name = "btn_selecthbpath";
 			this.btn_selecthbpath.Size = new System.Drawing.Size(40, 23);
 			this.btn_selecthbpath.TabIndex = 25;
@@ -188,7 +190,7 @@ namespace HSCentric
 			// 
 			this.textbox_HBPath.Location = new System.Drawing.Point(71, 40);
 			this.textbox_HBPath.Name = "textbox_HBPath";
-			this.textbox_HBPath.Size = new System.Drawing.Size(287, 21);
+			this.textbox_HBPath.Size = new System.Drawing.Size(427, 21);
 			this.textbox_HBPath.TabIndex = 24;
 			// 
 			// label5
@@ -200,11 +202,29 @@ namespace HSCentric
 			this.label5.TabIndex = 23;
 			this.label5.Text = "兄弟路径";
 			// 
+			// textBox_hsmodPort
+			// 
+			this.textBox_hsmodPort.Location = new System.Drawing.Point(435, 13);
+			this.textBox_hsmodPort.Name = "textBox_hsmodPort";
+			this.textBox_hsmodPort.Size = new System.Drawing.Size(109, 21);
+			this.textBox_hsmodPort.TabIndex = 27;
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(370, 16);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(59, 12);
+			this.label1.TabIndex = 26;
+			this.label1.Text = "HSMod端口";
+			// 
 			// HSUnitForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(564, 368);
+			this.Controls.Add(this.textBox_hsmodPort);
+			this.Controls.Add(this.label1);
 			this.Controls.Add(this.btn_selecthbpath);
 			this.Controls.Add(this.textbox_HBPath);
 			this.Controls.Add(this.label5);
@@ -244,5 +264,7 @@ namespace HSCentric
 		private System.Windows.Forms.Button btn_selecthbpath;
 		private System.Windows.Forms.TextBox textbox_HBPath;
 		private System.Windows.Forms.Label label5;
+		private System.Windows.Forms.TextBox textBox_hsmodPort;
+		private System.Windows.Forms.Label label1;
 	}
 }

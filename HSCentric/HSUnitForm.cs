@@ -16,6 +16,7 @@ namespace HSCentric
 			textbox_HBPath.Text = m_unit.HBPath;
 			textbox_ID.Text = m_unit.ID;
 			textbox_Token.Text = m_unit.Token;
+			textBox_hsmodPort.Text = m_unit.HSModPort.ToString();
 
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.模式.ToString(), 80);
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.队伍.ToString(), 40);
@@ -53,11 +54,20 @@ namespace HSCentric
 				MessageBox.Show("请添加一个模式", "Error");
 				return;
 			}
+			int tmpHSModPort = 0;
+			if (false == int.TryParse(textBox_hsmodPort.Text, out tmpHSModPort) ||
+				tmpHSModPort <= 0 ||
+				tmpHSModPort > 65536)
+			{
+				MessageBox.Show("请输入正确的端口号", "Error");
+				return;
+			}
 
 			m_unit.HBPath = textbox_HBPath.Text;
 			m_unit.ID = textbox_ID.Text;
 			m_unit.Token = textbox_Token.Text;
 			m_unit.Enable = checkbox_Enable.Checked;
+			m_unit.HSModPort = tmpHSModPort;
 			DialogResult = DialogResult.OK;
 			Close();
 		}
