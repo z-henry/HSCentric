@@ -44,7 +44,7 @@ namespace HSCentric.Const
 	public enum TASK_MODE
 	{
 		刷图,
-		刷神秘人,
+		神秘人,
 		佣兵任务,
 		一条龙,
 		PVP,
