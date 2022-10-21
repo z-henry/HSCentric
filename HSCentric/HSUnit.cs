@@ -365,7 +365,7 @@ namespace HSCentric
 								Level = Convert.ToInt32(match.Groups[1].Value),
 								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
 							};
-							m_rewardXP = m_rewardXP.TotalXP > rewardXP.TotalXP ? m_rewardXP : rewardXP;
+							m_rewardXP = rewardXP;
 						}
 						break;
 					}
@@ -431,7 +431,7 @@ namespace HSCentric
 								Level = Convert.ToInt32(match.Groups[1].Value),
 								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
 							};
-							m_rewardXP = m_rewardXP.TotalXP > rewardXP.TotalXP ? m_rewardXP : rewardXP;
+							m_rewardXP = rewardXP;
 						}
 						m_classicRate = match.Groups[3].Value;
 						return;
