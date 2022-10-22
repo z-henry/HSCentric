@@ -258,7 +258,6 @@ namespace HSCentric
 		}
 		private CacheConfig ReadConfigValue()
 		{
-			CacheConfig resultConfig = new CacheConfig();
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == File.Exists(pathConfig.ToString()))
 				return null;
@@ -267,6 +266,7 @@ namespace HSCentric
 				return null;
 			m_fileLastEdit[(int)FILE_TYPE.佣兵配置] = fileConfig.LastWriteTime;
 
+			CacheConfig resultConfig = new CacheConfig();
 			resultConfig.awakeTime = Common.IniReadValue<DateTime>("配置", "唤醒时间", new DateTime(2000, 1, 1), pathConfig.ToString());
 			resultConfig.awakePeriod = 60 * Common.IniReadValue<int>("配置", "唤醒时间间隔", 22, pathConfig.ToString());
 			resultConfig.mode = Common.IniReadValue<string>("配置", "插件运行模式", "", pathConfig.ToString());
@@ -292,6 +292,10 @@ namespace HSCentric
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
+			DirectoryInfo pathHsmodConfig = new DirectoryInfo(Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			if (false == System.IO.File.Exists(pathHsmodConfig.ToString()))
+				return;
+
 			Common.IniWriteValue("配置", "插件开关", Enable.ToString(), pathConfig.ToString());
 			if (task != null)
 			{
@@ -302,6 +306,10 @@ namespace HSCentric
 				Common.IniWriteValue("配置", "要刷的地图", task.Map.ToString(), pathConfig.ToString());
 				Common.IniWriteValue("配置", "总队伍人数", task.MercTeamNumTotal.ToString(), pathConfig.ToString());
 				Common.IniWriteValue("配置", "队伍核心人数", task.MercTeamNumCore.ToString(), pathConfig.ToString());
+			}
+			else
+			{
+				Common.IniWriteValue("全局", "变速齿轮状态", false.ToString(), pathHsmodConfig.ToString());
 			}
 			Out.Log($"[{ID}]写入配置 mode:{task?.Mode} teamName:{task?.TeamName} strategyName:{task?.StrategyName} " +
 				$"Enable:{Enable} Scale:{task?.Scale} Map:{task?.Map} " +
