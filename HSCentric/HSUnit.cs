@@ -303,9 +303,9 @@ namespace HSCentric
 				Common.IniWriteValue("配置", "总队伍人数", task.MercTeamNumTotal.ToString(), pathConfig.ToString());
 				Common.IniWriteValue("配置", "队伍核心人数", task.MercTeamNumCore.ToString(), pathConfig.ToString());
 			}
-			Out.Log($"[{ID}]写入配置 mode:{task.Mode} teamName:{task.TeamName} strategyName:{task.StrategyName} " +
-				$"Enable:{Enable} Scale:{task.Scale} Map:{task.Map} " +
-				$"MercTeamNumTotal:{task.MercTeamNumTotal} MercTeamNumCore:{task.MercTeamNumCore}"
+			Out.Log($"[{ID}]写入配置 mode:{task?.Mode} teamName:{task?.TeamName} strategyName:{task?.StrategyName} " +
+				$"Enable:{Enable} Scale:{task?.Scale} Map:{task?.Map} " +
+				$"MercTeamNumTotal:{task?.MercTeamNumTotal} MercTeamNumCore:{task?.MercTeamNumCore}"
 				);
 		}
 
