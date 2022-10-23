@@ -96,12 +96,29 @@ namespace HSCentric
 			set { m_hsmodPort = value; }
 		}
 
+		public void InitConfig()
+		{
+			InitMercPlugin();
+			InitHsMod();
+		}
+
+
+		public void InitMercPlugin()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			if (false == System.IO.File.Exists(pathConfig.ToString()))
+				return;
+
+			Common.IniWriteValue("配置", "是否自动升级技能", true.ToString(), pathConfig.ToString());
+			Common.IniWriteValue("配置", "是否自动制作佣兵", true.ToString(), pathConfig.ToString());
+		}
 
 		public void InitHsMod()
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == File.Exists(pathConfig.ToString()))
 				return; 
+
 			Common.IniWriteValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
 			Common.IniWriteValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
 			Common.IniWriteValue("全局", "游戏帧率", "15", pathConfig.ToString());
@@ -288,13 +305,27 @@ namespace HSCentric
 
 		private void WriteConfigValue(bool Enable, TaskUnit task)
 		{
+			WriteConfigHSMod();
+			WriteConfigValueMercPlugin(Enable, task);
+			Out.Log($"[{ID}]写入配置 mode:{task?.Mode} teamName:{task?.TeamName} strategyName:{task?.StrategyName} " +
+				$"Enable:{Enable} Scale:{task?.Scale} Map:{task?.Map} " +
+				$"MercTeamNumTotal:{task?.MercTeamNumTotal} MercTeamNumCore:{task?.MercTeamNumCore}"
+				);
+		}
+		private void WriteConfigHSMod()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			if (false == System.IO.File.Exists(pathConfig.ToString()))
+				return;
+
+			Common.IniWriteValue("全局", "变速齿轮状态", false.ToString(), pathConfig.ToString());
+		}
+		private void WriteConfigValueMercPlugin(bool Enable, TaskUnit task)
+		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
-			DirectoryInfo pathHsmodConfig = new DirectoryInfo(Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
-			if (false == System.IO.File.Exists(pathHsmodConfig.ToString()))
-				return;
 
 			Common.IniWriteValue("配置", "插件开关", Enable.ToString(), pathConfig.ToString());
 			if (task != null)
@@ -307,15 +338,8 @@ namespace HSCentric
 				Common.IniWriteValue("配置", "总队伍人数", task.MercTeamNumTotal.ToString(), pathConfig.ToString());
 				Common.IniWriteValue("配置", "队伍核心人数", task.MercTeamNumCore.ToString(), pathConfig.ToString());
 			}
-			else
-			{
-				Common.IniWriteValue("全局", "变速齿轮状态", false.ToString(), pathHsmodConfig.ToString());
-			}
-			Out.Log($"[{ID}]写入配置 mode:{task?.Mode} teamName:{task?.TeamName} strategyName:{task?.StrategyName} " +
-				$"Enable:{Enable} Scale:{task?.Scale} Map:{task?.Map} " +
-				$"MercTeamNumTotal:{task?.MercTeamNumTotal} MercTeamNumCore:{task?.MercTeamNumCore}"
-				);
 		}
+
 
 		public Task<string> GetHSLogPath()
 		{
