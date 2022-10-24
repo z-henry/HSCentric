@@ -49,7 +49,13 @@ namespace HSCentric
 			this.label5 = new System.Windows.Forms.Label();
 			this.textBox_hsmodPort = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
+			this.checkBox_switchmode = new System.Windows.Forms.CheckBox();
+			this.listSpecTask = new System.Windows.Forms.ListView();
+			this.contextMenuStrip1_RMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.设置toolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+			this.清除ToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.contextMenuStrip_RMenu.SuspendLayout();
+			this.contextMenuStrip1_RMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// label2
@@ -63,7 +69,7 @@ namespace HSCentric
 			// 
 			// btn_ok
 			// 
-			this.btn_ok.Location = new System.Drawing.Point(396, 333);
+			this.btn_ok.Location = new System.Drawing.Point(396, 354);
 			this.btn_ok.Name = "btn_ok";
 			this.btn_ok.Size = new System.Drawing.Size(75, 23);
 			this.btn_ok.TabIndex = 14;
@@ -91,7 +97,7 @@ namespace HSCentric
 			// 
 			// btn_cancel
 			// 
-			this.btn_cancel.Location = new System.Drawing.Point(477, 333);
+			this.btn_cancel.Location = new System.Drawing.Point(477, 354);
 			this.btn_cancel.Name = "btn_cancel";
 			this.btn_cancel.Size = new System.Drawing.Size(75, 23);
 			this.btn_cancel.TabIndex = 17;
@@ -107,7 +113,7 @@ namespace HSCentric
 			this.listTasks.Location = new System.Drawing.Point(14, 110);
 			this.listTasks.MultiSelect = false;
 			this.listTasks.Name = "listTasks";
-			this.listTasks.Size = new System.Drawing.Size(538, 217);
+			this.listTasks.Size = new System.Drawing.Size(538, 161);
 			this.listTasks.TabIndex = 18;
 			this.listTasks.UseCompatibleStateImageBehavior = false;
 			this.listTasks.View = System.Windows.Forms.View.Details;
@@ -218,11 +224,60 @@ namespace HSCentric
 			this.label1.TabIndex = 26;
 			this.label1.Text = "HSMod端口";
 			// 
+			// checkBox_switchmode
+			// 
+			this.checkBox_switchmode.AutoSize = true;
+			this.checkBox_switchmode.Location = new System.Drawing.Point(32, 278);
+			this.checkBox_switchmode.Name = "checkBox_switchmode";
+			this.checkBox_switchmode.Size = new System.Drawing.Size(348, 16);
+			this.checkBox_switchmode.TabIndex = 28;
+			this.checkBox_switchmode.Text = "自动换模式（当满级、W2、传说后，获取经验的模式变更为）";
+			this.checkBox_switchmode.UseVisualStyleBackColor = true;
+			// 
+			// listSpecTask
+			// 
+			this.listSpecTask.FullRowSelect = true;
+			this.listSpecTask.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.listSpecTask.HideSelection = false;
+			this.listSpecTask.Location = new System.Drawing.Point(14, 300);
+			this.listSpecTask.MultiSelect = false;
+			this.listSpecTask.Name = "listSpecTask";
+			this.listSpecTask.Size = new System.Drawing.Size(538, 48);
+			this.listSpecTask.TabIndex = 29;
+			this.listSpecTask.UseCompatibleStateImageBehavior = false;
+			this.listSpecTask.View = System.Windows.Forms.View.Details;
+			this.listSpecTask.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listSpecTask_MouseDoubleClick);
+			this.listSpecTask.MouseUp += new System.Windows.Forms.MouseEventHandler(this.listSpecTasks_MouseUp);
+			// 
+			// contextMenuStrip1_RMenu
+			// 
+			this.contextMenuStrip1_RMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.设置toolStripMenuItem1,
+            this.清除ToolStripMenuItem1});
+			this.contextMenuStrip1_RMenu.Name = "contextMenuStrip_RMenu";
+			this.contextMenuStrip1_RMenu.Size = new System.Drawing.Size(181, 70);
+			// 
+			// 设置toolStripMenuItem1
+			// 
+			this.设置toolStripMenuItem1.Name = "设置toolStripMenuItem1";
+			this.设置toolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+			this.设置toolStripMenuItem1.Text = "设置";
+			this.设置toolStripMenuItem1.Click += new System.EventHandler(this.设置toolStripMenuItem1_Click);
+			// 
+			// 清除ToolStripMenuItem1
+			// 
+			this.清除ToolStripMenuItem1.Name = "清除ToolStripMenuItem1";
+			this.清除ToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+			this.清除ToolStripMenuItem1.Text = "清除";
+			this.清除ToolStripMenuItem1.Click += new System.EventHandler(this.清除ToolStripMenuItem1_Click);
+			// 
 			// HSUnitForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(564, 368);
+			this.ClientSize = new System.Drawing.Size(564, 389);
+			this.Controls.Add(this.listSpecTask);
+			this.Controls.Add(this.checkBox_switchmode);
 			this.Controls.Add(this.textBox_hsmodPort);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.btn_selecthbpath);
@@ -241,6 +296,7 @@ namespace HSCentric
 			this.Name = "HSUnitForm";
 			this.Text = "HSUnitForm";
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
+			this.contextMenuStrip1_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -266,5 +322,10 @@ namespace HSCentric
 		private System.Windows.Forms.Label label5;
 		private System.Windows.Forms.TextBox textBox_hsmodPort;
 		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.CheckBox checkBox_switchmode;
+		private System.Windows.Forms.ListView listSpecTask;
+		private System.Windows.Forms.ContextMenuStrip contextMenuStrip1_RMenu;
+		private System.Windows.Forms.ToolStripMenuItem 设置toolStripMenuItem1;
+		private System.Windows.Forms.ToolStripMenuItem 清除ToolStripMenuItem1;
 	}
 }

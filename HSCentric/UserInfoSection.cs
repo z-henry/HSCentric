@@ -63,6 +63,13 @@ namespace HSCentric
 			get { return (TaskCollection)base["tasks"]; }
 			set { base["tasks"] = value; }
 		}
+		[ConfigurationProperty("tasks_spec", IsRequired = false)]
+		public TaskCollection TasksSpec
+		{
+			get { return (TaskCollection)base["tasks_spec"]; }
+			set { base["tasks_spec"] = value; }
+		}
+
 		[ConfigurationProperty("level", IsRequired = false, DefaultValue = 2)]
 		public int Level
 		{
@@ -104,6 +111,12 @@ namespace HSCentric
 		{
 			get { return (int)this["hsmod_port"]; }
 			set { this["hsmod_port"] = value; }
+		}
+		[ConfigurationProperty("switch_task", IsRequired = false, DefaultValue = false)]
+		public bool SwitchTask
+		{
+			get { return (bool)this["switch_task"]; }
+			set { this["switch_task"] = value; }
 		}
 
 	}

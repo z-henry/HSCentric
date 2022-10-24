@@ -485,7 +485,7 @@ namespace HSCentric
 		private string m_ID = "";//自定id
 		private bool m_enable = false;//启用状态
 		private int m_hsmodPort = 58744;//hsmod端口
-		private TaskManager m_taskManager = new TaskManager();
+		private TaskManager m_taskManager = null;
 		private DateTime[] m_fileLastEdit = new DateTime[(int)FILE_TYPE.Total]{
 			new DateTime(2000,1,1),
 			new DateTime(2000,1,1),

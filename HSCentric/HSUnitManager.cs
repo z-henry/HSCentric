@@ -167,11 +167,10 @@ namespace HSCentric
 			HSUnitSection config = ConfigurationManager.GetSection("userinfo") as HSUnitSection;
 			foreach (HSUnitElement hs in config.HSUnit.Cast<HSUnitElement>().ToList())
 			{
-				List<TaskUnit> tasks = new List<TaskUnit>();
+				List<TaskUnit> tasks_common = new List<TaskUnit>();
 				foreach (TaskElement task in hs.Tasks.Cast<TaskElement>().ToList())
 				{
-
-					tasks.Add(new TaskUnit()
+					tasks_common.Add(new TaskUnit()
 					{
 						Mode = (TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.Mode),
 						StartTime = Convert.ToDateTime(task.StartTime),
@@ -184,18 +183,37 @@ namespace HSCentric
 						MercTeamNumTotal = task.NumTotal,
 					});
 				}
-				m_listHS.Add(new HSUnit()
+				TaskUnit taskSpec = null;
+				foreach (TaskElement task in hs.TasksSpec.Cast<TaskElement>().ToList())
+				{
+					taskSpec = new TaskUnit
+					{
+						Mode = (TASK_MODE)Enum.Parse(typeof(TASK_MODE), task.Mode),
+						StartTime = Convert.ToDateTime(task.StartTime),
+						StopTime = Convert.ToDateTime(task.StopTime),
+						StrategyName = task.StrategyName,
+						TeamName = task.TeamName,
+						Scale = task.Scale,
+						Map = task.Map,
+						MercTeamNumCore = task.NumCore,
+						MercTeamNumTotal = task.NumTotal,
+					};
+					//目前只有一次，保不齐会扩展
+					break;
+				}
+				HSUnit hsunit = new HSUnit()
 				{
 					ID = hs.ID,
 					Enable = hs.Enable,
-					Tasks = new TaskManager(tasks),
-					XP = new RewardXP () { Level = hs.Level, ProgressXP = hs.XP },
+					XP = new RewardXP { Level = hs.Level, ProgressXP = hs.XP },
 					Token = hs.Token,
 					HBPath = hs.HBPath,
 					MercPvpRate = hs.PvpRate,
 					ClassicRate = hs.ClassicRate,
 					HSModPort = hs.HSModPort,
-				});
+				};
+				hsunit.Tasks = new TaskManager(hsunit, tasks_common, taskSpec, hs.SwitchTask);//要传入对象，放到初始值设定里不会获取对象的this- -!!!
+				m_listHS.Add(hsunit);
 			}
 			m_hsPath = ConfigurationManager.AppSettings["hs_path"];
 		}
@@ -207,10 +225,10 @@ namespace HSCentric
 			foreach (HSUnit hs in m_listHS)
 			{
 				int index_task = 0;
-				TaskCollection tasks = new TaskCollection();
+				TaskCollection tasks_common = new TaskCollection();
 				foreach (TaskUnit task in hs.Tasks.GetTasks())
 				{
-					tasks.Add(new TaskElement()
+					tasks_common.Add(new TaskElement()
 					{
 						ID = ++index_task,
 						Mode = task.Mode.ToString(),
@@ -224,11 +242,26 @@ namespace HSCentric
 						NumCore =task.MercTeamNumCore,
 					});
 				}
+				TaskCollection tasks_spec = new TaskCollection();
+				tasks_spec.Add(new TaskElement()
+				{
+					ID = ++index_task,
+					Mode = hs.Tasks.GetTaskSpec().Mode.ToString(),
+					TeamName = hs.Tasks.GetTaskSpec().TeamName,
+					StrategyName = hs.Tasks.GetTaskSpec().StrategyName,
+					StartTime = hs.Tasks.GetTaskSpec().StartTime.ToString("G"),
+					StopTime = hs.Tasks.GetTaskSpec().StopTime.ToString("G"),
+					Scale = hs.Tasks.GetTaskSpec().Scale,
+					Map = hs.Tasks.GetTaskSpec().Map,
+					NumTotal = hs.Tasks.GetTaskSpec().MercTeamNumTotal,
+					NumCore = hs.Tasks.GetTaskSpec().MercTeamNumCore
+				});
 				section.HSUnit.Add(new HSUnitElement()
 				{
 					ID = hs.ID,
 					Enable = hs.Enable,
-					Tasks = tasks,
+					Tasks = tasks_common,
+					TasksSpec = tasks_spec,
 					Level = hs.XP.Level,
 					XP = hs.XP.ProgressXP,
 					HBPath = hs.HBPath,
@@ -236,6 +269,7 @@ namespace HSCentric
 					ClassicRate = hs.ClassicRate,
 					PvpRate = hs.MercPvpRate,
 					HSModPort = hs.HSModPort,
+					SwitchTask = hs.Tasks.SwitchTask
 				});
 			}
 			config.AppSettings.Settings["hs_path"].Value = m_hsPath;

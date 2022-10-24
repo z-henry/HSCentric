@@ -9,8 +9,11 @@ namespace HSCentric
 	[Serializable]
 	public class TaskManager
 	{
-		public TaskManager (List<TaskUnit> tasks = null)
+		public TaskManager(HSUnit hsUnit, List<TaskUnit> tasks, TaskUnit taskspec, bool swtichTask)
 		{
+			m_hsunit = hsUnit;
+			m_specTask = taskspec;
+			m_switchTask = swtichTask;
 			if (tasks != null)
 				tasks.ForEach(i => Add(i));
 		}
@@ -25,6 +28,10 @@ namespace HSCentric
 				return null;
 
 			return m_tasks[index];
+		}
+		public TaskUnit GetTaskSpec()
+		{
+			return m_specTask;
 		}
 
 		public bool Remove(int index)
@@ -45,6 +52,22 @@ namespace HSCentric
 			Sort();
 			return true;
 		}
+		public bool RemoveSpec()
+		{
+			m_specTask = null;
+			return true;
+		}
+		public bool AddSpec(TaskUnit task)
+		{
+			m_specTask = task;
+			return true;
+		}
+		public bool SwitchTask
+		{
+			get { return m_switchTask; }
+			set { m_switchTask = value; }
+		}
+
 		public bool Modify(int index, TaskUnit task)
 		{
 			if (!IsTimeLegal(task, index))
@@ -56,13 +79,14 @@ namespace HSCentric
 		}
 		public TaskUnit GetCurrentTask()
 		{
+			TaskUnit result = m_tasks[0];
 			DateTime currentTime = DateTime.Now;
 			foreach (TaskUnit task in m_tasks)
 			{
 				if (currentTime.TimeOfDay <= task.StopTime.TimeOfDay)
-					return task;
+					result = task;
 			}
-			return m_tasks[0];
+			return SwitchTaskIfMeetConditions(result);
 		}
 		public object DeepClone()
 		{
@@ -92,7 +116,28 @@ namespace HSCentric
 			}
 			return true;
 		}
+		private TaskUnit SwitchTaskIfMeetConditions(TaskUnit taskunit)
+		{
+			if (false == m_switchTask)
+				return taskunit;
+			TaskUnit taskunit_switch = (TaskUnit)m_specTask.DeepClone();
+			taskunit_switch.StartTime = taskunit.StartTime;
+			taskunit_switch.StopTime = taskunit.StopTime;
+			if (m_hsunit.XP.Level >= 400)
+				if (taskunit.Mode == TASK_MODE.PVP && m_hsunit.MercPvpRate >= 12000)
+					return taskunit_switch;
+				else if (Common.IsBuddyMode(taskunit.Mode) && m_hsunit.ClassicRate.IndexOf("传说")  != -1)
+					return taskunit_switch;
+				else if (taskunit.Mode == TASK_MODE.挂机收菜)
+					return taskunit_switch;
+
+			return taskunit;
+		}
+
 		private List<TaskUnit> m_tasks = new List<TaskUnit>();
+		private HSUnit m_hsunit = null;
+		private TaskUnit m_specTask = null;
+		private bool m_switchTask = false;
 	}
 
 	[Serializable]
@@ -170,7 +215,7 @@ namespace HSCentric
 		}
 
 		private DateTime m_startTime = DateTime.Now;
-		private DateTime m_stopTime = DateTime.Now;
+		private DateTime m_stopTime = DateTime.Now.AddMinutes(1);
 		private TASK_MODE m_mode = TASK_MODE.挂机收菜;
 		private string m_teamName ="test";
 		private string m_strategyName = "PVE策略";
