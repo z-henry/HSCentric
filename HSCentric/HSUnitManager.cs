@@ -98,7 +98,7 @@ namespace HSCentric
 						{
 							if (hsUnit.NeedAdjustMode())
 								hsUnit.AdjustMode();
-							hsUnit.InitHsMod();
+							hsUnit.InitConfig();
 							hsUnit.StartHS(msg_start_reason);
 							Common.Delay(5 * 1000);
 							if (Common.IsBuddyMode(currentTask.Mode))

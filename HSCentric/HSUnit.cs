@@ -103,7 +103,7 @@ namespace HSCentric
 		}
 
 
-		public void InitMercPlugin()
+		private void InitMercPlugin()
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
@@ -113,7 +113,7 @@ namespace HSCentric
 			Common.IniWriteValue("配置", "是否自动制作佣兵", true.ToString(), pathConfig.ToString());
 		}
 
-		public void InitHsMod()
+		private void InitHsMod()
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == File.Exists(pathConfig.ToString()))
