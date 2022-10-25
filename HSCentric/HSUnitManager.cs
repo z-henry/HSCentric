@@ -183,7 +183,7 @@ namespace HSCentric
 						MercTeamNumTotal = task.NumTotal,
 					});
 				}
-				TaskUnit taskSpec = null;
+				TaskUnit taskSpec = new TaskUnit();
 				foreach (TaskElement task in hs.TasksSpec.Cast<TaskElement>().ToList())
 				{
 					taskSpec = new TaskUnit

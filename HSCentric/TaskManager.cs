@@ -84,7 +84,10 @@ namespace HSCentric
 			foreach (TaskUnit task in m_tasks)
 			{
 				if (currentTime.TimeOfDay <= task.StopTime.TimeOfDay)
+				{
 					result = task;
+					break;
+				}
 			}
 			return SwitchTaskIfMeetConditions(result);
 		}
@@ -216,8 +219,8 @@ namespace HSCentric
 
 		private DateTime m_startTime = DateTime.Now;
 		private DateTime m_stopTime = DateTime.Now.AddMinutes(1);
-		private TASK_MODE m_mode = TASK_MODE.挂机收菜;
-		private string m_teamName ="test";
+		private TASK_MODE m_mode = TASK_MODE.一条龙;
+		private string m_teamName ="初始队伍";
 		private string m_strategyName = "PVE策略";
 		private bool m_scale = false;
 		private string m_map = "2-5";
