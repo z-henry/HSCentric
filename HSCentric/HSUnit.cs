@@ -15,6 +15,10 @@ namespace HSCentric
 	[Serializable]
 	public class HSUnit
 	{
+		public HSUnit()
+		{
+			m_taskManager = new TaskManager(this, null, new TaskUnit(), false);
+		}
 		[Serializable]
 		public class CacheConfig
 		{
@@ -127,7 +131,7 @@ namespace HSCentric
 			Common.IniWriteValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
 			Common.IniWriteValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
 			Common.IniWriteValue("全局", "游戏帧率", "15", pathConfig.ToString());
-// 			Common.IniWriteValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
+			Common.IniWriteValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
 			Common.IniWriteValue("Dev", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
 		}
 
@@ -491,7 +495,7 @@ namespace HSCentric
 		private string m_ID = "";//自定id
 		private bool m_enable = false;//启用状态
 		private int m_hsmodPort = 58744;//hsmod端口
-		private TaskManager m_taskManager = null;
+		private TaskManager m_taskManager;
 		private DateTime[] m_fileLastEdit = new DateTime[(int)FILE_TYPE.Total]{
 			new DateTime(2000,1,1),
 			new DateTime(2000,1,1),

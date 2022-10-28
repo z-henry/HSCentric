@@ -273,7 +273,6 @@ namespace HSCentric
 					SwitchTask = hs.Tasks.SwitchTask
 				});
 			}
-			config.AppSettings.Settings["hs_path"].Value = m_hsPath;
 			config.Save();
 // 			ConfigurationManager.RefreshSection("userinfo");
 		}

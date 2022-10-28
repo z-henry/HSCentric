@@ -18,7 +18,7 @@ namespace HSCentric
 			textbox_ID.Text = m_unit.ID;
 			textbox_Token.Text = m_unit.Token;
 			textBox_hsmodPort.Text = m_unit.HSModPort.ToString();
-			checkBox_switchmode.Checked = m_unit.Tasks.SwitchTask;
+			checkBox_switchmode.Checked = m_unit.Tasks?.SwitchTask??false;
 
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.模式.ToString(), 80);
 			this.listTasks.Columns.Add(LIST_TASK_COLUMN.队伍.ToString(), 40);
