@@ -208,6 +208,7 @@ namespace HSCentric
 					XP = new RewardXP { Level = hs.Level, ProgressXP = hs.XP },
 					Token = hs.Token,
 					HBPath = hs.HBPath,
+					HSPath = hs.HSPath,
 					MercPvpRate = hs.PvpRate,
 					ClassicRate = hs.ClassicRate,
 					HSModPort = hs.HSModPort,
@@ -215,7 +216,6 @@ namespace HSCentric
 				hsunit.Tasks = new TaskManager(hsunit, tasks_common, taskSpec, hs.SwitchTask);//要传入对象，放到初始值设定里不会获取对象的this- -!!!
 				m_listHS.Add(hsunit);
 			}
-			m_hsPath = ConfigurationManager.AppSettings["hs_path"];
 		}
 		static void SaveConfig()
 		{
@@ -265,6 +265,7 @@ namespace HSCentric
 					Level = hs.XP.Level,
 					XP = hs.XP.ProgressXP,
 					HBPath = hs.HBPath,
+					HSPath = hs.HSPath,
 					Token = hs.Token,
 					ClassicRate = hs.ClassicRate,
 					PvpRate = hs.MercPvpRate,

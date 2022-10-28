@@ -66,6 +66,11 @@ namespace HSCentric
 			get { return m_hbPath; }
 			set { m_hbPath = value; }
 		}
+		public string HSPath
+		{
+			get { return m_hsPath; }
+			set { m_hsPath = value; }
+		}
 		public TaskUnit CurrentTask
 		{
 			get { return Tasks.GetCurrentTask(); }
@@ -105,7 +110,7 @@ namespace HSCentric
 
 		private void InitMercPlugin()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
@@ -115,14 +120,14 @@ namespace HSCentric
 
 		private void InitHsMod()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == File.Exists(pathConfig.ToString()))
 				return; 
 
 			Common.IniWriteValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
 			Common.IniWriteValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
 			Common.IniWriteValue("全局", "游戏帧率", "15", pathConfig.ToString());
-			Common.IniWriteValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
+// 			Common.IniWriteValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
 			Common.IniWriteValue("Dev", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
 		}
 
@@ -149,7 +154,7 @@ namespace HSCentric
 			if (string.IsNullOrEmpty (m_hsLogFile))
 				return true;
 
-			string rootPath = System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + '/' + m_hsLogFile;
+			string rootPath = System.IO.Path.GetDirectoryName(m_hsPath) + '/' + m_hsLogFile;
 			if (false == System.IO.File.Exists(rootPath))
 				return false;
 
@@ -175,7 +180,7 @@ namespace HSCentric
 		{
 			Process process = new Process();
 			process.StartInfo.UseShellExecute = false;
-			process.StartInfo.FileName = HSUnitManager.m_hsPath;
+			process.StartInfo.FileName = m_hsPath;
 			process.StartInfo.Arguments += " " + m_token;
 			process.StartInfo.Arguments += " --hsunitid:" + m_ID;
 			process.StartInfo.Arguments += " --startmethod:hscentric";
@@ -275,7 +280,7 @@ namespace HSCentric
 		}
 		private CacheConfig ReadConfigValue()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == File.Exists(pathConfig.ToString()))
 				return null;
 			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
@@ -314,7 +319,7 @@ namespace HSCentric
 		}
 		private void WriteConfigHSMod()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
@@ -322,7 +327,7 @@ namespace HSCentric
 		}
 		private void WriteConfigValueMercPlugin(bool Enable, TaskUnit task)
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
@@ -346,7 +351,7 @@ namespace HSCentric
 			var task = Task.Run(() =>
 			{
 				Thread.Sleep(20 * 1000);
-				DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+				DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 				if (false == File.Exists(pathConfig.ToString()))
 					return "";
 
@@ -374,7 +379,7 @@ namespace HSCentric
 			try
 			{
 				//佣兵日志获取经验
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepinEx/Log/" + ID);
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID);
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
 					return;
 				List<FileInfo> testList = rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly).ToList();
@@ -411,7 +416,7 @@ namespace HSCentric
 		{
 			try
 			{
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(HSUnitManager.m_hsPath) + "/BepinEx/Log/" + ID);
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID);
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
 					return;
 				List<FileInfo> testList = rootHS.GetFiles("gamerecord@*.log", SearchOption.TopDirectoryOnly).ToList();
@@ -479,6 +484,7 @@ namespace HSCentric
 		private int m_pvpRate = 0;
 		private string m_classicRate = "";
 		private string m_hbPath = "";//hb路径
+		private string m_hsPath = "";
 		private string m_token = "";//token
 		private int m_pid = 0;//进程id
 		private string m_hsLogFile = "";//炉石进程对应的日志

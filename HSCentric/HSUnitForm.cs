@@ -14,6 +14,7 @@ namespace HSCentric
 				m_unit = (HSUnit)unit.DeepClone();
 			checkbox_Enable.Checked = m_unit.Enable;
 			textbox_HBPath.Text = m_unit.HBPath;
+			textbox_HSPath.Text = m_unit.HSPath;
 			textbox_ID.Text = m_unit.ID;
 			textbox_Token.Text = m_unit.Token;
 			textBox_hsmodPort.Text = m_unit.HSModPort.ToString();
@@ -59,6 +60,11 @@ namespace HSCentric
 				MessageBox.Show("请输入炉石Token", "Error");
 				return;
 			}
+			if (textbox_HSPath.Text.Length <= 0)
+			{
+				MessageBox.Show("请输入炉石路径", "Error");
+				return;
+			}
 			if (listTasks.Items.Count <= 0)
 			{
 				MessageBox.Show("请添加一个模式", "Error");
@@ -79,6 +85,7 @@ namespace HSCentric
 			}
 
 			m_unit.HBPath = textbox_HBPath.Text;
+			m_unit.HSPath = textbox_HSPath.Text;
 			m_unit.ID = textbox_ID.Text;
 			m_unit.Token = textbox_Token.Text;
 			m_unit.Enable = checkbox_Enable.Checked;
@@ -104,6 +111,19 @@ namespace HSCentric
 
 			textbox_HBPath.Text = openFileDialog.FileName;
 		}
+
+		private void btn_selecthspath_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog openFileDialog = new OpenFileDialog();
+			openFileDialog.Filter = "Hearthstone.exe|*.exe";
+			openFileDialog.DereferenceLinks = false;
+			openFileDialog.ShowDialog();
+			if (string.IsNullOrEmpty(openFileDialog.FileName))
+				return;
+
+			textbox_HSPath.Text = openFileDialog.FileName;
+		}
+
 
 		private void 添加ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
@@ -371,7 +391,6 @@ namespace HSCentric
 				listSpecTask.Items.Add(item);
 			}
 		}
-
 
 		private HSUnit m_unit = new HSUnit();
 	}

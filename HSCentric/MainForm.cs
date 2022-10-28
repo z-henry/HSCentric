@@ -43,7 +43,6 @@ namespace HSCentric
 			HSUnitManager.Init();
 			UI_Flush();
 			MyRestFul.Init(ConfigurationManager.AppSettings["rest_url"]);
-			textbox_Path.Text = ConfigurationManager.AppSettings["hs_path"];
 			this.timer1.Start();
 		}
 		private void TickProcess(object sender, EventArgs e)
@@ -75,16 +74,10 @@ namespace HSCentric
 			timer1.Stop();
 			HSUnitManager.Release();
 			Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-			config.AppSettings.Settings["hs_path"].Value = textbox_Path.Text;
 			config.Save();
 		}
 		private void btn_add_Click(object sender, EventArgs e)
 		{
-			if (string.IsNullOrEmpty(HSUnitManager.m_hsPath))
-			{
-				MessageBox.Show("请先设置炉石路径", "ERROR");
-				return;
-			}
 			HSUnitForm dlg = new HSUnitForm();
 			if (dlg.ShowDialog() != DialogResult.OK)
 				return;
@@ -265,25 +258,6 @@ namespace HSCentric
 			g = Math.Min(Math.Max(0, g), 255);
 			b = Math.Min(Math.Max(0, b), 255);
 			return Color.FromArgb(r, g, b);
-		}
-
-		private void btn_selectpath_Click(object sender, EventArgs e)
-		{
-			OpenFileDialog openFileDialog = new OpenFileDialog();
-			openFileDialog.Filter = "Hearthstone.exe|*.exe";
-			openFileDialog.DereferenceLinks = false;
-			openFileDialog.ShowDialog();
-			if (string.IsNullOrEmpty(openFileDialog.FileName))
-				return;
-
-			textbox_Path.Text = openFileDialog.FileName;
-
-			if (MessageBox.Show("设置保存成功，下次启动时生效，是否马上重启软件？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-			{
-				Application.Exit();
-				System.Diagnostics.Process.Start(System.Reflection.Assembly.GetExecutingAssembly().Location);
-
-			}
 		}
 	}
 }

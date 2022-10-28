@@ -49,15 +49,12 @@ namespace HSCentric
 			this.label_checktime = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.btn_selectpath = new System.Windows.Forms.Button();
-			this.textbox_Path = new System.Windows.Forms.TextBox();
-			this.label3 = new System.Windows.Forms.Label();
 			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// btn_add
 			// 
-			this.btn_add.Location = new System.Drawing.Point(409, 6);
+			this.btn_add.Location = new System.Drawing.Point(823, 6);
 			this.btn_add.Name = "btn_add";
 			this.btn_add.Size = new System.Drawing.Size(75, 23);
 			this.btn_add.TabIndex = 8;
@@ -67,7 +64,7 @@ namespace HSCentric
 			// 
 			// btn_del
 			// 
-			this.btn_del.Location = new System.Drawing.Point(490, 6);
+			this.btn_del.Location = new System.Drawing.Point(904, 6);
 			this.btn_del.Name = "btn_del";
 			this.btn_del.Size = new System.Drawing.Size(75, 23);
 			this.btn_del.TabIndex = 9;
@@ -123,7 +120,7 @@ namespace HSCentric
 			// label_currenttime
 			// 
 			this.label_currenttime.AutoSize = true;
-			this.label_currenttime.Location = new System.Drawing.Point(640, 11);
+			this.label_currenttime.Location = new System.Drawing.Point(83, 11);
 			this.label_currenttime.Name = "label_currenttime";
 			this.label_currenttime.Size = new System.Drawing.Size(29, 12);
 			this.label_currenttime.TabIndex = 11;
@@ -132,7 +129,7 @@ namespace HSCentric
 			// label_checktime
 			// 
 			this.label_checktime.AutoSize = true;
-			this.label_checktime.Location = new System.Drawing.Point(860, 11);
+			this.label_checktime.Location = new System.Drawing.Point(303, 11);
 			this.label_checktime.Name = "label_checktime";
 			this.label_checktime.Size = new System.Drawing.Size(29, 12);
 			this.label_checktime.TabIndex = 12;
@@ -141,7 +138,7 @@ namespace HSCentric
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(569, 11);
+			this.label1.Location = new System.Drawing.Point(12, 11);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(65, 12);
 			this.label1.TabIndex = 13;
@@ -150,46 +147,17 @@ namespace HSCentric
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(765, 11);
+			this.label2.Location = new System.Drawing.Point(208, 11);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(89, 12);
 			this.label2.TabIndex = 14;
 			this.label2.Text = "下次检测时间：";
-			// 
-			// btn_selectpath
-			// 
-			this.btn_selectpath.Location = new System.Drawing.Point(363, 6);
-			this.btn_selectpath.Name = "btn_selectpath";
-			this.btn_selectpath.Size = new System.Drawing.Size(40, 23);
-			this.btn_selectpath.TabIndex = 17;
-			this.btn_selectpath.Text = "...";
-			this.btn_selectpath.UseVisualStyleBackColor = true;
-			this.btn_selectpath.Click += new System.EventHandler(this.btn_selectpath_Click);
-			// 
-			// textbox_Path
-			// 
-			this.textbox_Path.Location = new System.Drawing.Point(70, 6);
-			this.textbox_Path.Name = "textbox_Path";
-			this.textbox_Path.Size = new System.Drawing.Size(287, 21);
-			this.textbox_Path.TabIndex = 16;
-			// 
-			// label3
-			// 
-			this.label3.AutoSize = true;
-			this.label3.Location = new System.Drawing.Point(11, 11);
-			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(53, 12);
-			this.label3.TabIndex = 15;
-			this.label3.Text = "炉石路径";
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(991, 279);
-			this.Controls.Add(this.btn_selectpath);
-			this.Controls.Add(this.textbox_Path);
-			this.Controls.Add(this.label3);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.label_checktime);
@@ -221,9 +189,6 @@ namespace HSCentric
 		private Label label_checktime;
 		private Label label1;
 		private Label label2;
-		private Button btn_selectpath;
-		private TextBox textbox_Path;
-		private Label label3;
 	}
 }
 

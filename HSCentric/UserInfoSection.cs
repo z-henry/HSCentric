@@ -88,6 +88,13 @@ namespace HSCentric
 			get { return (string)this["hbpath"]; }
 			set { this["hbpath"] = value; }
 		}
+		[ConfigurationProperty("hspath", IsRequired = false, DefaultValue = "")]
+		public string HSPath
+		{
+			get { return (string)this["hspath"]; }
+			set { this["hspath"] = value; }
+		}
+
 		[ConfigurationProperty("token", IsRequired = true)]
 		public string Token
 		{
