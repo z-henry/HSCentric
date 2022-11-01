@@ -166,7 +166,7 @@ namespace HSCentric
 			this.Controls.Add(this.btn_del);
 			this.Controls.Add(this.btn_add);
 			this.Name = "MainForm";
-			this.Text = "中控 5.1.14";
+			this.Text = "中控 5.1.15";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);

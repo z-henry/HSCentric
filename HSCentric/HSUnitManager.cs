@@ -119,6 +119,8 @@ namespace HSCentric
 				for (int i = 0, ii = m_listHS.Count; i < ii; ++i)
 				{
 					HSUnit hsUnit = m_listHS[i];
+					hsUnit.UpdateStatsMonth();
+
 					hsUnit.ReadMercLog();
 					hsUnit.ReadMercRecordLog();
 					hsUnit.ReadHBLog();
@@ -212,6 +214,7 @@ namespace HSCentric
 					MercPvpRate = hs.PvpRate,
 					ClassicRate = hs.ClassicRate,
 					HSModPort = hs.HSModPort,
+					StatsMonth = hs.StatsMonth,
 				};
 				hsunit.Tasks = new TaskManager(hsunit, tasks_common, taskSpec, hs.SwitchTask);//要传入对象，放到初始值设定里不会获取对象的this- -!!!
 				m_listHS.Add(hsunit);
@@ -270,6 +273,7 @@ namespace HSCentric
 					ClassicRate = hs.ClassicRate,
 					PvpRate = hs.MercPvpRate,
 					HSModPort = hs.HSModPort,
+					StatsMonth = hs.StatsMonth,
 					SwitchTask = hs.Tasks.SwitchTask
 				});
 			}

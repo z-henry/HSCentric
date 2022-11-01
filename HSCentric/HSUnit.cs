@@ -104,6 +104,11 @@ namespace HSCentric
 			get { return m_hsmodPort; }
 			set { m_hsmodPort = value; }
 		}
+		public int StatsMonth
+		{
+			get { return m_statsMonth; }
+			set { m_statsMonth = value; }
+		}
 
 		public void InitConfig()
 		{
@@ -483,6 +488,21 @@ namespace HSCentric
 			{
 			}
 		}
+		public void UpdateStatsMonth()
+		{
+			if (m_statsMonth == DateTime.Now.Month)
+				return;
+
+			DateTime check_point = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1, 1, 0, 0);
+			if (DateTime.Now > check_point)
+			{
+				m_statsMonth = DateTime.Now.Month;
+				m_pvpRate = 0;
+				m_classicRate = "";
+				m_fileLastEdit[(int)FILE_TYPE.佣兵对局日志] = DateTime.Now;
+				m_fileLastEdit[(int)FILE_TYPE.兄弟日志] = DateTime.Now;
+			}
+		}
 
 		private RewardXP m_rewardXP = new RewardXP();
 		private int m_pvpRate = 0;
@@ -497,11 +517,12 @@ namespace HSCentric
 		private int m_hsmodPort = 58744;//hsmod端口
 		private TaskManager m_taskManager;
 		private DateTime[] m_fileLastEdit = new DateTime[(int)FILE_TYPE.Total]{
-			new DateTime(2000,1,1),
-			new DateTime(2000,1,1),
-			new DateTime(2000,1,1),
-			new DateTime(2000,1,1)
+			DateTime.Now,
+			DateTime.Now,
+			DateTime.Now,
+			DateTime.Now,
 		};
 		private CacheConfig m_cacheConfig = new CacheConfig();
+		private int m_statsMonth = -1;
 	}
 }

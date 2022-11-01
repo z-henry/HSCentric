@@ -125,6 +125,12 @@ namespace HSCentric
 			get { return (bool)this["switch_task"]; }
 			set { this["switch_task"] = value; }
 		}
+		[ConfigurationProperty("stats_month", IsRequired = false, DefaultValue = -1)]
+		public int StatsMonth
+		{
+			get { return (int)this["stats_month"]; }
+			set { this["stats_month"] = value; }
+		}
 
 	}
 	public class TaskCollection : ConfigurationElementCollection
