@@ -54,7 +54,7 @@ namespace HSCentric
 			// 
 			// btn_add
 			// 
-			this.btn_add.Location = new System.Drawing.Point(823, 6);
+			this.btn_add.Location = new System.Drawing.Point(10, 6);
 			this.btn_add.Name = "btn_add";
 			this.btn_add.Size = new System.Drawing.Size(75, 23);
 			this.btn_add.TabIndex = 8;
@@ -64,7 +64,7 @@ namespace HSCentric
 			// 
 			// btn_del
 			// 
-			this.btn_del.Location = new System.Drawing.Point(904, 6);
+			this.btn_del.Location = new System.Drawing.Point(91, 6);
 			this.btn_del.Name = "btn_del";
 			this.btn_del.Size = new System.Drawing.Size(75, 23);
 			this.btn_del.TabIndex = 9;
@@ -80,7 +80,7 @@ namespace HSCentric
 			this.listHS.Location = new System.Drawing.Point(12, 35);
 			this.listHS.MultiSelect = false;
 			this.listHS.Name = "listHS";
-			this.listHS.Size = new System.Drawing.Size(967, 233);
+			this.listHS.Size = new System.Drawing.Size(865, 233);
 			this.listHS.TabIndex = 10;
 			this.listHS.UseCompatibleStateImageBehavior = false;
 			this.listHS.View = System.Windows.Forms.View.Details;
@@ -120,7 +120,7 @@ namespace HSCentric
 			// label_currenttime
 			// 
 			this.label_currenttime.AutoSize = true;
-			this.label_currenttime.Location = new System.Drawing.Point(83, 11);
+			this.label_currenttime.Location = new System.Drawing.Point(243, 11);
 			this.label_currenttime.Name = "label_currenttime";
 			this.label_currenttime.Size = new System.Drawing.Size(29, 12);
 			this.label_currenttime.TabIndex = 11;
@@ -129,7 +129,7 @@ namespace HSCentric
 			// label_checktime
 			// 
 			this.label_checktime.AutoSize = true;
-			this.label_checktime.Location = new System.Drawing.Point(303, 11);
+			this.label_checktime.Location = new System.Drawing.Point(463, 11);
 			this.label_checktime.Name = "label_checktime";
 			this.label_checktime.Size = new System.Drawing.Size(29, 12);
 			this.label_checktime.TabIndex = 12;
@@ -138,7 +138,7 @@ namespace HSCentric
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(12, 11);
+			this.label1.Location = new System.Drawing.Point(172, 11);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(65, 12);
 			this.label1.TabIndex = 13;
@@ -147,7 +147,7 @@ namespace HSCentric
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(208, 11);
+			this.label2.Location = new System.Drawing.Point(368, 11);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(89, 12);
 			this.label2.TabIndex = 14;
@@ -157,7 +157,7 @@ namespace HSCentric
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(991, 279);
+			this.ClientSize = new System.Drawing.Size(884, 279);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.label_checktime);
