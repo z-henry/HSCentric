@@ -51,6 +51,7 @@ namespace HSCentric.Const
 		挂机收菜,
 		解锁装备,
 		主线任务,
+		活动任务,
 		狂野,
 		标准,
 		经典,
