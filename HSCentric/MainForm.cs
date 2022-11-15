@@ -77,7 +77,10 @@ namespace HSCentric
 			timer1.Stop();
 			HSUnitManager.Get().Release();
 			Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-			config.AppSettings.Settings["bnet_path"].Value = textbox_BNetPath.Text;
+			if (config.AppSettings.Settings["bnet_path"] != null)
+				config.AppSettings.Settings["bnet_path"].Value = textbox_BNetPath.Text;
+			else
+				config.AppSettings.Settings.Add("bnet_path", textbox_BNetPath.Text);
 			config.Save();
 		}
 		private void btn_add_Click(object sender, EventArgs e)
