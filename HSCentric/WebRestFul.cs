@@ -74,7 +74,7 @@ namespace HSCentric
 			switch (requestInfo.func)
 			{
 				case "query":
-					foreach (var iter in HSUnitManager.GetHSUnits())
+					foreach (var iter in HSUnitManager.Get().GetHSUnits())
 					{
 						resultInfo.units.Add(new UnitInfo()
 						{
@@ -89,7 +89,7 @@ namespace HSCentric
 					break;
 
 				case "switch":
-					HSUnitManager.SetEnable(requestInfo.unit.name, requestInfo.unit.enable);
+					HSUnitManager.Get().SetEnable(requestInfo.unit.name, requestInfo.unit.enable);
 					Out.Log(string.Format("post修改[{0}][{1}]", requestInfo.unit.name, requestInfo.unit.enable));
 					break;
 

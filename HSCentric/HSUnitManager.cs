@@ -8,23 +8,46 @@ using System.Management;
 
 namespace HSCentric
 {
-	public static class HSUnitManager
+	public class HSUnitManager
 	{
-		public static void Init()
+		private static readonly HSUnitManager instance = new HSUnitManager();
+
+		public static HSUnitManager Get()
 		{
+			return instance;
+		}
+
+		public void Init(Action callbackUpdateHS)
+		{
+			m_callbackUpdateHS = callbackUpdateHS;
 			LoadConfig();
-			foreach(var process in HSProcess())
+			foreach (var process in HSProcess())
 			{
 				process.Kill();
 				Out.Log(string.Format("关闭炉石残留[pid:{0}]", process.Id));
 				Common.Delay(5000);
 			}
 		}
-		public static void Release()
+
+		public void Release()
 		{
 			SaveConfig();
 		}
-		public static List<HSUnit> GetHSUnits()
+
+		public void InterruptBeforeUpdate()
+		{
+			if (false == m_waitForUpdateHS)
+			{
+				m_waitForUpdateHS = true;
+				m_callbackUpdateHS();
+			}	
+		}
+		public void RecoverAfterUpdated()
+		{
+			m_waitForUpdateHS = false;
+		}
+
+		public List<HSUnit> GetHSUnits()
 		{
 			List<HSUnit> result = new List<HSUnit>();
 			lock (m_lockHS)
@@ -36,16 +59,28 @@ namespace HSCentric
 			}
 			return result;
 		}
-		public static void Check()
+
+		public void Check()
 		{
 			TimeSpan timespan_farmendding = new TimeSpan(0, 2, 0);//收菜模式结束一定时间内启动收尾
 			lock (m_lockHS)
 			{
 				for (int i = 0, ii = m_listHS.Count; i < ii; ++i)
 				{
-					HSUnit hsUnit = m_listHS[i]; 
+					HSUnit hsUnit = m_listHS[i];
 					var basicConfigValue = hsUnit.BasicConfigValue;
 					var currentTask = hsUnit.CurrentTask;
+
+					// 升级的时候关掉所有客户端
+					if (m_waitForUpdateHS == true)
+					{
+						if (hsUnit.IsProcessAlive())
+						{
+							Out.Log(string.Format("[{0}]升级关闭客户端", hsUnit.ID));
+							hsUnit.KillHS();
+						}
+						continue;
+					}
 
 					// 没启用就跳过
 					if (!hsUnit.Enable)
@@ -104,7 +139,7 @@ namespace HSCentric
 							if (Common.IsBuddyMode(currentTask.Mode))
 							{
 								Common.Delay(5 * 1000);
-								hsUnit.StartHB(msg_start_reason); 
+								hsUnit.StartHB(msg_start_reason);
 								Common.Delay(5 * 1000);
 							}
 						}
@@ -112,7 +147,8 @@ namespace HSCentric
 				}
 			}
 		}
-		public static void CheckLog()
+
+		public void CheckLog()
 		{
 			lock (m_lockHS)
 			{
@@ -130,18 +166,19 @@ namespace HSCentric
 			}
 		}
 
-		internal static void FlipEnable(int index)
+		internal void FlipEnable(int index)
 		{
 			lock (m_lockHS)
 			{
 				m_listHS[index].Enable = !m_listHS[index].Enable;
 			}
 		}
-		internal static void SetEnable(string memberName, bool flag)
+
+		internal void SetEnable(string memberName, bool flag)
 		{
 			lock (m_lockHS)
 			{
-				foreach(var iter in m_listHS)
+				foreach (var iter in m_listHS)
 				{
 					if (iter.ID == memberName)
 						iter.Enable = flag;
@@ -149,22 +186,23 @@ namespace HSCentric
 			}
 		}
 
-		internal static void Remove(int index)
+		internal void Remove(int index)
 		{
 			lock (m_lockHS)
 			{
 				m_listHS.RemoveAt(index);
 			}
 		}
-		public static void Add(HSUnit unit)
+
+		public void Add(HSUnit unit)
 		{
 			lock (m_lockHS)
 			{
 				m_listHS.Add(unit);
 			}
-
 		}
-		static void LoadConfig()
+
+		private void LoadConfig()
 		{
 			HSUnitSection config = ConfigurationManager.GetSection("userinfo") as HSUnitSection;
 			foreach (HSUnitElement hs in config.HSUnit.Cast<HSUnitElement>().ToList())
@@ -220,7 +258,8 @@ namespace HSCentric
 				m_listHS.Add(hsunit);
 			}
 		}
-		static void SaveConfig()
+
+		private void SaveConfig()
 		{
 			Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 			HSUnitSection section = config.GetSection("userinfo") as HSUnitSection;
@@ -242,7 +281,7 @@ namespace HSCentric
 						Scale = task.Scale,
 						Map = task.Map,
 						NumTotal = task.MercTeamNumTotal,
-						NumCore =task.MercTeamNumCore,
+						NumCore = task.MercTeamNumCore,
 					});
 				}
 				TaskCollection tasks_spec = new TaskCollection();
@@ -278,17 +317,18 @@ namespace HSCentric
 				});
 			}
 			config.Save();
-// 			ConfigurationManager.RefreshSection("userinfo");
+			// 			ConfigurationManager.RefreshSection("userinfo");
 		}
 
-		internal static void Modify(int index, HSUnit unit)
+		internal void Modify(int index, HSUnit unit)
 		{
 			lock (m_lockHS)
 			{
 				m_listHS[index] = unit;
 			}
 		}
-		internal static HSUnit Get(int index)
+
+		internal HSUnit GetUnitByIndex(int index)
 		{
 			lock (m_lockHS)
 			{
@@ -296,18 +336,19 @@ namespace HSCentric
 			}
 		}
 
-		internal static void StartOnce(int index)
+		internal void StartOnce(int index)
 		{
 			lock (m_lockHS)
 			{
 				if (!m_listHS[index].IsProcessAlive())
 				{
-// 					m_listHS[index].InitHsMod();
+					// 					m_listHS[index].InitHsMod();
 					m_listHS[index].StartHS("手动启动");
 				}
 			}
 		}
-		internal static void BackUpConfig()
+
+		internal void BackUpConfig()
 		{
 			try
 			{
@@ -315,22 +356,21 @@ namespace HSCentric
 				Process proc;
 				proc = new Process();
 				proc.StartInfo.FileName = AppDomain.CurrentDomain.BaseDirectory + @"script\backup\backup.bat";
-				proc.StartInfo.Arguments = "\"" + System.IO.Path.GetDirectoryName(m_hsPath) + "\"";
 				proc.StartInfo.CreateNoWindow = true;   //不创建该进程的窗口
 				proc.StartInfo.UseShellExecute = false;   //不使用shell壳运行
-				proc.Start();
-				proc.WaitForExit();
+// 				proc.Start();
+// 				proc.WaitForExit();
 			}
 			catch
 			{ }
 		}
 
-		internal static List<Process> HSProcess()
+		internal List<Process> HSProcess()
 		{
 			List<Process> listProcess = new List<Process>();
-			foreach(var process_iter in Process.GetProcessesByName("Hearthstone"))
+			foreach (var process_iter in Process.GetProcessesByName("Hearthstone"))
 			{
-// 				Out.Log(string.Format("炉石残留[pid:{0}]", process_iter.Id));
+				// 				Out.Log(string.Format("炉石残留[pid:{0}]", process_iter.Id));
 				using (var searcher = new ManagementObjectSearcher(
 					"SELECT CommandLine FROM Win32_Process WHERE ProcessId = " + process_iter.Id))
 				using (var objects = searcher.Get())
@@ -347,13 +387,10 @@ namespace HSCentric
 			return listProcess;
 		}
 
-
-
-
-		static List<HSUnit> m_listHS = new List<HSUnit>();
-		static object m_lockHS = new object();
-		static public string m_hsPath = "";
+		private List<HSUnit> m_listHS = new List<HSUnit>();
+		private object m_lockHS = new object();
+		private bool m_waitForUpdateHS = false;//等待升级
+		private Action m_callbackUpdateHS;//升级完了回调函数
 
 	}
-
 }

@@ -49,6 +49,9 @@ namespace HSCentric
 			this.label_checktime = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
+			this.btn_selecthspath = new System.Windows.Forms.Button();
+			this.textbox_BNetPath = new System.Windows.Forms.TextBox();
+			this.label6 = new System.Windows.Forms.Label();
 			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -80,7 +83,7 @@ namespace HSCentric
 			this.listHS.Location = new System.Drawing.Point(12, 35);
 			this.listHS.MultiSelect = false;
 			this.listHS.Name = "listHS";
-			this.listHS.Size = new System.Drawing.Size(865, 233);
+			this.listHS.Size = new System.Drawing.Size(765, 233);
 			this.listHS.TabIndex = 10;
 			this.listHS.UseCompatibleStateImageBehavior = false;
 			this.listHS.View = System.Windows.Forms.View.Details;
@@ -120,7 +123,7 @@ namespace HSCentric
 			// label_currenttime
 			// 
 			this.label_currenttime.AutoSize = true;
-			this.label_currenttime.Location = new System.Drawing.Point(243, 11);
+			this.label_currenttime.Location = new System.Drawing.Point(81, 271);
 			this.label_currenttime.Name = "label_currenttime";
 			this.label_currenttime.Size = new System.Drawing.Size(29, 12);
 			this.label_currenttime.TabIndex = 11;
@@ -129,7 +132,7 @@ namespace HSCentric
 			// label_checktime
 			// 
 			this.label_checktime.AutoSize = true;
-			this.label_checktime.Location = new System.Drawing.Point(463, 11);
+			this.label_checktime.Location = new System.Drawing.Point(301, 271);
 			this.label_checktime.Name = "label_checktime";
 			this.label_checktime.Size = new System.Drawing.Size(29, 12);
 			this.label_checktime.TabIndex = 12;
@@ -138,7 +141,7 @@ namespace HSCentric
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(172, 11);
+			this.label1.Location = new System.Drawing.Point(10, 271);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(65, 12);
 			this.label1.TabIndex = 13;
@@ -147,17 +150,46 @@ namespace HSCentric
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(368, 11);
+			this.label2.Location = new System.Drawing.Point(206, 271);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(89, 12);
 			this.label2.TabIndex = 14;
 			this.label2.Text = "下次检测时间：";
 			// 
+			// btn_selecthspath
+			// 
+			this.btn_selecthspath.Location = new System.Drawing.Point(580, 4);
+			this.btn_selecthspath.Name = "btn_selecthspath";
+			this.btn_selecthspath.Size = new System.Drawing.Size(40, 23);
+			this.btn_selecthspath.TabIndex = 35;
+			this.btn_selecthspath.Text = "...";
+			this.btn_selecthspath.UseVisualStyleBackColor = true;
+			this.btn_selecthspath.Click += new System.EventHandler(this.btn_selecthspath_Click);
+			// 
+			// textbox_BNetPath
+			// 
+			this.textbox_BNetPath.Location = new System.Drawing.Point(239, 6);
+			this.textbox_BNetPath.Name = "textbox_BNetPath";
+			this.textbox_BNetPath.Size = new System.Drawing.Size(335, 21);
+			this.textbox_BNetPath.TabIndex = 34;
+			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(180, 11);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(53, 12);
+			this.label6.TabIndex = 33;
+			this.label6.Text = "战网路径";
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(884, 279);
+			this.ClientSize = new System.Drawing.Size(788, 286);
+			this.Controls.Add(this.btn_selecthspath);
+			this.Controls.Add(this.textbox_BNetPath);
+			this.Controls.Add(this.label6);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.label_checktime);
@@ -166,7 +198,7 @@ namespace HSCentric
 			this.Controls.Add(this.btn_del);
 			this.Controls.Add(this.btn_add);
 			this.Name = "MainForm";
-			this.Text = "中控 5.2.0";
+			this.Text = "中控 5.3.0";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.ResumeLayout(false);
@@ -189,6 +221,9 @@ namespace HSCentric
 		private Label label_checktime;
 		private Label label1;
 		private Label label2;
+		private Button btn_selecthspath;
+		private TextBox textbox_BNetPath;
+		private Label label6;
 	}
 }
 

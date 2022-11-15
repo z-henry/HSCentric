@@ -78,6 +78,7 @@ namespace HSCentric.Const
 		佣兵对局日志,
 		兄弟日志,
 		佣兵配置,
+		炉石日志,
 		Total,
 	}
 

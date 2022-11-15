@@ -1,17 +1,16 @@
-﻿using System.Diagnostics;
-using System.Collections.Generic;
-using System.IO;
+﻿using HSCentric.Const;
 using System;
-using System.Runtime.Serialization.Formatters.Binary;
-using HSCentric.Const;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace HSCentric
 {
-
 	[Serializable]
 	public class HSUnit
 	{
@@ -19,6 +18,7 @@ namespace HSCentric
 		{
 			m_taskManager = new TaskManager(this, null, new TaskUnit(), false);
 		}
+
 		[Serializable]
 		public class CacheConfig
 		{
@@ -33,6 +33,7 @@ namespace HSCentric
 			public int numCore = 0;
 			public int numTotal = 6;
 		}
+
 		public object DeepClone()
 		{
 			BinaryFormatter bf = new BinaryFormatter();
@@ -50,60 +51,72 @@ namespace HSCentric
 				return m_cacheConfig;
 			}
 		}
+
 		public bool Enable
 		{
 			get { return m_enable; }
 			set { m_enable = value; }
 		}
+
 		public string ID
 		{
 			get { return m_ID; }
 			set { m_ID = value; }
 		}
+
 		public string Token
 		{
 			get { return m_token; }
 			set { m_token = value; }
 		}
+
 		public string HBPath
 		{
 			get { return m_hbPath; }
 			set { m_hbPath = value; }
 		}
+
 		public string HSPath
 		{
 			get { return m_hsPath; }
 			set { m_hsPath = value; }
 		}
+
 		public TaskUnit CurrentTask
 		{
 			get { return Tasks.GetCurrentTask(); }
 		}
+
 		public TaskManager Tasks
 		{
 			get { return m_taskManager; }
 			set { m_taskManager = value; }
 		}
+
 		public RewardXP XP
 		{
 			get { return m_rewardXP; }
 			set { m_rewardXP = value; }
 		}
+
 		public string ClassicRate
 		{
 			get { return m_classicRate; }
 			set { m_classicRate = value; }
 		}
+
 		public int MercPvpRate
 		{
 			get { return m_pvpRate; }
 			set { m_pvpRate = value; }
 		}
+
 		public int HSModPort
 		{
 			get { return m_hsmodPort; }
 			set { m_hsmodPort = value; }
 		}
+
 		public int StatsMonth
 		{
 			get { return m_statsMonth; }
@@ -115,7 +128,6 @@ namespace HSCentric
 			InitMercPlugin();
 			InitHsMod();
 		}
-
 
 		private void InitMercPlugin()
 		{
@@ -131,7 +143,7 @@ namespace HSCentric
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == File.Exists(pathConfig.ToString()))
-				return; 
+				return;
 
 			Common.IniWriteValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
 			Common.IniWriteValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
@@ -146,6 +158,7 @@ namespace HSCentric
 			TimeSpan time_now = DateTime.Now.TimeOfDay;
 			return time_now >= currentTask.StartTime.TimeOfDay && time_now <= currentTask.StopTime.TimeOfDay;
 		}
+
 		public bool IsProcessAlive()
 		{
 			if (HearthstoneProcess() != null)
@@ -158,9 +171,10 @@ namespace HSCentric
 				return false;
 			}
 		}
+
 		public bool IsLogUpdated()
 		{
-			if (string.IsNullOrEmpty (m_hsLogFile))
+			if (string.IsNullOrEmpty(m_hsLogFile))
 				return true;
 
 			string rootPath = System.IO.Path.GetDirectoryName(m_hsPath) + '/' + m_hsLogFile;
@@ -175,8 +189,8 @@ namespace HSCentric
 				return true;
 			}
 			return false;
-
 		}
+
 		public void KillHS(string msg = "")
 		{
 			HearthstoneProcess()?.Kill();
@@ -185,6 +199,7 @@ namespace HSCentric
 			m_hsLogFile = "";
 			Common.Delay(5 * 1000);
 		}
+
 		public async void StartHS(string msg = "")
 		{
 			Process process = new Process();
@@ -200,7 +215,10 @@ namespace HSCentric
 			Out.Log(string.Format("[{0}]启动 {1} [pid:{2}]", ID, msg, m_pid));
 			m_hsLogFile = await GetHSLogPath();
 			Out.Log(string.Format("[{0}]记录炉石日志路径 {1}", ID, m_hsLogFile));
+			if (true == NeedUpdateHS())
+				HSUnitManager.Get().InterruptBeforeUpdate();
 		}
+
 		public void StartHB(string msg = "")
 		{
 			var currentTask = CurrentTask;
@@ -255,6 +273,7 @@ namespace HSCentric
 				}
 			}
 		}
+
 		public bool AdjustMode()
 		{
 			TaskUnit currentTask = CurrentTask;
@@ -269,7 +288,6 @@ namespace HSCentric
 			var basicConfigValue = BasicConfigValue;
 			return true;
 		}
-
 
 		private Process HearthstoneProcess()
 		{
@@ -287,6 +305,7 @@ namespace HSCentric
 			}
 			return target;
 		}
+
 		private CacheConfig ReadConfigValue()
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
@@ -309,11 +328,11 @@ namespace HSCentric
 			resultConfig.numCore = Common.IniReadValue<int>("配置", "队伍核心人数", 0, pathConfig.ToString());
 			resultConfig.numTotal = Common.IniReadValue<int>("配置", "总队伍人数", 6, pathConfig.ToString());
 
-// 			Out.Log($"[{ID}]更新缓存 awakeTime:{resultConfig.awakeTime} awakePeriod:{resultConfig.awakePeriod} " +
-// 				$"mode:{resultConfig.mode} teamName:{resultConfig.teamName} strategyName:{resultConfig.strategyName} " +
-// 				$"mercPluginEnable:{resultConfig.mercPluginEnable} scale:{resultConfig.scale} map:{resultConfig.map} " +
-// 				$"numCore:{resultConfig.numCore} numTotal:{resultConfig.numTotal}"
-// 				);
+			// 			Out.Log($"[{ID}]更新缓存 awakeTime:{resultConfig.awakeTime} awakePeriod:{resultConfig.awakePeriod} " +
+			// 				$"mode:{resultConfig.mode} teamName:{resultConfig.teamName} strategyName:{resultConfig.strategyName} " +
+			// 				$"mercPluginEnable:{resultConfig.mercPluginEnable} scale:{resultConfig.scale} map:{resultConfig.map} " +
+			// 				$"numCore:{resultConfig.numCore} numTotal:{resultConfig.numTotal}"
+			// 				);
 			return resultConfig;
 		}
 
@@ -326,6 +345,7 @@ namespace HSCentric
 				$"MercTeamNumTotal:{task?.MercTeamNumTotal} MercTeamNumCore:{task?.MercTeamNumCore}"
 				);
 		}
+
 		private void WriteConfigHSMod()
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
@@ -334,12 +354,12 @@ namespace HSCentric
 
 			Common.IniWriteValue("全局", "变速齿轮状态", false.ToString(), pathConfig.ToString());
 		}
+
 		private void WriteConfigValueMercPlugin(bool Enable, TaskUnit task)
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
-
 
 			Common.IniWriteValue("配置", "插件开关", Enable.ToString(), pathConfig.ToString());
 			if (task != null)
@@ -354,34 +374,19 @@ namespace HSCentric
 			}
 		}
 
-
 		public Task<string> GetHSLogPath()
 		{
 			var task = Task.Run(() =>
 			{
-				Thread.Sleep(20 * 1000);
+				Thread.Sleep(30 * 1000);
 				DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 				if (false == File.Exists(pathConfig.ToString()))
 					return "";
 
 				return Common.IniReadValue<string>("Dev", "炉石日志", "", pathConfig.ToString());
-// 				string[] fileLines = File.ReadAllLines(pathConfig.ToString());
-// 				foreach (var line in fileLines)
-// 				{
-// 					if (line.IndexOf("炉石日志 = ") == 0)
-// 					{
-// 						int start_pos = "炉石日志 = ".Length;
-// 						if (line.Length > start_pos)
-// 							return line.Substring(start_pos);
-// 						else
-// 							return "";
-// 					}
-// 				}
-// 				return "";
 			});
 			return task;
 		}
-
 
 		public void ReadMercLog()
 		{
@@ -421,6 +426,7 @@ namespace HSCentric
 			{
 			}
 		}
+
 		public void ReadMercRecordLog()
 		{
 			try
@@ -488,6 +494,21 @@ namespace HSCentric
 			{
 			}
 		}
+
+		public bool NeedUpdateHS()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/" + m_hsLogFile);
+			if (false == File.Exists(pathConfig.ToString()))
+				return false;
+
+			foreach (string line in File.ReadLines(pathConfig.ToString()).Reverse<string>())
+			{
+				if (line.IndexOf("《炉石传说》已更新，请下载最新版本。") > 0)
+					return true;
+			}
+			return false;
+		}
+
 		public void UpdateStatsMonth()
 		{
 			if (m_statsMonth == DateTime.Now.Month)
@@ -516,12 +537,15 @@ namespace HSCentric
 		private bool m_enable = false;//启用状态
 		private int m_hsmodPort = 58744;//hsmod端口
 		private TaskManager m_taskManager;
+
 		private DateTime[] m_fileLastEdit = new DateTime[(int)FILE_TYPE.Total]{
 			DateTime.Now,
 			DateTime.Now,
 			DateTime.Now,
 			DateTime.Now,
+			DateTime.Now,
 		};
+
 		private CacheConfig m_cacheConfig = new CacheConfig();
 		private int m_statsMonth = -1;
 	}

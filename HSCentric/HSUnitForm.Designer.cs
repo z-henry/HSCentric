@@ -290,6 +290,7 @@ namespace HSCentric
 			this.textbox_HSPath.Name = "textbox_HSPath";
 			this.textbox_HSPath.Size = new System.Drawing.Size(427, 21);
 			this.textbox_HSPath.TabIndex = 31;
+			this.textbox_HSPath.TextChanged += new System.EventHandler(this.textbox_HSPath_TextChanged);
 			// 
 			// label6
 			// 
@@ -299,6 +300,7 @@ namespace HSCentric
 			this.label6.Size = new System.Drawing.Size(53, 12);
 			this.label6.TabIndex = 30;
 			this.label6.Text = "炉石路径";
+			this.label6.Click += new System.EventHandler(this.label6_Click);
 			// 
 			// HSUnitForm
 			// 

@@ -39,8 +39,11 @@ namespace HSCentric
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.经验.ToString(), 50);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.PVP分数.ToString(), 60);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.传统模式等级.ToString(), 140);
+			this.textbox_BNetPath.Text = ConfigurationManager.AppSettings["bnet_path"];
 
-			HSUnitManager.Init();
+
+			UpdateManger.Get().Init(new Action(HSUnitManager.Get().RecoverAfterUpdated), textbox_BNetPath.Text);
+			HSUnitManager.Get().Init(new Action(UpdateManger.Get().Start));
 			UI_Flush();
 			MyRestFul.Init(ConfigurationManager.AppSettings["rest_url"]);
 			this.timer1.Start();
@@ -52,7 +55,7 @@ namespace HSCentric
 			if (DateTime.Now > m_CheckTime_runinfo)
 			{
 				m_CheckTime_runinfo = DateTime.Now.AddSeconds(timespan_checkpriod.TotalSeconds);
-				HSUnitManager.Check();
+				HSUnitManager.Get().Check();
 				UI_Flush();
 			}
 
@@ -61,7 +64,7 @@ namespace HSCentric
 			if (DateTime.Now > m_CheckTime_readlog)
 			{
 				m_CheckTime_readlog = DateTime.Now.AddSeconds(timespan_readlogpriod.TotalSeconds);
-				HSUnitManager.CheckLog();
+				HSUnitManager.Get().CheckLog();
 			}
 
 			label_currenttime.Text = DateTime.Now.ToString("G");
@@ -72,8 +75,9 @@ namespace HSCentric
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
 			timer1.Stop();
-			HSUnitManager.Release();
+			HSUnitManager.Get().Release();
 			Configuration config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+			config.AppSettings.Settings["bnet_path"].Value = textbox_BNetPath.Text;
 			config.Save();
 		}
 		private void btn_add_Click(object sender, EventArgs e)
@@ -81,14 +85,14 @@ namespace HSCentric
 			HSUnitForm dlg = new HSUnitForm();
 			if (dlg.ShowDialog() != DialogResult.OK)
 				return;
-			HSUnitManager.Add(dlg.Unit);
+			HSUnitManager.Get().Add(dlg.Unit);
 			UI_Flush();
 		}
 		private void btn_del_Click(object sender, EventArgs e)
 		{
 			if (listHS.SelectedItems.Count > 0)
 			{
-				HSUnitManager.Remove(listHS.SelectedItems[0].Index);
+				HSUnitManager.Get().Remove(listHS.SelectedItems[0].Index);
 				UI_Flush();
 			}
 			else
@@ -96,7 +100,7 @@ namespace HSCentric
 		}
 		private void UI_Flush()
 		{
-			List<HSUnit> listsHS = HSUnitManager.GetHSUnits();
+			List<HSUnit> listsHS = HSUnitManager.Get().GetHSUnits();
 			listHS.Items.Clear();
 
 			foreach (HSUnit unit in listsHS)
@@ -167,7 +171,7 @@ namespace HSCentric
 		{
 			if (listHS.SelectedItems.Count > 0)
 			{
-				HSUnitManager.FlipEnable(listHS.SelectedItems[0].Index);
+				HSUnitManager.Get().FlipEnable(listHS.SelectedItems[0].Index);
 				UI_Flush();
 			}
 			else
@@ -196,11 +200,11 @@ namespace HSCentric
 			if (listHS.SelectedItems.Count > 0)
 			{
 				int index = listHS.SelectedItems[0].Index;
-				HSUnitForm dlg = new HSUnitForm(HSUnitManager.Get(index));
+				HSUnitForm dlg = new HSUnitForm(HSUnitManager.Get().GetUnitByIndex(index));
 				if (dlg.ShowDialog() != DialogResult.OK)
 					return;
 
-				HSUnitManager.Modify(index, dlg.Unit);
+				HSUnitManager.Get().Modify(index, dlg.Unit);
 				UI_Flush();
 			}
 		}
@@ -211,7 +215,7 @@ namespace HSCentric
 			{
 				int index = listHS.SelectedItems[0].Index;
 
-				HSUnitManager.StartOnce(index);
+				HSUnitManager.Get().StartOnce(index);
 			}
 			else
 				MessageBox.Show("请选中一个成员", "ERROR");
@@ -221,7 +225,7 @@ namespace HSCentric
 		{
 			try
 			{
-				HSUnitManager.BackUpConfig();
+				HSUnitManager.Get().BackUpConfig();
 				MessageBox.Show(string.Format("备份完成"));
 			}
 			catch (Exception ex)
@@ -258,6 +262,24 @@ namespace HSCentric
 			g = Math.Min(Math.Max(0, g), 255);
 			b = Math.Min(Math.Max(0, b), 255);
 			return Color.FromArgb(r, g, b);
+		}
+
+		private void btn_selecthspath_Click(object sender, EventArgs e)
+		{
+			OpenFileDialog openFileDialog = new OpenFileDialog();
+			openFileDialog.Filter = "Battle.net Launcher.exe|*.exe";
+			openFileDialog.DereferenceLinks = false;
+			openFileDialog.ShowDialog();
+			if (string.IsNullOrEmpty(openFileDialog.FileName))
+				return;
+
+			textbox_BNetPath.Text = openFileDialog.FileName;
+
+			if (MessageBox.Show("设置保存成功，下次启动时生效，是否马上重启软件？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+			{
+				Application.Exit();
+				System.Diagnostics.Process.Start(System.Reflection.Assembly.GetExecutingAssembly().Location);
+			}
 		}
 	}
 }
