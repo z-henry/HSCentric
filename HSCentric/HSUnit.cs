@@ -232,10 +232,11 @@ namespace HSCentric
 					int delay = GetQueueSec();
 					if (delay < 30)
 						try_count++;
-					if (try_count >= 3)
+					if (try_count >= 5)
 					{
 						Out.Log(string.Format("[{0}]HS登录检测失败", ID, try_count));
-						break;
+						KillHS("HS登录检测失败");
+						return;
 					}
 
 					if (delay < 0)
@@ -604,7 +605,7 @@ namespace HSCentric
 				while (lines.Count > 0)
 				{
 					line = lines.Pop();
-					if (line.Contains("[Login] We are now logged in, stopping processing challenges"))
+					if (line.Contains("[Startup] Startup stage LaunchGame"))
 					{
 						return true;
 					}
