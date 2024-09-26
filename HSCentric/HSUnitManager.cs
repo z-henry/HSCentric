@@ -134,14 +134,9 @@ namespace HSCentric
 							if (hsUnit.NeedAdjustMode())
 								hsUnit.AdjustMode();
 							hsUnit.InitConfig();
-							hsUnit.StartHS(msg_start_reason);
+							hsUnit.Start(msg_start_reason, Common.IsBuddyMode(currentTask.Mode));
 							Common.Delay(5 * 1000);
-							if (Common.IsBuddyMode(currentTask.Mode))
-							{
-								Common.Delay(5 * 1000);
-								hsUnit.StartHB(msg_start_reason);
-								Common.Delay(5 * 1000);
-							}
+
 						}
 					}
 				}
@@ -343,7 +338,7 @@ namespace HSCentric
 				if (!m_listHS[index].IsProcessAlive())
 				{
 					// 					m_listHS[index].InitHsMod();
-					m_listHS[index].StartHS("手动启动");
+					m_listHS[index].Start("手动启动", false);
 				}
 			}
 		}

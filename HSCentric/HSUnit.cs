@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -135,8 +136,8 @@ namespace HSCentric
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
-			Common.IniWriteValue("配置", "是否自动升级技能", true.ToString(), pathConfig.ToString());
-			Common.IniWriteValue("配置", "是否自动制作佣兵", true.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("配置", "是否自动升级技能", true.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("配置", "是否自动制作佣兵", true.ToString(), pathConfig.ToString());
 		}
 
 		private void InitHsMod()
@@ -145,11 +146,11 @@ namespace HSCentric
 			if (false == File.Exists(pathConfig.ToString()))
 				return;
 
-			Common.IniWriteValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
-			Common.IniWriteValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
-			Common.IniWriteValue("全局", "游戏帧率", "15", pathConfig.ToString());
-			Common.IniWriteValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
-			Common.IniWriteValue("开发", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
+			MyConfig.WriteIniValue("全局", "游戏帧率", "15", pathConfig.ToString());
+			MyConfig.WriteIniValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("开发", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
 		}
 
 		public bool IsActive()
@@ -209,7 +210,48 @@ namespace HSCentric
 			Common.Delay(5 * 1000);
 		}
 
-		public async void StartHS(string msg = "")
+		public async void Start(string msg, bool need_hb)
+		{
+			StartHS(msg);
+			int pid = m_pid;
+			await Delay(30*1000);
+			if (pid != m_pid)
+				return;
+			m_hsLogFileDir = GetHSLogPath();
+			Out.Log(string.Format("[{0}]记录炉石日志路径 {1}", ID, m_hsLogFileDir));
+
+			if (true == NeedUpdateHS())
+				HSUnitManager.Get().InterruptBeforeUpdate();
+
+			if (need_hb)
+			{
+				int try_count = 0;
+				while(false == HSSuccessLogin())
+				{
+
+					int delay = GetQueueSec();
+					if (delay < 30)
+						try_count++;
+					if (try_count >= 3)
+					{
+						Out.Log(string.Format("[{0}]HS登录检测失败", ID, try_count));
+						break;
+					}
+
+					if (delay < 0)
+						Out.Log(string.Format("[{0}]HS启动等待", ID, try_count));
+					else
+						Out.Log(string.Format("[{0}]HS排队等待：{2}秒", ID, try_count, delay));
+					await Delay(30 * 1000);
+					if (pid != m_pid)
+						return;
+				}
+
+				StartHB(msg);
+			}
+		}
+
+		public void StartHS(string msg = "")
 		{
 			Process process = new Process();
 			process.StartInfo.UseShellExecute = false;
@@ -222,10 +264,6 @@ namespace HSCentric
 			m_pid = process.Id;
 			m_hsLogFileDir = "";
 			Out.Log(string.Format("[{0}]启动 {1} [pid:{2}]", ID, msg, m_pid));
-			m_hsLogFileDir = await GetHSLogPath();
-			Out.Log(string.Format("[{0}]记录炉石日志路径 {1}", ID, m_hsLogFileDir));
-			if (true == NeedUpdateHS())
-				HSUnitManager.Get().InterruptBeforeUpdate();
 		}
 
 		public void StartHB(string msg = "")
@@ -326,16 +364,16 @@ namespace HSCentric
 			m_fileLastEdit[(int)FILE_TYPE.佣兵配置] = fileConfig.LastWriteTime;
 
 			CacheConfig resultConfig = new CacheConfig();
-			resultConfig.awakeTime = Common.IniReadValue<DateTime>("配置", "唤醒时间", new DateTime(2000, 1, 1), pathConfig.ToString());
-			resultConfig.awakePeriod = 60 * Common.IniReadValue<int>("配置", "唤醒时间间隔", 22, pathConfig.ToString());
-			resultConfig.mode = Common.IniReadValue<string>("配置", "插件运行模式", "", pathConfig.ToString());
-			resultConfig.teamName = Common.IniReadValue<string>("配置", "使用的队伍名称", "", pathConfig.ToString());
-			resultConfig.strategyName = Common.IniReadValue<string>("配置", "战斗策略", "", pathConfig.ToString());
-			resultConfig.mercPluginEnable = Common.IniReadValue<bool>("配置", "插件开关", false, pathConfig.ToString());
-			resultConfig.scale = Common.IniReadValue<bool>("配置", "自动齿轮加速", false, pathConfig.ToString());
-			resultConfig.map = Common.IniReadValue<string>("配置", "要刷的地图", "2-5", pathConfig.ToString());
-			resultConfig.numCore = Common.IniReadValue<int>("配置", "队伍核心人数", 0, pathConfig.ToString());
-			resultConfig.numTotal = Common.IniReadValue<int>("配置", "总队伍人数", 6, pathConfig.ToString());
+			resultConfig.awakeTime = MyConfig.ReadIniValue<DateTime>("配置", "唤醒时间", new DateTime(2000, 1, 1), pathConfig.ToString());
+			resultConfig.awakePeriod = 60 * MyConfig.ReadIniValue<int>("配置", "唤醒时间间隔", 22, pathConfig.ToString());
+			resultConfig.mode = MyConfig.ReadIniValue<string>("配置", "插件运行模式", "", pathConfig.ToString());
+			resultConfig.teamName = MyConfig.ReadIniValue<string>("配置", "使用的队伍名称", "", pathConfig.ToString());
+			resultConfig.strategyName = MyConfig.ReadIniValue<string>("配置", "战斗策略", "", pathConfig.ToString());
+			resultConfig.mercPluginEnable = MyConfig.ReadIniValue<bool>("配置", "插件开关", false, pathConfig.ToString());
+			resultConfig.scale = MyConfig.ReadIniValue<bool>("配置", "自动齿轮加速", false, pathConfig.ToString());
+			resultConfig.map = MyConfig.ReadIniValue<string>("配置", "要刷的地图", "2-5", pathConfig.ToString());
+			resultConfig.numCore = MyConfig.ReadIniValue<int>("配置", "队伍核心人数", 0, pathConfig.ToString());
+			resultConfig.numTotal = MyConfig.ReadIniValue<int>("配置", "总队伍人数", 6, pathConfig.ToString());
 
 			// 			Out.Log($"[{ID}]更新缓存 awakeTime:{resultConfig.awakeTime} awakePeriod:{resultConfig.awakePeriod} " +
 			// 				$"mode:{resultConfig.mode} teamName:{resultConfig.teamName} strategyName:{resultConfig.strategyName} " +
@@ -361,7 +399,7 @@ namespace HSCentric
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
-			Common.IniWriteValue("全局", "变速齿轮状态", false.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("全局", "变速齿轮状态", false.ToString(), pathConfig.ToString());
 		}
 
 		private void WriteConfigValueMercPlugin(bool Enable, TaskUnit task)
@@ -370,31 +408,32 @@ namespace HSCentric
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
-			Common.IniWriteValue("配置", "插件开关", Enable.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("配置", "插件开关", Enable.ToString(), pathConfig.ToString());
 			if (task != null)
 			{
-				Common.IniWriteValue("配置", "插件运行模式", task.Mode.ToString(), pathConfig.ToString());
-				Common.IniWriteValue("配置", "使用的队伍名称", task.TeamName.ToString(), pathConfig.ToString());
-				Common.IniWriteValue("配置", "战斗策略", task.StrategyName.ToString(), pathConfig.ToString());
-				Common.IniWriteValue("配置", "自动齿轮加速", task.Scale.ToString(), pathConfig.ToString());
-				Common.IniWriteValue("配置", "要刷的地图", task.Map.ToString(), pathConfig.ToString());
-				Common.IniWriteValue("配置", "总队伍人数", task.MercTeamNumTotal.ToString(), pathConfig.ToString());
-				Common.IniWriteValue("配置", "队伍核心人数", task.MercTeamNumCore.ToString(), pathConfig.ToString());
+				MyConfig.WriteIniValue("配置", "插件运行模式", task.Mode.ToString(), pathConfig.ToString());
+				MyConfig.WriteIniValue("配置", "使用的队伍名称", task.TeamName.ToString(), pathConfig.ToString());
+				MyConfig.WriteIniValue("配置", "战斗策略", task.StrategyName.ToString(), pathConfig.ToString());
+				MyConfig.WriteIniValue("配置", "自动齿轮加速", task.Scale.ToString(), pathConfig.ToString());
+				MyConfig.WriteIniValue("配置", "要刷的地图", task.Map.ToString(), pathConfig.ToString());
+				MyConfig.WriteIniValue("配置", "总队伍人数", task.MercTeamNumTotal.ToString(), pathConfig.ToString());
+				MyConfig.WriteIniValue("配置", "队伍核心人数", task.MercTeamNumCore.ToString(), pathConfig.ToString());
 			}
 		}
 
-		public Task<string> GetHSLogPath()
+		public async Task Delay(int milliseconds)
 		{
-			var task = Task.Run(() =>
-			{
-				Thread.Sleep(30 * 1000);
-				DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
-				if (false == File.Exists(pathConfig.ToString()))
-					return "";
+			await Task.Delay(milliseconds);
+		}
 
-				return Common.IniReadValue<string>("开发", "炉石日志", "", pathConfig.ToString());
-			});
-			return task;
+		public string GetHSLogPath()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			if (false == File.Exists(pathConfig.ToString()))
+				return "";
+
+			return MyConfig.ReadIniValue<string>("开发", "炉石日志", "", pathConfig.ToString());
+
 		}
 
 		public void ReadMercLog()
@@ -512,15 +551,114 @@ namespace HSCentric
 			if (!File.Exists(logFilePath))
 				return false;
 
-			// 从文件的最后一行往上读取
-			foreach (string line in File.ReadLines(logFilePath).Reverse())
+			// 打开文件，允许其他进程同时访问（如日志进程）
+			using (FileStream fs = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+			using (StreamReader sr = new StreamReader(fs))
 			{
-				// 判断是否包含指定的更新提示信息
-				if (line.Contains("《炉石传说》已更新，请下载最新版本。"))
-					return true;
+				string line;
+
+				// 使用栈来倒序处理文件中的行
+				var lines = new Stack<string>();
+				while ((line = sr.ReadLine()) != null)
+				{
+					lines.Push(line);
+				}
+
+				// 反向检查
+				while (lines.Count > 0)
+				{
+					line = lines.Pop();
+
+					// 检查是否包含指定的更新提示信息
+					if (line.Contains("《炉石传说》已更新，请下载最新版本。"))
+					{
+						return true;
+					}
+				}
 			}
 
 			return false;
+		}
+		public bool HSSuccessLogin()
+		{
+			string logFilePath = Path.Combine(m_hsLogFileDir, "Hearthstone.log");
+
+			// 检查文件是否存在
+			if (!File.Exists(logFilePath))
+				return false;
+
+			// 打开文件，允许其他进程同时访问（如写入日志的进程）
+			using (FileStream fs = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+			using (StreamReader sr = new StreamReader(fs))
+			{
+				string line;
+
+				// 倒序读取文件内容：由于 StreamReader 不能倒序读取，我们可以采用一个反向扫描的方法。
+				var lines = new Stack<string>();
+				while ((line = sr.ReadLine()) != null)
+				{
+					lines.Push(line);
+				}
+
+				// 反向检查
+				while (lines.Count > 0)
+				{
+					line = lines.Pop();
+					if (line.Contains("[Login] We are now logged in, stopping processing challenges"))
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+		public int GetQueueSec()
+		{
+			string logFilePath = Path.Combine(m_hsLogFileDir, "Hearthstone.log");
+
+			// 检查文件是否存在
+			if (!File.Exists(logFilePath))
+				return 0;
+
+			// 打开文件，允许其他进程同时访问（如日志进程）
+			using (FileStream fs = new FileStream(logFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+			using (StreamReader sr = new StreamReader(fs))
+			{
+				string line;
+
+				// 使用栈来倒序处理文件中的行
+				var lines = new Stack<string>();
+				while ((line = sr.ReadLine()) != null)
+				{
+					lines.Push(line);
+				}
+
+				// 反向检查
+				while (lines.Count > 0)
+				{
+					line = lines.Pop();
+
+					// 判断是否包含指定的更新提示信息
+					if (line.Contains("排队中，预计"))
+					{
+						// 正则表达式匹配 "预计" 后面的数字
+						string pattern = @"预计(\d+)秒";
+
+						// 使用正则表达式提取数字
+						Match match = Regex.Match(line, pattern);
+						if (match.Success)
+						{
+							return int.Parse(match.Groups[1].Value);
+						}
+						else
+						{
+							return -1;  // 如果正则匹配失败，返回 -1 表示错误
+						}
+					}
+				}
+			}
+			return -1;
 		}
 
 
