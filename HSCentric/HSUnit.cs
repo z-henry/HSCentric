@@ -149,7 +149,7 @@ namespace HSCentric
 			Common.IniWriteValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
 			Common.IniWriteValue("全局", "游戏帧率", "15", pathConfig.ToString());
 			Common.IniWriteValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
-			Common.IniWriteValue("Dev", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
+			Common.IniWriteValue("开发", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
 		}
 
 		public bool IsActive()
@@ -174,20 +174,29 @@ namespace HSCentric
 
 		public bool IsLogUpdated()
 		{
-			if (string.IsNullOrEmpty(m_hsLogFile))
+			if (string.IsNullOrEmpty(m_hsLogFileDir))
 				return true;
 
-			string rootPath = System.IO.Path.GetDirectoryName(m_hsPath) + '/' + m_hsLogFile;
-			if (false == System.IO.File.Exists(rootPath))
+			// 如果目录不存在，返回 false
+			if (!Directory.Exists(m_hsLogFileDir))
 				return false;
 
-			FileInfo logFile = new FileInfo(rootPath);
-			double inteval = 5f;
-			TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
-			if (timeSpan.TotalMinutes < inteval)
+			string[] logFiles = Directory.GetFiles(m_hsLogFileDir);
+			double interval = 5f;
+
+			// 遍历每个文件，检查修改时间
+			foreach (string filePath in logFiles)
 			{
-				return true;
+				FileInfo logFile = new FileInfo(filePath);
+				TimeSpan timeSpan = new TimeSpan(DateTime.Now.Ticks - logFile.LastWriteTime.Ticks);
+
+				// 如果有文件在指定间隔内被修改过，返回 true
+				if (timeSpan.TotalMinutes < interval)
+				{
+					return true;
+				}
 			}
+			// 如果没有任何文件在指定间隔内被修改过，返回 false
 			return false;
 		}
 
@@ -196,7 +205,7 @@ namespace HSCentric
 			HearthstoneProcess()?.Kill();
 			Out.Log(string.Format("[{0}]结束 {1}", ID, msg));
 			m_pid = 0;
-			m_hsLogFile = "";
+			m_hsLogFileDir = "";
 			Common.Delay(5 * 1000);
 		}
 
@@ -211,10 +220,10 @@ namespace HSCentric
 			process.Start();
 			process.WaitForInputIdle();
 			m_pid = process.Id;
-			m_hsLogFile = "";
+			m_hsLogFileDir = "";
 			Out.Log(string.Format("[{0}]启动 {1} [pid:{2}]", ID, msg, m_pid));
-			m_hsLogFile = await GetHSLogPath();
-			Out.Log(string.Format("[{0}]记录炉石日志路径 {1}", ID, m_hsLogFile));
+			m_hsLogFileDir = await GetHSLogPath();
+			Out.Log(string.Format("[{0}]记录炉石日志路径 {1}", ID, m_hsLogFileDir));
 			if (true == NeedUpdateHS())
 				HSUnitManager.Get().InterruptBeforeUpdate();
 		}
@@ -383,7 +392,7 @@ namespace HSCentric
 				if (false == File.Exists(pathConfig.ToString()))
 					return "";
 
-				return Common.IniReadValue<string>("Dev", "炉石日志", "", pathConfig.ToString());
+				return Common.IniReadValue<string>("开发", "炉石日志", "", pathConfig.ToString());
 			});
 			return task;
 		}
@@ -497,17 +506,23 @@ namespace HSCentric
 
 		public bool NeedUpdateHS()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/" + m_hsLogFile);
-			if (false == File.Exists(pathConfig.ToString()))
+			string logFilePath = Path.Combine(m_hsLogFileDir, "Hearthstone.log");
+
+			// 检查文件是否存在
+			if (!File.Exists(logFilePath))
 				return false;
 
-			foreach (string line in File.ReadLines(pathConfig.ToString()).Reverse<string>())
+			// 从文件的最后一行往上读取
+			foreach (string line in File.ReadLines(logFilePath).Reverse())
 			{
-				if (line.IndexOf("《炉石传说》已更新，请下载最新版本。") > 0)
+				// 判断是否包含指定的更新提示信息
+				if (line.Contains("《炉石传说》已更新，请下载最新版本。"))
 					return true;
 			}
+
 			return false;
 		}
+
 
 		public void UpdateStatsMonth()
 		{
@@ -532,7 +547,7 @@ namespace HSCentric
 		private string m_hsPath = "";
 		private string m_token = "";//token
 		private int m_pid = 0;//进程id
-		private string m_hsLogFile = "";//炉石进程对应的日志
+		private string m_hsLogFileDir = "";//炉石进程对应的日志
 		private string m_ID = "";//自定id
 		private bool m_enable = false;//启用状态
 		private int m_hsmodPort = 58744;//hsmod端口
