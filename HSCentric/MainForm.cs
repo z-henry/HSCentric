@@ -6,6 +6,7 @@ using System.Text;
 using System.Windows.Forms;
 using HSCentric.Const;
 using System.Net.Sockets;
+using System.Windows.Documents;
 // using MimeKit;
 
 namespace HSCentric
@@ -141,17 +142,28 @@ namespace HSCentric
 			List<HSUnit> listsHS = HSUnitManager.Get().GetHSUnits();
 			listHS.Items.Clear();
 
+			string tooltips_str = $"共{listsHS.Count}个任务";
 			foreach (HSUnit unit in listsHS)
 			{
+				tooltips_str += $"\r\n{unit.ID}：";
 				var basicConfigValue = unit.BasicConfigValue;
 				var currentTask = unit.CurrentTask;
 				Color default_color;
 				if (!unit.Enable)
+				{
 					default_color = Color.Pink;
+					tooltips_str += $"已停用，";
+				}
 				else if (unit.IsActive())
+				{
 					default_color = Color.YellowGreen;
+					tooltips_str += $"激活中，";
+				}
 				else
+				{
 					default_color = Color.White;
+					tooltips_str += $"休眠中，";
+				}
 
 				ListViewItem item = new ListViewItem();
 				item.UseItemStyleForSubItems = false;
@@ -181,21 +193,25 @@ namespace HSCentric
 							break;
 						case LIST_UNIT_COLUMN.预设模式:
 							subitem.Text = currentTask.Mode.ToString();
+							tooltips_str += $"{subitem.Text}，";
 							break;
 						case LIST_UNIT_COLUMN.启用时间段:
 							subitem.Text = currentTask.StartTime.ToString("HH:mm") + "-" + currentTask.StopTime.ToString("HH:mm");
 							break;
 						case LIST_UNIT_COLUMN.等级:
 							subitem.Text = unit.XP.Level.ToString();
+							tooltips_str += $"{unit.XP.Level}级，";
 							break;
 						case LIST_UNIT_COLUMN.经验:
 							subitem.Text = unit.XP.TotalXP.ToString();
+							tooltips_str += $"{unit.XP.TotalXP}经验，";
 							break;
 						case LIST_UNIT_COLUMN.PVP分数:
 							subitem.Text = unit.MercPvpRate.ToString();
 							break;
 						case LIST_UNIT_COLUMN.传统模式等级:
 							subitem.Text = unit.ClassicRate;
+							tooltips_str += $"{unit.ClassicRate}";
 							break;
 						default:
 							break;
@@ -203,6 +219,8 @@ namespace HSCentric
 					item.SubItems.Add(subitem);
 				}
 				listHS.Items.Add(item);
+
+				notifyIcon1.Text = tooltips_str;
 			}
 		}
 		private void 启用ToolStripMenuItem_Click(object sender, EventArgs e)
