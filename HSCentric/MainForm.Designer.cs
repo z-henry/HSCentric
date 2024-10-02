@@ -37,6 +37,7 @@ namespace HSCentric
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.btn_add = new System.Windows.Forms.Button();
 			this.btn_del = new System.Windows.Forms.Button();
@@ -52,7 +53,12 @@ namespace HSCentric
 			this.btn_selecthspath = new System.Windows.Forms.Button();
 			this.textbox_BNetPath = new System.Windows.Forms.TextBox();
 			this.label6 = new System.Windows.Forms.Label();
+			this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+			this.显示ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.contextMenuStrip_RMenu.SuspendLayout();
+			this.contextMenuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// btn_add
@@ -182,6 +188,35 @@ namespace HSCentric
 			this.label6.TabIndex = 33;
 			this.label6.Text = "战网路径";
 			// 
+			// notifyIcon1
+			// 
+			this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip1;
+			this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
+			this.notifyIcon1.Text = "notifyIcon1";
+			this.notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
+			// 
+			// contextMenuStrip1
+			// 
+			this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.显示ToolStripMenuItem,
+            this.退出ToolStripMenuItem});
+			this.contextMenuStrip1.Name = "contextMenuStrip1";
+			this.contextMenuStrip1.Size = new System.Drawing.Size(101, 48);
+			// 
+			// 显示ToolStripMenuItem
+			// 
+			this.显示ToolStripMenuItem.Name = "显示ToolStripMenuItem";
+			this.显示ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.显示ToolStripMenuItem.Text = "显示";
+			this.显示ToolStripMenuItem.Click += new System.EventHandler(this.显示ToolStripMenuItem_Click);
+			// 
+			// 退出ToolStripMenuItem
+			// 
+			this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
+			this.退出ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.退出ToolStripMenuItem.Text = "退出";
+			this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -197,10 +232,12 @@ namespace HSCentric
 			this.Controls.Add(this.listHS);
 			this.Controls.Add(this.btn_del);
 			this.Controls.Add(this.btn_add);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "MainForm";
 			this.Text = "中控 6.0.2 from henryz";
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
+			this.contextMenuStrip1.ResumeLayout(false);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -224,6 +261,10 @@ namespace HSCentric
 		private Button btn_selecthspath;
 		private TextBox textbox_BNetPath;
 		private Label label6;
+		private NotifyIcon notifyIcon1;
+		private ContextMenuStrip contextMenuStrip1;
+		private ToolStripMenuItem 显示ToolStripMenuItem;
+		private ToolStripMenuItem 退出ToolStripMenuItem;
 	}
 }
 

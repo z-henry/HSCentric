@@ -47,7 +47,42 @@ namespace HSCentric
 			UI_Flush();
 			MyRestFul.Init(ConfigurationManager.AppSettings["rest_url"]);
 			this.timer1.Start();
+
+			this.Resize += Form1_Resize;
 		}
+
+
+		// 最小化按钮的点击事件（可选）
+		private void btnMinimize_Click(object sender, EventArgs e)
+		{
+			MinimizeToTray();
+		}
+
+		// 窗体的 Resize 事件处理
+		private void Form1_Resize(object sender, EventArgs e)
+		{
+			if (this.WindowState == FormWindowState.Minimized)
+			{
+				MinimizeToTray();
+			}
+		}
+
+		// 最小化到托盘的通用方法
+		private void MinimizeToTray()
+		{
+			this.Hide();
+			notifyIcon1.Visible = true;
+			notifyIcon1.ShowBalloonTip(1000, "HSCentirc", "应用程序已最小化到托盘。", ToolTipIcon.Info);
+		}
+
+		// 显示窗口并还原
+		private void ShowWindow()
+		{
+			this.Show();
+			this.WindowState = FormWindowState.Normal;
+			notifyIcon1.Visible = false;
+		}
+
 		private void TickProcess(object sender, EventArgs e)
 		{
 			//检测重启
@@ -283,6 +318,23 @@ namespace HSCentric
 				Application.Exit();
 				System.Diagnostics.Process.Start(System.Reflection.Assembly.GetExecutingAssembly().Location);
 			}
+		}
+
+		private void notifyIcon1_DoubleClick(object sender, EventArgs e)
+		{
+			ShowWindow();
+		}
+
+		private void 显示ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			ShowWindow();
+		}
+
+		private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+
+			notifyIcon1.Visible = false;
+			Application.Exit();
 		}
 	}
 }
