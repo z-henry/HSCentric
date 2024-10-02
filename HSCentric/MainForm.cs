@@ -72,7 +72,6 @@ namespace HSCentric
 		private void MinimizeToTray()
 		{
 			this.Hide();
-			notifyIcon1.Visible = true;
 			notifyIcon1.ShowBalloonTip(1000, "HSCentirc", "应用程序已最小化到托盘。", ToolTipIcon.Info);
 		}
 
@@ -81,7 +80,6 @@ namespace HSCentric
 		{
 			this.Show();
 			this.WindowState = FormWindowState.Normal;
-			notifyIcon1.Visible = false;
 		}
 
 		private void TickProcess(object sender, EventArgs e)
@@ -351,7 +349,7 @@ namespace HSCentric
 		private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 
-			notifyIcon1.Visible = false;
+			//notifyIcon1.Visible = false;
 			Application.Exit();
 		}
 	}

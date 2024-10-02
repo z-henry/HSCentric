@@ -193,6 +193,7 @@ namespace HSCentric
 			this.notifyIcon1.ContextMenuStrip = this.contextMenuStrip1;
 			this.notifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon1.Icon")));
 			this.notifyIcon1.Text = "notifyIcon1";
+			this.notifyIcon1.Visible = true;
 			this.notifyIcon1.DoubleClick += new System.EventHandler(this.notifyIcon1_DoubleClick);
 			// 
 			// contextMenuStrip1
@@ -206,20 +207,19 @@ namespace HSCentric
 			// 显示ToolStripMenuItem
 			// 
 			this.显示ToolStripMenuItem.Name = "显示ToolStripMenuItem";
-			this.显示ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.显示ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
 			this.显示ToolStripMenuItem.Text = "显示";
 			this.显示ToolStripMenuItem.Click += new System.EventHandler(this.显示ToolStripMenuItem_Click);
 			// 
 			// 退出ToolStripMenuItem
 			// 
 			this.退出ToolStripMenuItem.Name = "退出ToolStripMenuItem";
-			this.退出ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.退出ToolStripMenuItem.Size = new System.Drawing.Size(100, 22);
 			this.退出ToolStripMenuItem.Text = "退出";
 			this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
-
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(788, 286);
