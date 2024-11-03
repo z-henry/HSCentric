@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -134,7 +135,20 @@ namespace HSCentric
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
-				return;
+			{
+				// 获取文件的目录路径
+				string directory = Path.GetDirectoryName(pathConfig.ToString());
+
+				// 如果目录不存在，创建目录
+				if (!Directory.Exists(directory))
+					Directory.CreateDirectory(directory);
+
+				// 创建文件并写入空内容或初始内容，UTF-8 编码
+				using (StreamWriter sw = new StreamWriter(pathConfig.ToString(), false, new UTF8Encoding(false)))
+				{
+					sw.Write("");  // 可以在这里写入默认内容，如果不需要可以留空
+				}
+			}
 
 			MyConfig.WriteIniValue("配置", "是否自动升级技能", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("配置", "是否自动制作佣兵", true.ToString(), pathConfig.ToString());
@@ -144,14 +158,48 @@ namespace HSCentric
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == File.Exists(pathConfig.ToString()))
-				return;
+			{
+				// 获取文件的目录路径
+				string directory = Path.GetDirectoryName(pathConfig.ToString());
+
+				// 如果目录不存在，创建目录
+				if (!Directory.Exists(directory))
+					Directory.CreateDirectory(directory);
+
+				// 创建文件并写入空内容或初始内容，UTF-8 编码
+				using (StreamWriter sw = new StreamWriter(pathConfig.ToString(), false, new UTF8Encoding(false)))
+				{
+					sw.Write("");  // 可以在这里写入默认内容，如果不需要可以留空
+				}
+			}
 
 			MyConfig.WriteIniValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
-			MyConfig.WriteIniValue("全局", "游戏帧率", "15", pathConfig.ToString());
-			MyConfig.WriteIniValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
+// 			MyConfig.WriteIniValue("全局", "游戏帧率", "-1", pathConfig.ToString());
+// 			MyConfig.WriteIniValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("开发", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
 		}
+
+		public void ReleaseConfig()
+		{
+			ReleaseMercPlugin();
+			ReleaseHsMod();
+		}
+
+		private void ReleaseMercPlugin()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
+			if (true == File.Exists(pathConfig.ToString()))
+				MyConfig.WriteIniValue("配置", "插件开关", false.ToString(), pathConfig.ToString());
+		}
+
+		private void ReleaseHsMod()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			if (true == File.Exists(pathConfig.ToString()))
+				MyConfig.WriteIniValue("全局", "HsMod状态", false.ToString(), pathConfig.ToString());
+		}
+
 
 		public bool IsActive()
 		{
@@ -325,14 +373,7 @@ namespace HSCentric
 		public bool AdjustMode()
 		{
 			TaskUnit currentTask = CurrentTask;
-			if (Common.IsBuddyMode(currentTask.Mode))
-			{
-				WriteConfigValue(false, null);
-			}
-			else
-			{
-				WriteConfigValue(true, currentTask);
-			}
+			WriteConfigValue(!Common.IsBuddyMode(currentTask.Mode), currentTask);
 			var basicConfigValue = BasicConfigValue;
 			return true;
 		}
@@ -386,7 +427,7 @@ namespace HSCentric
 
 		private void WriteConfigValue(bool Enable, TaskUnit task)
 		{
-			WriteConfigHSMod();
+			WriteConfigHSMod(Enable, task);
 			WriteConfigValueMercPlugin(Enable, task);
 			Out.Log($"[{ID}]写入配置 mode:{task?.Mode} teamName:{task?.TeamName} strategyName:{task?.StrategyName} " +
 				$"Enable:{Enable} Scale:{task?.Scale} Map:{task?.Map} " +
@@ -394,13 +435,17 @@ namespace HSCentric
 				);
 		}
 
-		private void WriteConfigHSMod()
+		private void WriteConfigHSMod(bool Enable, TaskUnit task)
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
-			MyConfig.WriteIniValue("全局", "变速齿轮状态", false.ToString(), pathConfig.ToString());
+			if(Enable == false)
+				MyConfig.WriteIniValue("全局", "变速齿轮状态", task.Scale.ToString(), pathConfig.ToString());
+			else
+				MyConfig.WriteIniValue("全局", "变速齿轮状态", false.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("全局", "变速倍率", "8", pathConfig.ToString());
 		}
 
 		private void WriteConfigValueMercPlugin(bool Enable, TaskUnit task)
@@ -410,7 +455,7 @@ namespace HSCentric
 				return;
 
 			MyConfig.WriteIniValue("配置", "插件开关", Enable.ToString(), pathConfig.ToString());
-			if (task != null)
+			if (Enable == true)
 			{
 				MyConfig.WriteIniValue("配置", "插件运行模式", task.Mode.ToString(), pathConfig.ToString());
 				MyConfig.WriteIniValue("配置", "使用的队伍名称", task.TeamName.ToString(), pathConfig.ToString());

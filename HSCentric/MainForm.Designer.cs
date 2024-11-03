@@ -57,6 +57,8 @@ namespace HSCentric
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.显示ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.部署插件配置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.关闭插件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.contextMenuStrip1.SuspendLayout();
 			this.SuspendLayout();
@@ -101,28 +103,30 @@ namespace HSCentric
 			this.contextMenuStrip_RMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.启用ToolStripMenuItem,
             this.启动ToolStripMenuItem,
-            this.备份插件设置ToolStripMenuItem});
+            this.备份插件设置ToolStripMenuItem,
+            this.部署插件配置ToolStripMenuItem,
+            this.关闭插件ToolStripMenuItem});
 			this.contextMenuStrip_RMenu.Name = "contextMenuStrip1";
-			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(149, 70);
+			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(181, 136);
 			// 
 			// 启用ToolStripMenuItem
 			// 
 			this.启用ToolStripMenuItem.Name = "启用ToolStripMenuItem";
-			this.启用ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+			this.启用ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.启用ToolStripMenuItem.Text = "启用";
 			this.启用ToolStripMenuItem.Click += new System.EventHandler(this.启用ToolStripMenuItem_Click);
 			// 
 			// 启动ToolStripMenuItem
 			// 
 			this.启动ToolStripMenuItem.Name = "启动ToolStripMenuItem";
-			this.启动ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+			this.启动ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.启动ToolStripMenuItem.Text = "启动一次";
 			this.启动ToolStripMenuItem.Click += new System.EventHandler(this.启动ToolStripMenuItem_Click);
 			// 
 			// 备份插件设置ToolStripMenuItem
 			// 
 			this.备份插件设置ToolStripMenuItem.Name = "备份插件设置ToolStripMenuItem";
-			this.备份插件设置ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+			this.备份插件设置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.备份插件设置ToolStripMenuItem.Text = "备份插件设置";
 			this.备份插件设置ToolStripMenuItem.Click += new System.EventHandler(this.备份插件设置ToolStripMenuItem_Click);
 			// 
@@ -218,6 +222,20 @@ namespace HSCentric
 			this.退出ToolStripMenuItem.Text = "退出";
 			this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
 			// 
+			// 部署插件配置ToolStripMenuItem
+			// 
+			this.部署插件配置ToolStripMenuItem.Name = "部署插件配置ToolStripMenuItem";
+			this.部署插件配置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.部署插件配置ToolStripMenuItem.Text = "部署插件配置";
+			this.部署插件配置ToolStripMenuItem.Click += new System.EventHandler(this.部署插件配置ToolStripMenuItem_Click);
+			// 
+			// 关闭插件ToolStripMenuItem
+			// 
+			this.关闭插件ToolStripMenuItem.Name = "关闭插件ToolStripMenuItem";
+			this.关闭插件ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.关闭插件ToolStripMenuItem.Text = "关闭插件";
+			this.关闭插件ToolStripMenuItem.Click += new System.EventHandler(this.关闭插件ToolStripMenuItem_Click);
+			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -235,7 +253,8 @@ namespace HSCentric
 			this.Controls.Add(this.btn_add);
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "MainForm";
-			this.Text = "中控 6.0.2 from henryz";
+			this.Text = "中控 6.0.3 from henryz";
+			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
 			this.contextMenuStrip_RMenu.ResumeLayout(false);
 			this.contextMenuStrip1.ResumeLayout(false);
@@ -251,6 +270,7 @@ namespace HSCentric
 		private Button btn_add;
 		private Button btn_del;
 		private ListView listHS;
+		private bool flag_exit = false;
 		private ContextMenuStrip contextMenuStrip_RMenu;
 		private ToolStripMenuItem 启用ToolStripMenuItem;
 		private ToolStripMenuItem 启动ToolStripMenuItem;
@@ -266,6 +286,8 @@ namespace HSCentric
 		private ContextMenuStrip contextMenuStrip1;
 		private ToolStripMenuItem 显示ToolStripMenuItem;
 		private ToolStripMenuItem 退出ToolStripMenuItem;
+		private ToolStripMenuItem 部署插件配置ToolStripMenuItem;
+		private ToolStripMenuItem 关闭插件ToolStripMenuItem;
 	}
 }
 

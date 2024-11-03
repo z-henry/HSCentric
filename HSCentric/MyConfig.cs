@@ -17,7 +17,7 @@ namespace HSCentric
 				return defaultValue;
 
 			string currentSection = "";
-			foreach (var line in File.ReadAllLines(filePath, Encoding.UTF8))
+			foreach (var line in File.ReadAllLines(filePath, new UTF8Encoding(false)))
 			{
 				string trimmedLine = line.Trim();
 				// 跳过空行和注释
@@ -57,7 +57,7 @@ namespace HSCentric
 		{
 			List<string> lines = new List<string>();
 			if (File.Exists(filePath))
-				lines.AddRange(File.ReadAllLines(filePath, Encoding.UTF8));
+				lines.AddRange(File.ReadAllLines(filePath, new UTF8Encoding(false)));
 
 			int sectionIndex = -1;
 			for (int i = 0; i < lines.Count; i++)
@@ -128,7 +128,7 @@ namespace HSCentric
 			}
 
 			// 将修改后的内容写回文件，以 UTF-8 编码
-			File.WriteAllLines(filePath, lines, Encoding.UTF8);
+			File.WriteAllLines(filePath, lines, new UTF8Encoding(false));
 		}
 	}
 }

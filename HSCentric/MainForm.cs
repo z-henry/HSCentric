@@ -18,7 +18,7 @@ namespace HSCentric
 // 			TcpClient client = new TcpClient("cn.version.battle.net", 1119);
 // 			using (NetworkStream stream = client.GetStream())
 // 			{
-// 				byte[] req = Encoding.UTF8.GetBytes("v1/products/hsb/versions\r\n");
+// 				byte[] req = new UTF8Encoding(false).GetBytes("v1/products/hsb/versions\r\n");
 // 
 // 				stream.Write(req, 0, req.Length);
 // 
@@ -99,12 +99,21 @@ namespace HSCentric
 			{
 				m_CheckTime_readlog = DateTime.Now.AddSeconds(timespan_readlogpriod.TotalSeconds);
 				HSUnitManager.Get().CheckLog();
+				Out.Log(string.Format("running"));
 			}
 
 			label_currenttime.Text = DateTime.Now.ToString("G");
 			label_checktime.Text = m_CheckTime_runinfo.ToString("G");
 			label_checktime.BackColor = GetColor(timespan_checkpriod.TotalMilliseconds, new TimeSpan(m_CheckTime_runinfo.Ticks - DateTime.Now.Ticks).TotalMilliseconds,
 				new List<Color>() { Color.YellowGreen, Color.Yellow, Color.Red });
+		}
+		private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			if (flag_exit == false)
+			{
+				e.Cancel = true;
+				MinimizeToTray();
+			}
 		}
 		private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
 		{
@@ -150,17 +159,17 @@ namespace HSCentric
 				if (!unit.Enable)
 				{
 					default_color = Color.Pink;
-					tooltips_str += $"已停用，";
+					tooltips_str += $"已停用。";
 				}
 				else if (unit.IsActive())
 				{
 					default_color = Color.YellowGreen;
-					tooltips_str += $"激活中，";
+					tooltips_str += $"激活中。";
 				}
 				else
 				{
 					default_color = Color.White;
-					tooltips_str += $"休眠中，";
+					tooltips_str += $"休眠中。";
 				}
 
 				ListViewItem item = new ListViewItem();
@@ -191,25 +200,25 @@ namespace HSCentric
 							break;
 						case LIST_UNIT_COLUMN.预设模式:
 							subitem.Text = currentTask.Mode.ToString();
-							tooltips_str += $"{subitem.Text}，";
+							//tooltips_str += $"{subitem.Text}，";
 							break;
 						case LIST_UNIT_COLUMN.启用时间段:
 							subitem.Text = currentTask.StartTime.ToString("HH:mm") + "-" + currentTask.StopTime.ToString("HH:mm");
 							break;
 						case LIST_UNIT_COLUMN.等级:
 							subitem.Text = unit.XP.Level.ToString();
-							tooltips_str += $"{unit.XP.Level}级，";
+							//tooltips_str += $"{unit.XP.Level}级，";
 							break;
 						case LIST_UNIT_COLUMN.经验:
 							subitem.Text = unit.XP.TotalXP.ToString();
-							tooltips_str += $"{unit.XP.TotalXP}经验，";
+							//tooltips_str += $"{unit.XP.TotalXP}经验，";
 							break;
 						case LIST_UNIT_COLUMN.PVP分数:
 							subitem.Text = unit.MercPvpRate.ToString();
 							break;
 						case LIST_UNIT_COLUMN.传统模式等级:
 							subitem.Text = unit.ClassicRate;
-							tooltips_str += $"{unit.ClassicRate}";
+							//tooltips_str += $"{unit.ClassicRate}";
 							break;
 						default:
 							break;
@@ -218,6 +227,8 @@ namespace HSCentric
 				}
 				listHS.Items.Add(item);
 
+				if (tooltips_str.Length > 64)
+					tooltips_str = tooltips_str.Substring(0, 60) + "..."; // 截断字符串
 				notifyIcon1.Text = tooltips_str;
 			}
 		}
@@ -348,9 +359,30 @@ namespace HSCentric
 
 		private void 退出ToolStripMenuItem_Click(object sender, EventArgs e)
 		{
+			flag_exit = true;
+			Close();
+		}
 
-			//notifyIcon1.Visible = false;
-			Application.Exit();
+		private void 部署插件配置ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (listHS.SelectedItems.Count > 0)
+			{
+				HSUnitManager.Get().InitConfig(listHS.SelectedItems[0].Index);
+				UI_Flush();
+			}
+			else
+				MessageBox.Show("请选中一个成员", "ERROR");
+		}
+
+		private void 关闭插件ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (listHS.SelectedItems.Count > 0)
+			{
+				HSUnitManager.Get().ReleaseConfig(listHS.SelectedItems[0].Index);
+				UI_Flush();
+			}
+			else
+				MessageBox.Show("请选中一个成员", "ERROR");
 		}
 	}
 }

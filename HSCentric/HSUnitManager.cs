@@ -131,7 +131,7 @@ namespace HSCentric
 						if (msg_start_reason.Length > 0 &&
 							HSProcess().Count < 999)
 						{
-							if (hsUnit.NeedAdjustMode())
+							//if (hsUnit.NeedAdjustMode())
 								hsUnit.AdjustMode();
 							hsUnit.InitConfig();
 							hsUnit.Start(msg_start_reason, Common.IsBuddyMode(currentTask.Mode));
@@ -178,6 +178,22 @@ namespace HSCentric
 					if (iter.ID == memberName)
 						iter.Enable = flag;
 				}
+			}
+		}
+
+		internal void InitConfig(int index)
+		{
+			lock (m_lockHS)
+			{
+				m_listHS[index].InitConfig();
+			}
+		}
+
+		internal void ReleaseConfig(int index)
+		{
+			lock (m_lockHS)
+			{
+				m_listHS[index].ReleaseConfig();
 			}
 		}
 
