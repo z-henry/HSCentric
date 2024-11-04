@@ -223,14 +223,19 @@ namespace HSCentric
 
 		public bool IsLogUpdated()
 		{
-			if (string.IsNullOrEmpty(m_hsLogFileDir))
+			return LogsUpdated(m_hsLogFileDir) && LogsUpdated(System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs");
+		}
+
+		public bool LogsUpdated(string log_dir)
+		{
+			if (string.IsNullOrEmpty(log_dir))
 				return true;
 
 			// 如果目录不存在，返回 false
-			if (!Directory.Exists(m_hsLogFileDir))
+			if (!Directory.Exists(log_dir))
 				return false;
 
-			string[] logFiles = Directory.GetFiles(m_hsLogFileDir);
+			string[] logFiles = Directory.GetFiles(log_dir);
 			double interval = 5f;
 
 			// 遍历每个文件，检查修改时间
