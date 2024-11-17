@@ -99,7 +99,6 @@ namespace HSCentric
 			{
 				m_CheckTime_readlog = DateTime.Now.AddSeconds(timespan_readlogpriod.TotalSeconds);
 				HSUnitManager.Get().CheckLog();
-				Out.Log(string.Format("running"));
 			}
 
 			label_currenttime.Text = DateTime.Now.ToString("G");
