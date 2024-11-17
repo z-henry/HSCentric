@@ -223,7 +223,7 @@ namespace HSCentric
 
 		public bool IsLogUpdated()
 		{
-			return LogsUpdated(m_hsLogFileDir) && LogsUpdated(System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs");
+			return LogsUpdated(m_hsLogFileDir) && LogsUpdated(m_hbLogFileDir);
 		}
 
 		public bool LogsUpdated(string log_dir)
@@ -260,6 +260,7 @@ namespace HSCentric
 			Out.Log(string.Format("[{0}]结束 {1}", ID, msg));
 			m_pid = 0;
 			m_hsLogFileDir = "";
+			m_hbLogFileDir = "";
 			Common.Delay(5 * 1000);
 		}
 
@@ -302,6 +303,8 @@ namespace HSCentric
 				}
 
 				StartHB(msg);
+				await Delay(30 * 1000);
+				m_hbLogFileDir = System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs";
 			}
 		}
 
@@ -336,6 +339,7 @@ namespace HSCentric
 			process.Start();
 			process.WaitForInputIdle();
 			int pid = process.Id;
+			m_hbLogFileDir = "";
 
 			Out.Log(string.Format("[{0}]启动HB {1} [pid:{2}] [arg:{3}]", ID, msg, pid, process.StartInfo.Arguments));
 		}
@@ -737,6 +741,7 @@ namespace HSCentric
 		private string m_token = "";//token
 		private int m_pid = 0;//进程id
 		private string m_hsLogFileDir = "";//炉石进程对应的日志
+		private string m_hbLogFileDir = "";//HB进程对应的日志
 		private string m_ID = "";//自定id
 		private bool m_enable = false;//启用状态
 		private int m_hsmodPort = 58744;//hsmod端口

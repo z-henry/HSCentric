@@ -11,59 +11,20 @@ namespace HSCentric
 	[Serializable]
 	public class RewardXP
 	{
-		private static readonly Dictionary<int, int> CumulativeExpTable = new Dictionary<int, int>
-		{
-		{1, 0},
-		{2, 100},
-		{3, 375},
-		{4, 700},
-		{5, 1075},
-		{6, 1475},
-		{7, 1925},
-		{8, 2425},
-		{9, 2975},
-		{10, 3600},
-		{11, 4275},
-		{12, 5000},
-		{13, 5800},
-		{14, 6650},
-		{15, 7550},
-		{16, 8500},
-		{17, 9525},
-		{18, 10600},
-		{19, 11725},
-		{20, 12900},
-		{21, 14100},
-		{22, 15350},
-		{23, 16650},
-		{24, 17975},
-		{25, 19325},
-		{26, 20700},
-		{27, 22100},
-		{28, 23525},
-		{29, 24975},
-		{30, 26425},
-		{31, 27900},
-		{32, 29400},
-		{33, 30900},
-		{34, 32400},
-		{35, 33925},
-		{36, 35450},
-		{37, 36975},
-		{38, 38525},
-		{39, 40075},
-		{40, 41625},
-		{41, 43175},
-		{42, 44725},
-		{43, 46275},
-		{44, 47825},
-		{45, 49375},
-		{46, 50950},
-		{47, 52525},
-		{48, 54100},
-		{49, 55675},
-		{50, 57250}
-		};
+		private static readonly int[] CumulativeExpList = {
+			0,     100,   200,   350,   500,   725,   950,   1250,  1550,  1875,//1-10
+            2200,  2550,  2900,  3275,  3650,  4050,  4450,  4875,  5300,  5750,
+			6200,  6750,  7350,  8000,  8675,  9350,  10225, 11100, 12100, 13200,
+			14400, 15600, 16850, 18100, 19400, 20700, 22050, 23400, 24800, 26200,
+			27650, 29100, 30600, 32100, 33650, 35200, 36800, 38400, 40050, 41700,
+			43400, 45100, 46850, 48600, 50400, 52200, 54050, 55900, 57800, 59700,
+			61650, 63600, 65600, 67600, 69650, 71700, 73825, 75950, 78200, 80450,
+			82825, 85200, 87700, 90200, 92700, 95200, 97700, 100200,102700,105200,
+			107700,110200,112700,115200,117700,120200,122700,125200,127700,130200,
+			132700,135200,137700,140200,142700,145200,147700,150200,152700,155200,//90-100
+            156525,157850,159175,160500,161825,163150,164475,165800,167125,168450,
+			169775,171100,172425,173750,175075,176550,178025,179500,180975,182450,
+			183925,185400,186875,188350,189825,191300,192775,194250,195725,197200};
 
 		public object DeepClone()
 		{
@@ -75,52 +36,19 @@ namespace HSCentric
 		}
 		public int TotalXP
 		{
-			get 
+			get
 			{
 				int cumulative = 0;
 
-				if (m_Level <= 50)
-				{
-					// 等级 1 到 50
-					cumulative = CumulativeExpTable[m_Level];
-				}
+				if (m_Level <= 131)
+					cumulative = CumulativeExpList[m_Level - 2];
 				else
-				{
-					// 等级 51 到 400
-					cumulative = CumulativeExpTable[50]; // 等级50的累计经验
+					cumulative = CumulativeExpList[129] + (m_Level - 131) * 1500;
 
-					// 计算等级51到当前等级-1的经验
-					int additionalLevels = m_Level - 50;
-					int stepSize = 25;
-					int levelsPerStep = 50;
-					int stepIndex = (additionalLevels - 1) / levelsPerStep; // 0-based index
-
-					// 确保stepIndex不超过7（因为1500是最终经验值）
-					if (stepIndex >= 7)
-						stepIndex = 7;
-
-					// 基础经验值
-					int baseExp = 1325;
-
-					// 计算完整步骤的经验
-					for (int s = 0; s < stepIndex; s++)
-					{
-						int expPerLevel = baseExp + stepSize * s;
-						cumulative += levelsPerStep * expPerLevel;
-					}
-
-					// 当前步骤的经验
-					int currentStepExp = stepIndex < 7 ? baseExp + stepSize * stepIndex : 1500;
-
-					// 当前步骤中已经完成的等级数
-					int levelsInCurrentStep = additionalLevels - (stepIndex * levelsPerStep);
-					cumulative += levelsInCurrentStep * currentStepExp;
-				}
-
-				// 总经验值
 				return cumulative + m_ProgressXP;
 			}
 		}
+	
 		public int ProgressXP 
 		{
 			get { return m_ProgressXP; }
