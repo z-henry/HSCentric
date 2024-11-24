@@ -154,7 +154,11 @@ namespace HSCentric
 
 					hsUnit.ReadMercLog();
 					hsUnit.ReadMercRecordLog();
-					hsUnit.ReadHBLog();
+					if (false == hsUnit.ReadHBLog())
+						hsUnit.KillHS();
+					if (false == hsUnit.ReadHSLog())
+						hsUnit.KillHS();
+
 				}
 				SaveConfig();
 				BackUpConfig();

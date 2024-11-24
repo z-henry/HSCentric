@@ -556,23 +556,24 @@ namespace HSCentric
 			}
 		}
 
-		public void ReadHBLog()
+		public bool ReadHBLog()
 		{
 			try
 			{
 				if (string.IsNullOrEmpty(m_hbPath))
-					return;
+					return true;
 				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs");
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
-					return;
+					return true;
 				List<FileInfo> testList = rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly).ToList();
 				FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
 				if (targetFile == null)
-					return;
+					return true;
 				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.兄弟日志])
-					return;
+					return true;
 				m_fileLastEdit[(int)FILE_TYPE.兄弟日志] = targetFile.LastWriteTime;
 				System.Text.Encoding GB2312 = System.Text.Encoding.GetEncoding("GB2312");
+				int anomalyCount = 0; // 计数连续出现子串"检测到异常情况，将随机点击"的次数
 				foreach (string line in File.ReadLines(targetFile.FullName, System.Text.Encoding.GetEncoding("GB2312")).Reverse<string>())
 				{
 					if (line.IndexOf("[监控插件] 合计: 战令") > 0)
@@ -589,13 +590,61 @@ namespace HSCentric
 							m_rewardXP = rewardXP;
 						}
 						m_classicRate = match.Groups[3].Value;
-						return;
+						return true;
+					}
+
+					// 尾部连续出现“检测到异常情况，将随机点击”，需要退出
+					if (line.Contains("检测到异常情况，将随机点击"))
+					{
+						anomalyCount++;
+						if (anomalyCount >= 5) // 连续出现 5 次
+						{
+							return false;
+						}
+					}
+					else
+					{
+						anomalyCount = 0; // 如果不连续出现，则重置计数器
+						return true;
+					}
+				}
+
+			}
+			catch
+			{
+			}
+			return true;
+		}
+
+		public bool ReadHSLog()
+		{
+			try
+			{
+				string logFilePath = System.IO.Path.GetDirectoryName(m_hsPath) + "/Hearthstone.log";
+				if (!System.IO.File.Exists(logFilePath))
+					return true;
+
+				int anomalyCount = 0; // 计数连续出现子串的次数
+				foreach (string line in File.ReadLines(logFilePath).Reverse<string>())
+				{
+					// 检查是否包含指定子串
+					if (line.Contains("Network.DisconnectFromGameServer()"))
+					{
+						anomalyCount++;
+						if (anomalyCount >= 20)
+							return false;
+					}
+					else
+					{
+						anomalyCount = 0; // 如果不连续出现，则重置计数器
+						return true;
 					}
 				}
 			}
 			catch
 			{
 			}
+			return true;
 		}
 
 		public bool NeedUpdateHS()
