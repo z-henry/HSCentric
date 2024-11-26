@@ -605,7 +605,6 @@ namespace HSCentric
 					else
 					{
 						anomalyCount = 0; // 如果不连续出现，则重置计数器
-						return true;
 					}
 				}
 
@@ -637,7 +636,6 @@ namespace HSCentric
 					else
 					{
 						anomalyCount = 0; // 如果不连续出现，则重置计数器
-						return true;
 					}
 				}
 			}
