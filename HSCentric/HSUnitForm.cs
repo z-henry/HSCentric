@@ -297,10 +297,16 @@ namespace HSCentric
 					switch (list_item)
 					{
 						case LIST_TASK_COLUMN.队伍:
-							subitem.Text = task.TeamName;
+							if (Common.IsBGMode(task.Mode))
+								subitem.Text = "--";
+							else
+								subitem.Text = task.TeamName;
 							break;
 						case LIST_TASK_COLUMN.策略:
-							subitem.Text = task.StrategyName;
+							if (Common.IsBGMode(task.Mode))
+								subitem.Text = "--";
+							else
+								subitem.Text = task.StrategyName;
 							break;
 						case LIST_TASK_COLUMN.停止时间:
 							subitem.Text = task.StopTime.ToString("T");
@@ -312,19 +318,19 @@ namespace HSCentric
 							subitem.Text = task.Scale ? "√" : "";
 							break;
 						case LIST_TASK_COLUMN.地图:
-							if (Common.IsBuddyMode(task.Mode))
+							if (Common.IsBuddyMode(task.Mode) || Common.IsBGMode(task.Mode))
 								subitem.Text = "--";
 							else
 								subitem.Text = task.Map;
 							break;
 						case LIST_TASK_COLUMN.核心:
-							if (Common.IsBuddyMode(task.Mode))
+							if (Common.IsBuddyMode(task.Mode) || Common.IsBGMode(task.Mode))
 								subitem.Text = "--";
 							else
 								subitem.Text = task.MercTeamNumCore.ToString();
 							break;
 						case LIST_TASK_COLUMN.总数:
-							if (Common.IsBuddyMode(task.Mode))
+							if (Common.IsBuddyMode(task.Mode) || Common.IsBGMode(task.Mode))
 								subitem.Text = "--";
 							else
 								subitem.Text = task.MercTeamNumTotal.ToString();

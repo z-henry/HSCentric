@@ -119,7 +119,7 @@ namespace HSCentric
 						{
 							// 挂机收菜模式下，
 							// 1. 到唤醒时间唤醒
-							if (DateTime.Now >= basicConfigValue.awakeTime)
+							if (DateTime.Now >= basicConfigValue.mercCacheConfig.awakeTime)
 								msg_start_reason = string.Format("收菜唤醒时间到了", timespan_farmendding.TotalSeconds);
 							// 2. 没到唤醒时间，但是距离结束不到X分钟了，唤醒
 							else if ((currentTask.StopTime.TimeOfDay - DateTime.Now.TimeOfDay).TotalSeconds < timespan_farmendding.TotalSeconds)
@@ -152,6 +152,7 @@ namespace HSCentric
 					HSUnit hsUnit = m_listHS[i];
 					hsUnit.UpdateStatsMonth();
 
+					hsUnit.ReadBGLog();
 					hsUnit.ReadMercLog();
 					hsUnit.ReadMercRecordLog();
 					if (false == hsUnit.ReadHBLog())

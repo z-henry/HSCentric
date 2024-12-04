@@ -24,16 +24,28 @@ namespace HSCentric
 		[Serializable]
 		public class CacheConfig
 		{
-			public string mode = "";
-			public DateTime awakeTime = new DateTime(2000, 1, 1);
-			public int awakePeriod = 25;
-			public string teamName = "";
-			public string strategyName = "";
-			public bool mercPluginEnable = false;
-			public bool scale = false;
-			public string map = "2-5";
-			public int numCore = 0;
-			public int numTotal = 6;
+			[Serializable]
+			public class MercCacheConfig
+			{
+				public string mode = "";
+				public DateTime awakeTime = new DateTime(2000, 1, 1);
+				public int awakePeriod = 25;
+				public string teamName = "";
+				public string strategyName = "";
+				public bool PluginEnable = false;
+				public bool scale = false;
+				public string map = "2-5";
+				public int numCore = 0;
+				public int numTotal = 6;
+			}
+			[Serializable]
+			public class BGCacheConfig
+			{
+				public bool PluginEnable = false;
+			}
+
+			public MercCacheConfig mercCacheConfig = new MercCacheConfig();
+			public BGCacheConfig bgCacheConfig = new BGCacheConfig();
 		}
 
 		public object DeepClone()
@@ -49,7 +61,8 @@ namespace HSCentric
 		{
 			get
 			{
-				m_cacheConfig = ReadConfigValue() ?? m_cacheConfig;
+				m_cacheConfig.mercCacheConfig = ReadConfigValue_Merc() ?? m_cacheConfig.mercCacheConfig;
+				m_cacheConfig.bgCacheConfig = ReadConfigValue_BG() ?? m_cacheConfig.bgCacheConfig;
 				return m_cacheConfig;
 			}
 		}
@@ -129,6 +142,7 @@ namespace HSCentric
 		{
 			InitMercPlugin();
 			InitHsMod();
+			InitBGPlugin();
 		}
 
 		private void InitMercPlugin()
@@ -152,6 +166,26 @@ namespace HSCentric
 
 			MyConfig.WriteIniValue("配置", "是否自动升级技能", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("配置", "是否自动制作佣兵", true.ToString(), pathConfig.ToString());
+		}
+
+		private void InitBGPlugin()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/Battlegrounds.cfg");
+			if (false == System.IO.File.Exists(pathConfig.ToString()))
+			{
+				// 获取文件的目录路径
+				string directory = Path.GetDirectoryName(pathConfig.ToString());
+
+				// 如果目录不存在，创建目录
+				if (!Directory.Exists(directory))
+					Directory.CreateDirectory(directory);
+
+				// 创建文件并写入空内容或初始内容，UTF-8 编码
+				using (StreamWriter sw = new StreamWriter(pathConfig.ToString(), false, new UTF8Encoding(false)))
+				{
+					sw.Write("");  // 可以在这里写入默认内容，如果不需要可以留空
+				}
+			}
 		}
 
 		private void InitHsMod()
@@ -193,6 +227,13 @@ namespace HSCentric
 				MyConfig.WriteIniValue("配置", "插件开关", false.ToString(), pathConfig.ToString());
 		}
 
+		private void ReleaseBGPlugin()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/Battlegrounds.cfg");
+			if (true == File.Exists(pathConfig.ToString()))
+				MyConfig.WriteIniValue("配置", "插件开关", false.ToString(), pathConfig.ToString());
+		}
+
 		private void ReleaseHsMod()
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
@@ -223,7 +264,27 @@ namespace HSCentric
 
 		public bool IsLogUpdated()
 		{
-			return LogsUpdated(m_hsLogFileDir) && LogsUpdated(m_hbLogFileDir);
+			//炉石还没启动
+			if (string.IsNullOrEmpty(m_hsLogFileDir))
+				return true;
+
+			bool result = LogsUpdated(m_hsLogFileDir);
+			if (Common.IsBuddyMode(CurrentTask.Mode))
+				return result && LogsUpdated(m_hbLogFileDir);
+			else if (Common.IsBGMode(CurrentTask.Mode))
+			{
+				string exeDirectory = Path.GetDirectoryName(HSPath);
+				string logDirectory = Path.Combine(exeDirectory, "BepinEx", "Log", ID, "battlegrounds");
+				Out.Log(logDirectory);
+			}
+			else if (Common.IsMercMode(CurrentTask.Mode))
+			{
+				string exeDirectory = Path.GetDirectoryName(HSPath);
+				string logDirectory = Path.Combine(exeDirectory, "BepinEx", "Log", ID, "mercenarylog");
+				return result && LogsUpdated(logDirectory);
+			}
+
+			return result;
 		}
 
 		public bool LogsUpdated(string log_dir)
@@ -350,39 +411,41 @@ namespace HSCentric
 			TaskUnit currentTask = CurrentTask;
 			if (Common.IsBuddyMode(currentTask.Mode))
 			{
-				if (basicConfigValue.mercPluginEnable == true)
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
+				return basicConfigValue.mercCacheConfig.PluginEnable ||
+					basicConfigValue.bgCacheConfig.PluginEnable;
 			}
-			else
+			else if (Common.IsMercMode(currentTask.Mode))
 			{
-				if (basicConfigValue.mercPluginEnable == false ||
-					currentTask.Mode.ToString() != basicConfigValue.mode ||
-					currentTask.TeamName != basicConfigValue.teamName ||
-					currentTask.StrategyName != basicConfigValue.strategyName ||
-					currentTask.Scale != basicConfigValue.scale ||
-					currentTask.Map != basicConfigValue.map ||
-					currentTask.MercTeamNumCore != basicConfigValue.numCore ||
-					currentTask.MercTeamNumTotal != basicConfigValue.numTotal)
+				if (basicConfigValue.mercCacheConfig.PluginEnable == false ||
+					currentTask.Mode.ToString() != basicConfigValue.mercCacheConfig.mode ||
+					currentTask.TeamName != basicConfigValue.mercCacheConfig.teamName ||
+					currentTask.StrategyName != basicConfigValue.mercCacheConfig.strategyName ||
+					currentTask.Scale != basicConfigValue.mercCacheConfig.scale ||
+					currentTask.Map != basicConfigValue.mercCacheConfig.map ||
+					currentTask.MercTeamNumCore != basicConfigValue.mercCacheConfig.numCore ||
+					currentTask.MercTeamNumTotal != basicConfigValue.mercCacheConfig.numTotal ||
+					basicConfigValue.bgCacheConfig.PluginEnable)
 				{
 					return true;
 				}
-				else
-				{
-					return false;
-				}
+				return false;
 			}
+			else if (Common.IsBGMode(currentTask.Mode))
+			{
+				if (basicConfigValue.bgCacheConfig.PluginEnable == false || 
+					basicConfigValue.mercCacheConfig.PluginEnable)
+				{
+					return true;
+				}
+				return false;
+			}
+			return false;
 		}
 
 		public bool AdjustMode()
 		{
 			TaskUnit currentTask = CurrentTask;
-			WriteConfigValue(!Common.IsBuddyMode(currentTask.Mode), currentTask);
+			WriteConfigValue(currentTask);
 			var basicConfigValue = BasicConfigValue;
 			return true;
 		}
@@ -404,7 +467,7 @@ namespace HSCentric
 			return target;
 		}
 
-		private CacheConfig ReadConfigValue()
+		private CacheConfig.MercCacheConfig ReadConfigValue_Merc()
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == File.Exists(pathConfig.ToString()))
@@ -414,55 +477,68 @@ namespace HSCentric
 				return null;
 			m_fileLastEdit[(int)FILE_TYPE.佣兵配置] = fileConfig.LastWriteTime;
 
-			CacheConfig resultConfig = new CacheConfig();
+			CacheConfig.MercCacheConfig resultConfig = new CacheConfig.MercCacheConfig();
 			resultConfig.awakeTime = MyConfig.ReadIniValue<DateTime>("配置", "唤醒时间", new DateTime(2000, 1, 1), pathConfig.ToString());
 			resultConfig.awakePeriod = 60 * MyConfig.ReadIniValue<int>("配置", "唤醒时间间隔", 22, pathConfig.ToString());
 			resultConfig.mode = MyConfig.ReadIniValue<string>("配置", "插件运行模式", "", pathConfig.ToString());
 			resultConfig.teamName = MyConfig.ReadIniValue<string>("配置", "使用的队伍名称", "", pathConfig.ToString());
 			resultConfig.strategyName = MyConfig.ReadIniValue<string>("配置", "战斗策略", "", pathConfig.ToString());
-			resultConfig.mercPluginEnable = MyConfig.ReadIniValue<bool>("配置", "插件开关", false, pathConfig.ToString());
+			resultConfig.PluginEnable = MyConfig.ReadIniValue<bool>("配置", "插件开关", false, pathConfig.ToString());
 			resultConfig.scale = MyConfig.ReadIniValue<bool>("配置", "自动齿轮加速", false, pathConfig.ToString());
 			resultConfig.map = MyConfig.ReadIniValue<string>("配置", "要刷的地图", "2-5", pathConfig.ToString());
 			resultConfig.numCore = MyConfig.ReadIniValue<int>("配置", "队伍核心人数", 0, pathConfig.ToString());
 			resultConfig.numTotal = MyConfig.ReadIniValue<int>("配置", "总队伍人数", 6, pathConfig.ToString());
 
-			// 			Out.Log($"[{ID}]更新缓存 awakeTime:{resultConfig.awakeTime} awakePeriod:{resultConfig.awakePeriod} " +
-			// 				$"mode:{resultConfig.mode} teamName:{resultConfig.teamName} strategyName:{resultConfig.strategyName} " +
-			// 				$"mercPluginEnable:{resultConfig.mercPluginEnable} scale:{resultConfig.scale} map:{resultConfig.map} " +
-			// 				$"numCore:{resultConfig.numCore} numTotal:{resultConfig.numTotal}"
-			// 				);
+			return resultConfig;
+		}
+		private CacheConfig.BGCacheConfig ReadConfigValue_BG()
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/Battlegrounds.cfg");
+			if (false == File.Exists(pathConfig.ToString()))
+				return null;
+			FileInfo fileConfig = new FileInfo(pathConfig.ToString());
+			if (fileConfig.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.酒馆配置])
+				return null;
+			m_fileLastEdit[(int)FILE_TYPE.酒馆配置] = fileConfig.LastWriteTime;
+
+			CacheConfig.BGCacheConfig resultConfig = new CacheConfig.BGCacheConfig();
+			resultConfig.PluginEnable = MyConfig.ReadIniValue<bool>("配置", "插件开关", false, pathConfig.ToString());
+
 			return resultConfig;
 		}
 
-		private void WriteConfigValue(bool Enable, TaskUnit task)
+		private void WriteConfigValue(TaskUnit task)
 		{
-			WriteConfigHSMod(Enable, task);
-			WriteConfigValueMercPlugin(Enable, task);
+			WriteConfigHSMod(task);
+			WriteConfigValueMercPlugin(task);
+			WriteConfigValueBGPlugin(task);
 			Out.Log($"[{ID}]写入配置 mode:{task?.Mode} teamName:{task?.TeamName} strategyName:{task?.StrategyName} " +
 				$"Enable:{Enable} Scale:{task?.Scale} Map:{task?.Map} " +
 				$"MercTeamNumTotal:{task?.MercTeamNumTotal} MercTeamNumCore:{task?.MercTeamNumCore}"
 				);
 		}
 
-		private void WriteConfigHSMod(bool Enable, TaskUnit task)
+		private void WriteConfigHSMod(TaskUnit task)
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
-			if(Enable == false)
+			// 佣兵模式有自己的齿轮
+			if (Common.IsMercMode(task.Mode))
 				MyConfig.WriteIniValue("全局", "变速齿轮状态", task.Scale.ToString(), pathConfig.ToString());
 			else
 				MyConfig.WriteIniValue("全局", "变速齿轮状态", false.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("全局", "变速倍率", "8", pathConfig.ToString());
 		}
 
-		private void WriteConfigValueMercPlugin(bool Enable, TaskUnit task)
+		private void WriteConfigValueMercPlugin(TaskUnit task)
 		{
 			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/io.github.jimowushuang.hs.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
+			bool Enable = Common.IsMercMode(task.Mode);
 			MyConfig.WriteIniValue("配置", "插件开关", Enable.ToString(), pathConfig.ToString());
 			if (Enable == true)
 			{
@@ -474,6 +550,16 @@ namespace HSCentric
 				MyConfig.WriteIniValue("配置", "总队伍人数", task.MercTeamNumTotal.ToString(), pathConfig.ToString());
 				MyConfig.WriteIniValue("配置", "队伍核心人数", task.MercTeamNumCore.ToString(), pathConfig.ToString());
 			}
+		}
+
+		private void WriteConfigValueBGPlugin(TaskUnit task)
+		{
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/Battlegrounds.cfg");
+			if (false == System.IO.File.Exists(pathConfig.ToString()))
+				return;
+
+			bool Enable = Common.IsBGMode(task.Mode);
+			MyConfig.WriteIniValue("配置", "插件开关", Enable.ToString(), pathConfig.ToString());
 		}
 
 		public async Task Delay(int milliseconds)
@@ -496,7 +582,7 @@ namespace HSCentric
 			try
 			{
 				//佣兵日志获取经验
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID);
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "mercenarylog/");
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
 					return;
 				List<FileInfo> testList = rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly).ToList();
@@ -506,6 +592,45 @@ namespace HSCentric
 				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵日志])
 					return;
 				m_fileLastEdit[(int)FILE_TYPE.佣兵日志] = targetFile.LastWriteTime;
+				foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
+				{
+					if (line.IndexOf("战令信息") > 0)
+					{
+						Regex regex = new Regex(@"^.*等级:([\d]*).*经验:([\d]*).*$");
+						Match match = regex.Match(line);
+						if (match.Groups.Count == 3)
+						{
+							RewardXP rewardXP = new RewardXP()
+							{
+								Level = Convert.ToInt32(match.Groups[1].Value),
+								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
+							};
+							m_rewardXP = rewardXP;
+						}
+						break;
+					}
+				}
+			}
+			catch
+			{
+			}
+		}
+
+		public void ReadBGLog()
+		{
+			try
+			{
+				//酒馆日志获取经验
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "battlegrounds/");
+				if (false == System.IO.Directory.Exists(rootHS.ToString()))
+					return;
+				List<FileInfo> testList = rootHS.GetFiles("battlegrounds@*.log", SearchOption.TopDirectoryOnly).ToList();
+				FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
+				if (targetFile == null)
+					return;
+				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.酒馆日志])
+					return;
+				m_fileLastEdit[(int)FILE_TYPE.酒馆日志] = targetFile.LastWriteTime;
 				foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
 				{
 					if (line.IndexOf("战令信息") > 0)
@@ -795,6 +920,8 @@ namespace HSCentric
 		private TaskManager m_taskManager;
 
 		private DateTime[] m_fileLastEdit = new DateTime[(int)FILE_TYPE.Total]{
+			DateTime.Now,
+			DateTime.Now,
 			DateTime.Now,
 			DateTime.Now,
 			DateTime.Now,

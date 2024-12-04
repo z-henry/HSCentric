@@ -57,6 +57,7 @@ namespace HSCentric.Const
 		经典,
 		休闲,
 		幻变,
+		酒馆,
 	}
 
 	public enum BEHAVIOR_MODE
@@ -82,6 +83,8 @@ namespace HSCentric.Const
 		兄弟日志,
 		佣兵配置,
 		炉石日志,
+		酒馆日志,
+		酒馆配置,
 		Total,
 	}
 

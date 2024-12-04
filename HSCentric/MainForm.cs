@@ -186,16 +186,21 @@ namespace HSCentric
 					switch (list_item)
 					{
 						case LIST_UNIT_COLUMN.唤醒时间:
-							subitem.Text = basicConfigValue.awakeTime.ToString("G");
-							if (unit.Enable && basicConfigValue.mode == TASK_MODE.挂机收菜.ToString())
-								subitem.BackColor = GetColor(basicConfigValue.awakePeriod, new TimeSpan(basicConfigValue.awakeTime.Ticks - DateTime.Now.Ticks).TotalSeconds,
+							subitem.Text = basicConfigValue.mercCacheConfig.awakeTime.ToString("G");
+							if (unit.Enable && basicConfigValue.mercCacheConfig.mode == TASK_MODE.挂机收菜.ToString())
+								subitem.BackColor = GetColor(basicConfigValue.mercCacheConfig.awakePeriod, new TimeSpan(basicConfigValue.mercCacheConfig.awakeTime.Ticks - DateTime.Now.Ticks).TotalSeconds,
 									new List<Color>() { Color.White, default_color });
 							break;
 						case LIST_UNIT_COLUMN.成员:
 							subitem.Text = unit.ID;
 							break;
 						case LIST_UNIT_COLUMN.当前模式:
-							subitem.Text = basicConfigValue.mercPluginEnable ? basicConfigValue.mode : "非佣兵";
+							if (basicConfigValue.mercCacheConfig.PluginEnable)
+								subitem.Text = basicConfigValue.mercCacheConfig.mode;
+							else if(basicConfigValue.bgCacheConfig.PluginEnable)
+								subitem.Text = "酒馆";
+							else
+								subitem.Text = "传统对战";
 							break;
 						case LIST_UNIT_COLUMN.预设模式:
 							subitem.Text = currentTask.Mode.ToString();
