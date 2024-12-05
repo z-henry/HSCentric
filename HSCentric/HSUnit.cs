@@ -582,7 +582,7 @@ namespace HSCentric
 			try
 			{
 				//佣兵日志获取经验
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "mercenarylog/");
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "/mercenarylog/");
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
 					return;
 				List<FileInfo> testList = rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly).ToList();
@@ -621,7 +621,7 @@ namespace HSCentric
 			try
 			{
 				//酒馆日志获取经验
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "battlegrounds/");
+				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "/battlegrounds/");
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
 					return;
 				List<FileInfo> testList = rootHS.GetFiles("battlegrounds@*.log", SearchOption.TopDirectoryOnly).ToList();
