@@ -275,7 +275,7 @@ namespace HSCentric
 			{
 				string exeDirectory = Path.GetDirectoryName(HSPath);
 				string logDirectory = Path.Combine(exeDirectory, "BepinEx", "Log", ID, "battlegrounds");
-				Out.Log(logDirectory);
+				return result && LogsUpdated(logDirectory);
 			}
 			else if (Common.IsMercMode(CurrentTask.Mode))
 			{
