@@ -131,6 +131,18 @@ namespace HSCentric
 			get { return (int)this["stats_month"]; }
 			set { this["stats_month"] = value; }
 		}
+		[ConfigurationProperty("total_running_time", IsRequired = false, DefaultValue = 0L)]
+		public Int64 TotalRunningTime
+		{
+			get { return (Int64)this["total_running_time"]; }
+			set { this["total_running_time"] = value; }
+		}
+		[ConfigurationProperty("total_gaint_xp", IsRequired = false, DefaultValue = 0L)]
+		public Int64 TotalGaintXP
+		{
+			get { return (Int64)this["total_gaint_xp"]; }
+			set { this["total_gaint_xp"] = value; }
+		}
 
 	}
 	public class TaskCollection : ConfigurationElementCollection

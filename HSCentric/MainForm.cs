@@ -32,14 +32,15 @@ namespace HSCentric
 
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用.ToString(), 40);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.成员.ToString(), 80);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.当前模式.ToString(), 70);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.预设模式.ToString(), 70);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 130);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 95);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.等级.ToString(), 40);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.经验.ToString(), 50);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.经验效率.ToString(), 70);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.当前模式.ToString(), 70);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.预设模式.ToString(), 70);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 95);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.PVP分数.ToString(), 60);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.传统模式等级.ToString(), 140);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 130);
 			this.textbox_BNetPath.Text = ConfigurationManager.AppSettings["bnet_path"];
 
 
@@ -224,6 +225,9 @@ namespace HSCentric
 							subitem.Text = unit.ClassicRate;
 							//tooltips_str += $"{unit.ClassicRate}";
 							break;
+						case LIST_UNIT_COLUMN.经验效率:
+							subitem.Text = unit.XPRate.ToString("F2");
+							break;
 						default:
 							break;
 					}
@@ -383,6 +387,17 @@ namespace HSCentric
 			if (listHS.SelectedItems.Count > 0)
 			{
 				HSUnitManager.Get().ReleaseConfig(listHS.SelectedItems[0].Index);
+				UI_Flush();
+			}
+			else
+				MessageBox.Show("请选中一个成员", "ERROR");
+		}
+
+		private void 重置经验效率ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (listHS.SelectedItems.Count > 0)
+			{
+				HSUnitManager.Get().ResetXPRate(listHS.SelectedItems[0].Index);
 				UI_Flush();
 			}
 			else

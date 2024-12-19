@@ -46,6 +46,8 @@ namespace HSCentric
 			this.启用ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.启动ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.备份插件设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.部署插件配置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.关闭插件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.label_currenttime = new System.Windows.Forms.Label();
 			this.label_checktime = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
@@ -57,8 +59,7 @@ namespace HSCentric
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.显示ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.部署插件配置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.关闭插件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.重置经验效率ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.contextMenuStrip1.SuspendLayout();
 			this.SuspendLayout();
@@ -105,9 +106,10 @@ namespace HSCentric
             this.启动ToolStripMenuItem,
             this.备份插件设置ToolStripMenuItem,
             this.部署插件配置ToolStripMenuItem,
-            this.关闭插件ToolStripMenuItem});
+            this.关闭插件ToolStripMenuItem,
+            this.重置经验效率ToolStripMenuItem});
 			this.contextMenuStrip_RMenu.Name = "contextMenuStrip1";
-			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(181, 136);
+			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(181, 158);
 			// 
 			// 启用ToolStripMenuItem
 			// 
@@ -129,6 +131,20 @@ namespace HSCentric
 			this.备份插件设置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.备份插件设置ToolStripMenuItem.Text = "备份插件设置";
 			this.备份插件设置ToolStripMenuItem.Click += new System.EventHandler(this.备份插件设置ToolStripMenuItem_Click);
+			// 
+			// 部署插件配置ToolStripMenuItem
+			// 
+			this.部署插件配置ToolStripMenuItem.Name = "部署插件配置ToolStripMenuItem";
+			this.部署插件配置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.部署插件配置ToolStripMenuItem.Text = "部署插件配置";
+			this.部署插件配置ToolStripMenuItem.Click += new System.EventHandler(this.部署插件配置ToolStripMenuItem_Click);
+			// 
+			// 关闭插件ToolStripMenuItem
+			// 
+			this.关闭插件ToolStripMenuItem.Name = "关闭插件ToolStripMenuItem";
+			this.关闭插件ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.关闭插件ToolStripMenuItem.Text = "关闭插件";
+			this.关闭插件ToolStripMenuItem.Click += new System.EventHandler(this.关闭插件ToolStripMenuItem_Click);
 			// 
 			// label_currenttime
 			// 
@@ -222,19 +238,12 @@ namespace HSCentric
 			this.退出ToolStripMenuItem.Text = "退出";
 			this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
 			// 
-			// 部署插件配置ToolStripMenuItem
+			// 重置经验效率ToolStripMenuItem
 			// 
-			this.部署插件配置ToolStripMenuItem.Name = "部署插件配置ToolStripMenuItem";
-			this.部署插件配置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.部署插件配置ToolStripMenuItem.Text = "部署插件配置";
-			this.部署插件配置ToolStripMenuItem.Click += new System.EventHandler(this.部署插件配置ToolStripMenuItem_Click);
-			// 
-			// 关闭插件ToolStripMenuItem
-			// 
-			this.关闭插件ToolStripMenuItem.Name = "关闭插件ToolStripMenuItem";
-			this.关闭插件ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.关闭插件ToolStripMenuItem.Text = "关闭插件";
-			this.关闭插件ToolStripMenuItem.Click += new System.EventHandler(this.关闭插件ToolStripMenuItem_Click);
+			this.重置经验效率ToolStripMenuItem.Name = "重置经验效率ToolStripMenuItem";
+			this.重置经验效率ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.重置经验效率ToolStripMenuItem.Text = "重置经验效率";
+			this.重置经验效率ToolStripMenuItem.Click += new System.EventHandler(this.重置经验效率ToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 
@@ -288,6 +297,7 @@ namespace HSCentric
 		private ToolStripMenuItem 退出ToolStripMenuItem;
 		private ToolStripMenuItem 部署插件配置ToolStripMenuItem;
 		private ToolStripMenuItem 关闭插件ToolStripMenuItem;
+		private ToolStripMenuItem 重置经验效率ToolStripMenuItem;
 	}
 }
 

@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
+using System.Runtime;
 
 namespace HSCentric
 {
@@ -152,13 +153,25 @@ namespace HSCentric
 					HSUnit hsUnit = m_listHS[i];
 					hsUnit.UpdateStatsMonth();
 
-					hsUnit.ReadBGLog();
-					hsUnit.ReadMercLog();
-					hsUnit.ReadMercRecordLog();
-					if (false == hsUnit.ReadHBLog())
-						hsUnit.KillHS();
+					// 没启用就跳过
+					if (!hsUnit.Enable)
+						continue;
+
 					if (false == hsUnit.ReadHSLog())
 						hsUnit.KillHS();
+
+					if (Common.IsBGMode(hsUnit.CurrentTask.Mode))
+						hsUnit.ReadBGLog();
+					else if (Common.IsMercMode(hsUnit.CurrentTask.Mode))
+					{
+						hsUnit.ReadMercLog();
+						hsUnit.ReadMercRecordLog();
+					}
+					else if (Common.IsBuddyMode(hsUnit.CurrentTask.Mode))
+					{
+						if (false == hsUnit.ReadHBLog())
+							hsUnit.KillHS();
+					}
 
 				}
 				SaveConfig();
@@ -199,6 +212,15 @@ namespace HSCentric
 			lock (m_lockHS)
 			{
 				m_listHS[index].ReleaseConfig();
+			}
+		}
+
+		internal void ResetXPRate(int index)
+		{
+			lock (m_lockHS)
+			{
+				m_listHS[index].TotalRunningTime = 0;
+				m_listHS[index].TotalGaintXP = 0;
 			}
 		}
 
@@ -269,6 +291,8 @@ namespace HSCentric
 					ClassicRate = hs.ClassicRate,
 					HSModPort = hs.HSModPort,
 					StatsMonth = hs.StatsMonth,
+					TotalGaintXP = hs.TotalGaintXP,
+					TotalRunningTime = hs.TotalRunningTime,
 				};
 				hsunit.Tasks = new TaskManager(hsunit, tasks_common, taskSpec, hs.SwitchTask);//要传入对象，放到初始值设定里不会获取对象的this- -!!!
 				m_listHS.Add(hsunit);
@@ -329,7 +353,10 @@ namespace HSCentric
 					PvpRate = hs.MercPvpRate,
 					HSModPort = hs.HSModPort,
 					StatsMonth = hs.StatsMonth,
-					SwitchTask = hs.Tasks.SwitchTask
+					SwitchTask = hs.Tasks.SwitchTask,
+					TotalRunningTime = hs.TotalRunningTime,
+					TotalGaintXP = hs.TotalGaintXP,
+
 				});
 			}
 			config.Save();

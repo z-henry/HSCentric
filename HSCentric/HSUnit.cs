@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -70,7 +71,16 @@ namespace HSCentric
 		public bool Enable
 		{
 			get { return m_enable; }
-			set { m_enable = value; }
+			set 
+			{
+				m_enable = value;
+				if (!value)
+				{
+
+					Out.Log(string.Format($"[{ID}] 更新经验效率：关闭"));
+					m_lastXPUpdateTime = DateTime.MaxValue;
+				}
+			}
 		}
 
 		public string ID
@@ -112,6 +122,28 @@ namespace HSCentric
 		{
 			get { return m_rewardXP; }
 			set { m_rewardXP = value; }
+		}
+
+		public double XPRate
+		{
+			get 
+			{
+				if (m_totalRunningTime == 0)
+					return 0.0;
+				return (double)(m_totalGaintXP) / m_totalRunningTime * 3600; 
+			}
+		}
+
+		public Int64 TotalRunningTime
+		{
+			get { return m_totalRunningTime; }
+			set { m_totalRunningTime = value; }
+		}
+
+		public Int64 TotalGaintXP
+		{
+			get { return m_totalGaintXP; }
+			set { m_totalGaintXP = value; }
 		}
 
 		public string ClassicRate
@@ -219,6 +251,7 @@ namespace HSCentric
 			ReleaseMercPlugin();
 			ReleaseHsMod();
 		}
+				
 
 		private void ReleaseMercPlugin()
 		{
@@ -581,6 +614,10 @@ namespace HSCentric
 		{
 			try
 			{
+				// 炉石启动才读日志
+				if (string.IsNullOrEmpty(m_hsLogFileDir))
+					return;
+
 				//佣兵日志获取经验
 				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "/mercenarylog/");
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
@@ -600,12 +637,12 @@ namespace HSCentric
 						Match match = regex.Match(line);
 						if (match.Groups.Count == 3)
 						{
-							RewardXP rewardXP = new RewardXP()
+
+							XPUpdate(new RewardXP()
 							{
 								Level = Convert.ToInt32(match.Groups[1].Value),
 								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
-							};
-							m_rewardXP = rewardXP;
+							});
 						}
 						break;
 					}
@@ -620,6 +657,10 @@ namespace HSCentric
 		{
 			try
 			{
+				// 炉石启动才读日志
+				if (string.IsNullOrEmpty(m_hsLogFileDir))
+					return;
+
 				//酒馆日志获取经验
 				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "/battlegrounds/");
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
@@ -639,12 +680,11 @@ namespace HSCentric
 						Match match = regex.Match(line);
 						if (match.Groups.Count == 3)
 						{
-							RewardXP rewardXP = new RewardXP()
+							XPUpdate(new RewardXP()
 							{
 								Level = Convert.ToInt32(match.Groups[1].Value),
 								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
-							};
-							m_rewardXP = rewardXP;
+							});
 						}
 						break;
 					}
@@ -659,6 +699,10 @@ namespace HSCentric
 		{
 			try
 			{
+				// 炉石启动才读日志
+				if (string.IsNullOrEmpty(m_hsLogFileDir))
+					return;
+
 				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID);
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
 					return;
@@ -707,12 +751,11 @@ namespace HSCentric
 						Match match = regex.Match(line);
 						if (match.Groups.Count == 4)
 						{
-							RewardXP rewardXP = new RewardXP()
+							XPUpdate(new RewardXP()
 							{
 								Level = Convert.ToInt32(match.Groups[1].Value),
 								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
-							};
-							m_rewardXP = rewardXP;
+							});
 						}
 						m_classicRate = match.Groups[3].Value;
 						return true;
@@ -905,6 +948,32 @@ namespace HSCentric
 			}
 		}
 
+		private void XPUpdate(RewardXP rewardXP)
+		{
+			TimeSpan time_span = DateTime.Now - m_lastXPUpdateTime;
+			int xp_gaint = rewardXP.TotalXP-m_rewardXP.TotalXP;
+			if (time_span.TotalSeconds >= 0)
+			{
+				if (xp_gaint > 0)
+				{
+					Out.Log(string.Format($"[{ID}] 更新经验效率：时间增量[{(int)time_span.TotalSeconds}]，经验增量[{xp_gaint}]"));
+					m_lastXPUpdateTime = DateTime.Now;
+					m_totalRunningTime += (int)time_span.TotalSeconds;
+					m_totalGaintXP += xp_gaint;
+				}
+
+			}
+			else
+			{
+				Out.Log(string.Format($"[{ID}] 更新经验效率：开启"));
+				m_lastXPUpdateTime = DateTime.Now;
+			}
+			m_rewardXP = rewardXP;
+		}
+
+		private DateTime m_lastXPUpdateTime = DateTime.MaxValue;
+		private Int64 m_totalRunningTime = 0;
+		private Int64 m_totalGaintXP = 0;
 		private RewardXP m_rewardXP = new RewardXP();
 		private int m_pvpRate = 0;
 		private string m_classicRate = "";
