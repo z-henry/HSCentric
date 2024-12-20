@@ -41,9 +41,9 @@ namespace HSCentric
 				int cumulative = 0;
 
 				if (m_Level <= 131)
-					cumulative = CumulativeExpList[m_Level - 2];
+					cumulative = CumulativeExpList[m_Level - 1];
 				else
-					cumulative = CumulativeExpList[129] + (m_Level - 131) * 1500;
+					cumulative = CumulativeExpList[129] + (m_Level - 130) * 1500;
 
 				return cumulative + m_ProgressXP;
 			}
@@ -61,6 +61,6 @@ namespace HSCentric
 		}
 
 		private int m_ProgressXP = 0;
-		private int m_Level = 2;
+		private int m_Level = 1;
 	}
 }

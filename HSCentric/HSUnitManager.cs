@@ -76,10 +76,8 @@ namespace HSCentric
 					if (m_waitForUpdateHS == true)
 					{
 						if (hsUnit.IsProcessAlive())
-						{
-							Out.Info(string.Format("[{0}] 升级关闭客户端", hsUnit.ID));
-							hsUnit.KillHS();
-						}
+							hsUnit.KillHS("需要升级");
+
 						continue;
 					}
 
@@ -91,10 +89,7 @@ namespace HSCentric
 					if (!hsUnit.IsActive())
 					{
 						if (hsUnit.IsProcessAlive())
-						{
-							Out.Info(string.Format("[{0}] 未到启用时间", hsUnit.ID));
-							hsUnit.KillHS();
-						}
+							hsUnit.KillHS("未到启用时间");
 						continue;
 					}
 
@@ -158,7 +153,7 @@ namespace HSCentric
 						continue;
 
 					if (false == hsUnit.ReadHSLog())
-						hsUnit.KillHS();
+						hsUnit.KillHS("炉石本体日志异常");
 
 					if (Common.IsBGMode(hsUnit.CurrentTask.Mode))
 						hsUnit.ReadBGLog();
@@ -170,7 +165,7 @@ namespace HSCentric
 					else if (Common.IsBuddyMode(hsUnit.CurrentTask.Mode))
 					{
 						if (false == hsUnit.ReadHBLog())
-							hsUnit.KillHS();
+							hsUnit.KillHS("炉石兄弟日志异常");
 					}
 
 				}
@@ -386,7 +381,7 @@ namespace HSCentric
 				if (!m_listHS[index].IsProcessAlive())
 				{
 					// 					m_listHS[index].InitHsMod();
-					m_listHS[index].Start("手动启动", false);
+					m_listHS[index].StartHS("手动启动");
 				}
 			}
 		}

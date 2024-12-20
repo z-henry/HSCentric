@@ -218,6 +218,9 @@ namespace HSCentric
 					sw.Write("");  // 可以在这里写入默认内容，如果不需要可以留空
 				}
 			}
+
+			MyConfig.WriteIniValue("配置", "前四摆烂", true.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("配置", "维持分段", "2000", pathConfig.ToString());
 		}
 
 		private void InitHsMod()
@@ -241,8 +244,8 @@ namespace HSCentric
 
 			MyConfig.WriteIniValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
-// 			MyConfig.WriteIniValue("全局", "游戏帧率", "-1", pathConfig.ToString());
-// 			MyConfig.WriteIniValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
+ 			MyConfig.WriteIniValue("全局", "游戏帧率", "15", pathConfig.ToString());
+ 			MyConfig.WriteIniValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("开发", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
 		}
 
@@ -291,6 +294,8 @@ namespace HSCentric
 			else
 			{
 				m_pid = 0;
+				m_hsLogFileDir = "";
+				m_hbLogFileDir = "";
 				return false;
 			}
 		}
