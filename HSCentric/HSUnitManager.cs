@@ -25,7 +25,7 @@ namespace HSCentric
 			foreach (var process in HSProcess())
 			{
 				process.Kill();
-				Out.Log(string.Format("关闭炉石残留[pid:{0}]", process.Id));
+				Out.Info(string.Format("关闭炉石残留[pid:{0}]", process.Id));
 				Common.Delay(5000);
 			}
 		}
@@ -77,7 +77,7 @@ namespace HSCentric
 					{
 						if (hsUnit.IsProcessAlive())
 						{
-							Out.Log(string.Format("[{0}]升级关闭客户端", hsUnit.ID));
+							Out.Info(string.Format("[{0}] 升级关闭客户端", hsUnit.ID));
 							hsUnit.KillHS();
 						}
 						continue;
@@ -92,7 +92,7 @@ namespace HSCentric
 					{
 						if (hsUnit.IsProcessAlive())
 						{
-							Out.Log(string.Format("[{0}]未到启用时间", hsUnit.ID));
+							Out.Info(string.Format("[{0}] 未到启用时间", hsUnit.ID));
 							hsUnit.KillHS();
 						}
 						continue;

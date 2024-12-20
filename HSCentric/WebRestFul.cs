@@ -90,7 +90,7 @@ namespace HSCentric
 
 				case "switch":
 					HSUnitManager.Get().SetEnable(requestInfo.unit.name, requestInfo.unit.enable);
-					Out.Log(string.Format("post修改[{0}][{1}]", requestInfo.unit.name, requestInfo.unit.enable));
+					Out.Info(string.Format("post修改[{0}][{1}]", requestInfo.unit.name, requestInfo.unit.enable));
 					break;
 
 				default:

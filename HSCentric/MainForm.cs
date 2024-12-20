@@ -7,6 +7,7 @@ using System.Windows.Forms;
 using HSCentric.Const;
 using System.Net.Sockets;
 using System.Windows.Documents;
+using log4net.Config;
 // using MimeKit;
 
 namespace HSCentric
@@ -15,21 +16,15 @@ namespace HSCentric
 	{
 		public MainForm()
 		{
-// 			TcpClient client = new TcpClient("cn.version.battle.net", 1119);
-// 			using (NetworkStream stream = client.GetStream())
-// 			{
-// 				byte[] req = new UTF8Encoding(false).GetBytes("v1/products/hsb/versions\r\n");
-// 
-// 				stream.Write(req, 0, req.Length);
-// 
-// 				var message = MimeMessage.Load(stream);
-// 				int a = 0;
-// 			}
+
+			FixWorkingDirectory(); // 修正工作目录
 
 			this.InitializeComponent();
+
 			this.timer1.Interval = 100;
 			this.timer1.Tick += this.TickProcess;
 
+			//listHS
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用.ToString(), 40);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.成员.ToString(), 80);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.等级.ToString(), 40);
@@ -43,7 +38,16 @@ namespace HSCentric
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 130);
 			this.textbox_BNetPath.Text = ConfigurationManager.AppSettings["bnet_path"];
 
+// 			//listlog
+// 			listLog.Columns.Add("Logs", listLog.Width); // 添加一列并设置宽度为控件宽度
+// 			listLog.HeaderStyle = ColumnHeaderStyle.None; // 隐藏列头
+// 			listLog.FullRowSelect = true; // 使整个行可选
 
+
+			// 订阅 Out 类的事件
+			Out.Logged += OnLogged;
+
+			//初始化
 			UpdateManger.Get().Init(new Action(HSUnitManager.Get().RecoverAfterUpdated), textbox_BNetPath.Text);
 			HSUnitManager.Get().Init(new Action(UpdateManger.Get().Start));
 			UI_Flush();
@@ -51,6 +55,15 @@ namespace HSCentric
 			this.timer1.Start();
 
 			this.Resize += Form1_Resize;
+		}
+		private static void FixWorkingDirectory()
+		{
+			// 获取程序的实际运行目录
+			string actualPath = System.IO.Path.GetDirectoryName(
+				System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+			// 设置为当前工作目录
+			Environment.CurrentDirectory = actualPath;
 		}
 
 
@@ -402,6 +415,51 @@ namespace HSCentric
 			}
 			else
 				MessageBox.Show("请选中一个成员", "ERROR");
+		}
+
+		// 处理 日志事件
+		private void OnLogged(string level, string message)
+		{
+			if (listLog.InvokeRequired)
+			{
+				// 确保线程安全
+				listLog.Invoke(new Action(() => OnLogged(level, message)));
+				return;
+			}
+			var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+			var item = new ListViewItem($"[{timestamp}] {level}: {message}");
+			switch (level)
+			{
+				case "Info": item.ForeColor = Color.Black; break;
+				case "Error": item.ForeColor = Color.Red; break;
+				default: return;
+			}
+
+			// 向 ListBox 添加日志并限制行数
+			if (listLog.Items.Count >= 500)
+				listLog.Items.RemoveAt(0); // 移除最早的一行
+
+			listLog.Items.Add(item);
+			listLog.EnsureVisible(listLog.Items.Count - 1); // 滚动到最新行
+
+		}
+
+		private void listLog_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			// 获取当天日志文件路径
+			string logFileName = DateTime.Now.ToString("yyyy-MM-dd") + ".log"; // 当天日志文件名
+			string logFilePath = Out.LogBaseName + logFileName;
+
+			// 检查日志文件是否存在
+			if (System.IO.File.Exists(logFilePath))
+			{
+				// 使用默认文本编辑器打开日志文件
+				System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+				{
+					FileName = System.IO.Path.Combine(Environment.CurrentDirectory,logFilePath),
+					UseShellExecute = true
+				});
+			}
 		}
 	}
 }

@@ -77,7 +77,7 @@ namespace HSCentric
 				if (!value)
 				{
 
-					Out.Log(string.Format($"[{ID}] 更新经验效率：关闭"));
+					Out.Info(string.Format($"[{ID}] 更新经验效率：关闭"));
 					m_lastXPUpdateTime = DateTime.MaxValue;
 				}
 			}
@@ -351,7 +351,7 @@ namespace HSCentric
 		public void KillHS(string msg = "")
 		{
 			HearthstoneProcess()?.Kill();
-			Out.Log(string.Format("[{0}]结束 {1}", ID, msg));
+			Out.Info(string.Format("[{0}] 结束 {1}", ID, msg));
 			m_pid = 0;
 			m_hsLogFileDir = "";
 			m_hbLogFileDir = "";
@@ -366,7 +366,7 @@ namespace HSCentric
 			if (pid != m_pid)
 				return;
 			m_hsLogFileDir = GetHSLogPath();
-			Out.Log(string.Format("[{0}]记录炉石日志路径 {1}", ID, m_hsLogFileDir));
+			Out.Debug(string.Format("[{0}] 记录炉石日志路径 {1}", ID, m_hsLogFileDir));
 
 			if (true == NeedUpdateHS())
 				HSUnitManager.Get().InterruptBeforeUpdate();
@@ -382,15 +382,15 @@ namespace HSCentric
 						try_count++;
 					if (try_count >= 5)
 					{
-						Out.Log(string.Format("[{0}]HS登录检测失败", ID, try_count));
+						Out.Info(string.Format("[{0}] HS登录检测失败", ID, try_count));
 						KillHS("HS登录检测失败");
 						return;
 					}
 
 					if (delay < 0)
-						Out.Log(string.Format("[{0}]HS启动等待", ID, try_count));
+						Out.Info(string.Format("[{0}] HS启动等待", ID, try_count));
 					else
-						Out.Log(string.Format("[{0}]HS排队等待：{2}秒", ID, try_count, delay));
+						Out.Debug(string.Format("[{0}] HS排队等待：{2}秒", ID, try_count, delay));
 					await Delay(30 * 1000);
 					if (pid != m_pid)
 						return;
@@ -414,7 +414,7 @@ namespace HSCentric
 			process.WaitForInputIdle();
 			m_pid = process.Id;
 			m_hsLogFileDir = "";
-			Out.Log(string.Format("[{0}]启动 {1} [pid:{2}]", ID, msg, m_pid));
+			Out.Info(string.Format("[{0}] 启动 {1} [pid:{2}]", ID, msg, m_pid));
 		}
 
 		public void StartHB(string msg = "")
@@ -435,7 +435,7 @@ namespace HSCentric
 			int pid = process.Id;
 			m_hbLogFileDir = "";
 
-			Out.Log(string.Format("[{0}]启动HB {1} [pid:{2}] [arg:{3}]", ID, msg, pid, process.StartInfo.Arguments));
+			Out.Info(string.Format("[{0}] 启动HB {1} [pid:{2}] [arg:{3}]", ID, msg, pid, process.StartInfo.Arguments));
 		}
 
 		public bool NeedAdjustMode()
@@ -545,7 +545,7 @@ namespace HSCentric
 			WriteConfigHSMod(task);
 			WriteConfigValueMercPlugin(task);
 			WriteConfigValueBGPlugin(task);
-			Out.Log($"[{ID}]写入配置 mode:{task?.Mode} teamName:{task?.TeamName} strategyName:{task?.StrategyName} " +
+			Out.Debug($"[{ID}] 写入配置 mode:{task?.Mode} teamName:{task?.TeamName} strategyName:{task?.StrategyName} " +
 				$"Enable:{Enable} Scale:{task?.Scale} Map:{task?.Map} " +
 				$"MercTeamNumTotal:{task?.MercTeamNumTotal} MercTeamNumCore:{task?.MercTeamNumCore}"
 				);
@@ -956,7 +956,7 @@ namespace HSCentric
 			{
 				if (xp_gaint > 0)
 				{
-					Out.Log(string.Format($"[{ID}] 更新经验效率：时间增量[{(int)time_span.TotalSeconds}]，经验增量[{xp_gaint}]"));
+					Out.Debug(string.Format($"[{ID}] 更新经验效率：时间增量[{(int)time_span.TotalSeconds}]，经验增量[{xp_gaint}]"));
 					m_lastXPUpdateTime = DateTime.Now;
 					m_totalRunningTime += (int)time_span.TotalSeconds;
 					m_totalGaintXP += xp_gaint;
@@ -965,7 +965,7 @@ namespace HSCentric
 			}
 			else
 			{
-				Out.Log(string.Format($"[{ID}] 更新经验效率：开启"));
+				Out.Info(string.Format($"[{ID}] 更新经验效率：开启"));
 				m_lastXPUpdateTime = DateTime.Now;
 			}
 			m_rewardXP = rewardXP;

@@ -48,6 +48,7 @@ namespace HSCentric
 			this.备份插件设置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.部署插件配置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.关闭插件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.重置经验效率ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.label_currenttime = new System.Windows.Forms.Label();
 			this.label_checktime = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
@@ -59,7 +60,7 @@ namespace HSCentric
 			this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.显示ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.重置经验效率ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.listLog = new System.Windows.Forms.ListView();
 			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.contextMenuStrip1.SuspendLayout();
 			this.SuspendLayout();
@@ -92,7 +93,7 @@ namespace HSCentric
 			this.listHS.Location = new System.Drawing.Point(12, 35);
 			this.listHS.MultiSelect = false;
 			this.listHS.Name = "listHS";
-			this.listHS.Size = new System.Drawing.Size(765, 233);
+			this.listHS.Size = new System.Drawing.Size(765, 187);
 			this.listHS.TabIndex = 10;
 			this.listHS.UseCompatibleStateImageBehavior = false;
 			this.listHS.View = System.Windows.Forms.View.Details;
@@ -109,47 +110,54 @@ namespace HSCentric
             this.关闭插件ToolStripMenuItem,
             this.重置经验效率ToolStripMenuItem});
 			this.contextMenuStrip_RMenu.Name = "contextMenuStrip1";
-			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(181, 158);
+			this.contextMenuStrip_RMenu.Size = new System.Drawing.Size(149, 136);
 			// 
 			// 启用ToolStripMenuItem
 			// 
 			this.启用ToolStripMenuItem.Name = "启用ToolStripMenuItem";
-			this.启用ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.启用ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
 			this.启用ToolStripMenuItem.Text = "启用";
 			this.启用ToolStripMenuItem.Click += new System.EventHandler(this.启用ToolStripMenuItem_Click);
 			// 
 			// 启动ToolStripMenuItem
 			// 
 			this.启动ToolStripMenuItem.Name = "启动ToolStripMenuItem";
-			this.启动ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.启动ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
 			this.启动ToolStripMenuItem.Text = "启动一次";
 			this.启动ToolStripMenuItem.Click += new System.EventHandler(this.启动ToolStripMenuItem_Click);
 			// 
 			// 备份插件设置ToolStripMenuItem
 			// 
 			this.备份插件设置ToolStripMenuItem.Name = "备份插件设置ToolStripMenuItem";
-			this.备份插件设置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.备份插件设置ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
 			this.备份插件设置ToolStripMenuItem.Text = "备份插件设置";
 			this.备份插件设置ToolStripMenuItem.Click += new System.EventHandler(this.备份插件设置ToolStripMenuItem_Click);
 			// 
 			// 部署插件配置ToolStripMenuItem
 			// 
 			this.部署插件配置ToolStripMenuItem.Name = "部署插件配置ToolStripMenuItem";
-			this.部署插件配置ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.部署插件配置ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
 			this.部署插件配置ToolStripMenuItem.Text = "部署插件配置";
 			this.部署插件配置ToolStripMenuItem.Click += new System.EventHandler(this.部署插件配置ToolStripMenuItem_Click);
 			// 
 			// 关闭插件ToolStripMenuItem
 			// 
 			this.关闭插件ToolStripMenuItem.Name = "关闭插件ToolStripMenuItem";
-			this.关闭插件ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.关闭插件ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
 			this.关闭插件ToolStripMenuItem.Text = "关闭插件";
 			this.关闭插件ToolStripMenuItem.Click += new System.EventHandler(this.关闭插件ToolStripMenuItem_Click);
+			// 
+			// 重置经验效率ToolStripMenuItem
+			// 
+			this.重置经验效率ToolStripMenuItem.Name = "重置经验效率ToolStripMenuItem";
+			this.重置经验效率ToolStripMenuItem.Size = new System.Drawing.Size(148, 22);
+			this.重置经验效率ToolStripMenuItem.Text = "重置经验效率";
+			this.重置经验效率ToolStripMenuItem.Click += new System.EventHandler(this.重置经验效率ToolStripMenuItem_Click);
 			// 
 			// label_currenttime
 			// 
 			this.label_currenttime.AutoSize = true;
-			this.label_currenttime.Location = new System.Drawing.Point(81, 271);
+			this.label_currenttime.Location = new System.Drawing.Point(83, 514);
 			this.label_currenttime.Name = "label_currenttime";
 			this.label_currenttime.Size = new System.Drawing.Size(29, 12);
 			this.label_currenttime.TabIndex = 11;
@@ -158,7 +166,7 @@ namespace HSCentric
 			// label_checktime
 			// 
 			this.label_checktime.AutoSize = true;
-			this.label_checktime.Location = new System.Drawing.Point(301, 271);
+			this.label_checktime.Location = new System.Drawing.Point(303, 514);
 			this.label_checktime.Name = "label_checktime";
 			this.label_checktime.Size = new System.Drawing.Size(29, 12);
 			this.label_checktime.TabIndex = 12;
@@ -167,7 +175,7 @@ namespace HSCentric
 			// label1
 			// 
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(10, 271);
+			this.label1.Location = new System.Drawing.Point(12, 514);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(65, 12);
 			this.label1.TabIndex = 13;
@@ -176,7 +184,7 @@ namespace HSCentric
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(206, 271);
+			this.label2.Location = new System.Drawing.Point(208, 514);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(89, 12);
 			this.label2.TabIndex = 14;
@@ -238,18 +246,23 @@ namespace HSCentric
 			this.退出ToolStripMenuItem.Text = "退出";
 			this.退出ToolStripMenuItem.Click += new System.EventHandler(this.退出ToolStripMenuItem_Click);
 			// 
-			// 重置经验效率ToolStripMenuItem
+			// listLog
 			// 
-			this.重置经验效率ToolStripMenuItem.Name = "重置经验效率ToolStripMenuItem";
-			this.重置经验效率ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.重置经验效率ToolStripMenuItem.Text = "重置经验效率";
-			this.重置经验效率ToolStripMenuItem.Click += new System.EventHandler(this.重置经验效率ToolStripMenuItem_Click);
+			this.listLog.HideSelection = false;
+			this.listLog.Location = new System.Drawing.Point(12, 229);
+			this.listLog.Name = "listLog";
+			this.listLog.Size = new System.Drawing.Size(765, 282);
+			this.listLog.TabIndex = 36;
+			this.listLog.UseCompatibleStateImageBehavior = false;
+			this.listLog.View = System.Windows.Forms.View.List;
+			this.listLog.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listLog_MouseDoubleClick);
 			// 
 			// MainForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(788, 286);
+			this.ClientSize = new System.Drawing.Size(788, 535);
+			this.Controls.Add(this.listLog);
 			this.Controls.Add(this.btn_selecthspath);
 			this.Controls.Add(this.textbox_BNetPath);
 			this.Controls.Add(this.label6);
@@ -298,6 +311,7 @@ namespace HSCentric
 		private ToolStripMenuItem 部署插件配置ToolStripMenuItem;
 		private ToolStripMenuItem 关闭插件ToolStripMenuItem;
 		private ToolStripMenuItem 重置经验效率ToolStripMenuItem;
+		private ListView listLog;
 	}
 }
 

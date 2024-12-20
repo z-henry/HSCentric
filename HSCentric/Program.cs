@@ -18,7 +18,7 @@ namespace HSCentric
 
 			catch (Exception ex)
 			{
-				Out.Log("空间名：" + ex.Source + "；" + '\n' +
+				Out.Error("空间名：" + ex.Source + "；" + '\n' +
 					"方法名：" + ex.TargetSite + '\n' +
 					"故障点：" + ex.StackTrace.Substring(ex.StackTrace.LastIndexOf("\\") + 1, ex.StackTrace.Length - ex.StackTrace.LastIndexOf("\\") - 1) + '\n' +
 					"错误提示：" + ex.Message);

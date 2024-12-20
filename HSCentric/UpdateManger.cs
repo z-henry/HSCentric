@@ -73,7 +73,7 @@ namespace HSCentric
 			process.StartInfo.FileName = m_path;
 			process.Start();
 			process.WaitForInputIdle();
-			Out.Log("[升级]启动战网");
+			Out.Info("[升级]启动战网");
 			m_bnetStartTime = DateTime.Now;
 		}
 
@@ -82,12 +82,12 @@ namespace HSCentric
 			foreach (Process process in this.BattleNetProcess)
 			{
 				process.Kill();
-				Out.Log("[升级]停止战网");
+				Out.Info("[升级]停止战网");
 			}
 			foreach (Process process in this.BattleNetUpdateAgentProcess)
 			{
 				process.Kill();
-				Out.Log("[升级]停止战网Agent");
+				Out.Info("[升级]停止战网Agent");
 			}
 		}
 
@@ -97,20 +97,20 @@ namespace HSCentric
 			{
 				if (string.IsNullOrEmpty(m_path))
 				{
-					Out.Log("[升级]无战网日志");
+					Out.Error("[升级]无战网日志");
 					return true;
 				}
 				DirectoryInfo rootHS = new DirectoryInfo(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "/Battle.net/Logs");
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
 				{
-					Out.Log("[升级]无战网日志");
+					Out.Error("[升级]无战网日志");
 					return true;
 				}
 				List<FileInfo> testList = rootHS.GetFiles("battle.net-*.log", SearchOption.TopDirectoryOnly).ToList();
 				List<FileInfo> targetFile = testList.FindAll(x => string.Compare(x.Name, $"battle.net-{m_bnetStartTime.ToUniversalTime():yyyyMMddTHHmmss.ffffff}.log") > 0);
 				if (targetFile.Count != 1)
 				{
-					Out.Log("[升级]无战网日志");
+					Out.Error("[升级]无战网日志");
 					return true;
 				}
 				using (FileStream fs = new FileStream(targetFile[0].FullName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
@@ -122,7 +122,7 @@ namespace HSCentric
 						{
 							if (sr.ReadLine().IndexOf("Update completed: hs_beta") >= 0)
 							{
-								Out.Log("[升级]升级完毕");
+								Out.Info("[升级]升级完毕");
 								return true;
 							}
 						}
@@ -131,10 +131,10 @@ namespace HSCentric
 			}
 			catch
 			{
-				Out.Log("[升级]战网日志读取失败");
+				Out.Error("[升级]战网日志读取失败");
 				return false;
 			}
-			Out.Log("[升级]升级中");
+			Out.Debug("[升级]升级中");
 			return false;
 		}
 
