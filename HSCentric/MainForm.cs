@@ -38,10 +38,10 @@ namespace HSCentric
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.唤醒时间.ToString(), 130);
 			this.textbox_BNetPath.Text = ConfigurationManager.AppSettings["bnet_path"];
 
-// 			//listlog
-// 			listLog.Columns.Add("Logs", listLog.Width); // 添加一列并设置宽度为控件宽度
-// 			listLog.HeaderStyle = ColumnHeaderStyle.None; // 隐藏列头
-// 			listLog.FullRowSelect = true; // 使整个行可选
+			//listlog
+ 			listLog.Columns.Add("Logs", -2); // 添加一列并设置宽度为控件宽度
+ 			listLog.HeaderStyle = ColumnHeaderStyle.None; // 隐藏列头
+ 			listLog.FullRowSelect = true; // 使整个行可选
 
 
 			// 订阅 Out 类的事件
@@ -66,20 +66,13 @@ namespace HSCentric
 			Environment.CurrentDirectory = actualPath;
 		}
 
-
-		// 最小化按钮的点击事件（可选）
-		private void btnMinimize_Click(object sender, EventArgs e)
-		{
-			MinimizeToTray();
-		}
-
 		// 窗体的 Resize 事件处理
 		private void Form1_Resize(object sender, EventArgs e)
 		{
-			if (this.WindowState == FormWindowState.Minimized)
-			{
-				MinimizeToTray();
-			}
+// 			if (this.WindowState == FormWindowState.Minimized)
+// 			{
+// 				MinimizeToTray();
+// 			}
 		}
 
 		// 最小化到托盘的通用方法

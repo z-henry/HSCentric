@@ -221,6 +221,7 @@ namespace HSCentric
 
 			MyConfig.WriteIniValue("配置", "前四摆烂", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("配置", "维持分段", "2000", pathConfig.ToString());
+			MyConfig.WriteIniValue("配置", "快捷键调试", false.ToString(), pathConfig.ToString());
 		}
 
 		private void InitHsMod()
@@ -552,7 +553,8 @@ namespace HSCentric
 			WriteConfigValueBGPlugin(task);
 			Out.Debug($"[{ID}] 写入配置 mode:{task?.Mode} teamName:{task?.TeamName} strategyName:{task?.StrategyName} " +
 				$"Enable:{Enable} Scale:{task?.Scale} Map:{task?.Map} " +
-				$"MercTeamNumTotal:{task?.MercTeamNumTotal} MercTeamNumCore:{task?.MercTeamNumCore}"
+				$"MercTeamNumTotal:{task?.MercTeamNumTotal} MercTeamNumCore:{task?.MercTeamNumCore}" +
+				$"ClaimReward:{task?.ClaimReward} ClaimAchievement:{task?.ClaimAchievement} RefreshQuest:{task?.RefreshQuest} "
 				);
 		}
 
@@ -598,6 +600,9 @@ namespace HSCentric
 
 			bool Enable = Common.IsBGMode(task.Mode);
 			MyConfig.WriteIniValue("配置", "插件开关", Enable.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("自动", "刷新任务", task.RefreshQuest.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("自动", "领取成就", task.ClaimAchievement.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("自动", "领取奖励", task.ClaimReward.ToString(), pathConfig.ToString());
 		}
 
 		public async Task Delay(int milliseconds)

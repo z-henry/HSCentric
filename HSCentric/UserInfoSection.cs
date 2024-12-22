@@ -215,6 +215,24 @@ namespace HSCentric
 			get { return (bool)this["scale"]; }
 			set { this["scale"] = value; }
 		}
+		[ConfigurationProperty("claim_achievement", IsRequired = false, DefaultValue = false)]
+		public bool ClaimAchievement
+		{
+			get { return (bool)this["claim_achievement"]; }
+			set { this["claim_achievement"] = value; }
+		}
+		[ConfigurationProperty("claim_reward", IsRequired = false, DefaultValue = false)]
+		public bool ClaimReward
+		{
+			get { return (bool)this["claim_reward"]; }
+			set { this["claim_reward"] = value; }
+		}
+		[ConfigurationProperty("refresh_quest", IsRequired = false, DefaultValue = false)]
+		public bool RefreshQuest
+		{
+			get { return (bool)this["refresh_quest"]; }
+			set { this["refresh_quest"] = value; }
+		}
 		[ConfigurationProperty("map", IsRequired = false, DefaultValue = "2-5")]
 		public string Map
 		{

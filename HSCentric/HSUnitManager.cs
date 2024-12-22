@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Runtime;
+using System.Threading.Tasks;
 
 namespace HSCentric
 {
@@ -251,6 +252,9 @@ namespace HSCentric
 						StrategyName = task.StrategyName,
 						TeamName = task.TeamName,
 						Scale = task.Scale,
+						ClaimAchievement = task.ClaimAchievement,
+						ClaimReward = task.ClaimReward,
+						RefreshQuest = task.RefreshQuest,
 						Map = task.Map,
 						MercTeamNumCore = task.NumCore,
 						MercTeamNumTotal = task.NumTotal,
@@ -267,6 +271,9 @@ namespace HSCentric
 						StrategyName = task.StrategyName,
 						TeamName = task.TeamName,
 						Scale = task.Scale,
+						ClaimAchievement = task.ClaimAchievement,
+						ClaimReward = task.ClaimReward,
+						RefreshQuest = task.RefreshQuest,
 						Map = task.Map,
 						MercTeamNumCore = task.NumCore,
 						MercTeamNumTotal = task.NumTotal,
@@ -314,6 +321,9 @@ namespace HSCentric
 						StartTime = task.StartTime.ToString("G"),
 						StopTime = task.StopTime.ToString("G"),
 						Scale = task.Scale,
+						ClaimAchievement = task.ClaimAchievement,
+						ClaimReward = task.ClaimReward,
+						RefreshQuest = task.RefreshQuest,
 						Map = task.Map,
 						NumTotal = task.MercTeamNumTotal,
 						NumCore = task.MercTeamNumCore,
@@ -329,6 +339,9 @@ namespace HSCentric
 					StartTime = hs.Tasks.GetTaskSpec().StartTime.ToString("G"),
 					StopTime = hs.Tasks.GetTaskSpec().StopTime.ToString("G"),
 					Scale = hs.Tasks.GetTaskSpec().Scale,
+					ClaimAchievement = hs.Tasks.GetTaskSpec().ClaimAchievement,
+					ClaimReward = hs.Tasks.GetTaskSpec().ClaimReward,
+					RefreshQuest = hs.Tasks.GetTaskSpec().RefreshQuest,
 					Map = hs.Tasks.GetTaskSpec().Map,
 					NumTotal = hs.Tasks.GetTaskSpec().MercTeamNumTotal,
 					NumCore = hs.Tasks.GetTaskSpec().MercTeamNumCore

@@ -28,6 +28,9 @@ namespace HSCentric
 			dateTimePicker_start.Value = Task.StartTime;
 			dateTimePicker_stop.Value = Task.StopTime;
 			checkBoxScale.Checked = Task.Scale;
+			checkBoxQuest.Checked = Task.RefreshQuest;
+			checkBoxReward.Checked = Task.ClaimReward;
+			checkBoxAchievement.Checked = Task.ClaimAchievement;
 			textBox_map.Text = Task.Map;
 			comboBox_numCore.SelectedIndex = Task.MercTeamNumCore;
 			comboBox_numTotal.SelectedIndex = Task.MercTeamNumTotal-1;
@@ -70,6 +73,9 @@ namespace HSCentric
 			}
 
 			Task.Scale = checkBoxScale.Checked;
+			Task.RefreshQuest = checkBoxQuest.Checked;
+			Task.ClaimReward = checkBoxReward.Checked;
+			Task.ClaimAchievement = checkBoxAchievement.Checked;
 			Task.MercTeamNumTotal = comboBox_numTotal.SelectedIndex + 1;
 			Task.MercTeamNumCore = comboBox_numCore.SelectedIndex;
 			Task.Map = textBox_map.Text;

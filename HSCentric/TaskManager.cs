@@ -199,6 +199,10 @@ namespace HSCentric
 			get { return m_numTotal; }
 		}
 
+		public bool RefreshQuest { get; set; }
+		public bool ClaimAchievement { get; set; }
+		public bool ClaimReward { get; set; }
+
 		public bool IsTimeLegal()
 		{
 			return m_startTime.TimeOfDay < m_stopTime.TimeOfDay;

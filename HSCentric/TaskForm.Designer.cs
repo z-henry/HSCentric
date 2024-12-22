@@ -48,6 +48,9 @@ namespace HSCentric
 			this.comboBox_numCore = new System.Windows.Forms.ComboBox();
 			this.comboBox_numTotal = new System.Windows.Forms.ComboBox();
 			this.label8 = new System.Windows.Forms.Label();
+			this.checkBoxQuest = new System.Windows.Forms.CheckBox();
+			this.checkBoxAchievement = new System.Windows.Forms.CheckBox();
+			this.checkBoxReward = new System.Windows.Forms.CheckBox();
 			this.SuspendLayout();
 			// 
 			// label1
@@ -119,7 +122,7 @@ namespace HSCentric
 			// 
 			// btn_ok
 			// 
-			this.btn_ok.Location = new System.Drawing.Point(35, 239);
+			this.btn_ok.Location = new System.Drawing.Point(43, 275);
 			this.btn_ok.Name = "btn_ok";
 			this.btn_ok.Size = new System.Drawing.Size(75, 23);
 			this.btn_ok.TabIndex = 8;
@@ -129,7 +132,7 @@ namespace HSCentric
 			// 
 			// btn_cancel
 			// 
-			this.btn_cancel.Location = new System.Drawing.Point(116, 239);
+			this.btn_cancel.Location = new System.Drawing.Point(124, 275);
 			this.btn_cancel.Name = "btn_cancel";
 			this.btn_cancel.Size = new System.Drawing.Size(75, 23);
 			this.btn_cancel.TabIndex = 9;
@@ -149,7 +152,7 @@ namespace HSCentric
 			// checkBoxScale
 			// 
 			this.checkBoxScale.AutoSize = true;
-			this.checkBoxScale.Location = new System.Drawing.Point(116, 201);
+			this.checkBoxScale.Location = new System.Drawing.Point(89, 223);
 			this.checkBoxScale.Name = "checkBoxScale";
 			this.checkBoxScale.Size = new System.Drawing.Size(72, 16);
 			this.checkBoxScale.TabIndex = 12;
@@ -216,11 +219,44 @@ namespace HSCentric
 			this.label8.TabIndex = 18;
 			this.label8.Text = "总数";
 			// 
+			// checkBoxQuest
+			// 
+			this.checkBoxQuest.AutoSize = true;
+			this.checkBoxQuest.Location = new System.Drawing.Point(12, 223);
+			this.checkBoxQuest.Name = "checkBoxQuest";
+			this.checkBoxQuest.Size = new System.Drawing.Size(72, 16);
+			this.checkBoxQuest.TabIndex = 20;
+			this.checkBoxQuest.Text = "刷新任务";
+			this.checkBoxQuest.UseVisualStyleBackColor = true;
+			// 
+			// checkBoxAchievement
+			// 
+			this.checkBoxAchievement.AutoSize = true;
+			this.checkBoxAchievement.Location = new System.Drawing.Point(89, 201);
+			this.checkBoxAchievement.Name = "checkBoxAchievement";
+			this.checkBoxAchievement.Size = new System.Drawing.Size(72, 16);
+			this.checkBoxAchievement.TabIndex = 21;
+			this.checkBoxAchievement.Text = "领取成就";
+			this.checkBoxAchievement.UseVisualStyleBackColor = true;
+			// 
+			// checkBoxReward
+			// 
+			this.checkBoxReward.AutoSize = true;
+			this.checkBoxReward.Location = new System.Drawing.Point(11, 201);
+			this.checkBoxReward.Name = "checkBoxReward";
+			this.checkBoxReward.Size = new System.Drawing.Size(72, 16);
+			this.checkBoxReward.TabIndex = 22;
+			this.checkBoxReward.Text = "领取奖励";
+			this.checkBoxReward.UseVisualStyleBackColor = true;
+			// 
 			// TaskForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(202, 274);
+			this.ClientSize = new System.Drawing.Size(199, 301);
+			this.Controls.Add(this.checkBoxReward);
+			this.Controls.Add(this.checkBoxAchievement);
+			this.Controls.Add(this.checkBoxQuest);
 			this.Controls.Add(this.comboBox_numTotal);
 			this.Controls.Add(this.label8);
 			this.Controls.Add(this.comboBox_numCore);
@@ -268,5 +304,8 @@ namespace HSCentric
 		private System.Windows.Forms.ComboBox comboBox_numCore;
 		private System.Windows.Forms.ComboBox comboBox_numTotal;
 		private System.Windows.Forms.Label label8;
+		private System.Windows.Forms.CheckBox checkBoxQuest;
+		private System.Windows.Forms.CheckBox checkBoxAchievement;
+		private System.Windows.Forms.CheckBox checkBoxReward;
 	}
 }

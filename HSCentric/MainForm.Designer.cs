@@ -254,7 +254,7 @@ namespace HSCentric
 			this.listLog.Size = new System.Drawing.Size(765, 282);
 			this.listLog.TabIndex = 36;
 			this.listLog.UseCompatibleStateImageBehavior = false;
-			this.listLog.View = System.Windows.Forms.View.List;
+			this.listLog.View = System.Windows.Forms.View.Details;
 			this.listLog.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listLog_MouseDoubleClick);
 			// 
 			// MainForm
