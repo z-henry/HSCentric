@@ -84,13 +84,20 @@ namespace HSCentric
 
 					// 没启用就跳过
 					if (!hsUnit.Enable)
+					{
+						// 需要关闭经验统计
+						hsUnit.LastXPUpdateTime = DateTime.MaxValue;
 						continue;
+					}
 
 					// 不在启用时间段,启动了就干掉
 					if (!hsUnit.IsActive())
 					{
 						if (hsUnit.IsProcessAlive())
+						{
 							hsUnit.KillHS("未到启用时间");
+							hsUnit.LastXPUpdateTime = DateTime.MaxValue;
+						}
 						continue;
 					}
 

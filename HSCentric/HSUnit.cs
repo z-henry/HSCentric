@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 
 namespace HSCentric
 {
@@ -71,16 +72,7 @@ namespace HSCentric
 		public bool Enable
 		{
 			get { return m_enable; }
-			set 
-			{
-				m_enable = value;
-				if (!value)
-				{
-
-					Out.Info(string.Format($"[{ID}] 更新经验效率：关闭"));
-					m_lastXPUpdateTime = DateTime.MaxValue;
-				}
-			}
+			set { m_enable = value; }
 		}
 
 		public string ID
@@ -168,6 +160,21 @@ namespace HSCentric
 		{
 			get { return m_statsMonth; }
 			set { m_statsMonth = value; }
+		}
+		public DateTime LastXPUpdateTime
+		{
+			get { return m_lastXPUpdateTime; }
+			set
+			{
+				if (m_lastXPUpdateTime != value)
+				{
+					if (value == DateTime.MaxValue)
+						Out.Info(string.Format($"[{ID}] 更新经验效率：关闭"));
+					else if (m_lastXPUpdateTime == DateTime.MaxValue)
+						Out.Info(string.Format($"[{ID}] 更新经验效率：开启"));
+				}
+				m_lastXPUpdateTime = value; 
+			}
 		}
 
 		public void InitConfig()
@@ -361,6 +368,7 @@ namespace HSCentric
 			m_pid = 0;
 			m_hsLogFileDir = "";
 			m_hbLogFileDir = "";
+
 			Common.Delay(5 * 1000);
 		}
 
@@ -960,24 +968,16 @@ namespace HSCentric
 
 		private void XPUpdate(RewardXP rewardXP)
 		{
-			TimeSpan time_span = DateTime.Now - m_lastXPUpdateTime;
+			TimeSpan time_span = DateTime.Now - LastXPUpdateTime;
 			int xp_gaint = rewardXP.TotalXP-m_rewardXP.TotalXP;
 			if (time_span.TotalSeconds >= 0)
 			{
 				if (xp_gaint > 0)
-				{
-					Out.Debug(string.Format($"[{ID}] 更新经验效率：时间增量[{(int)time_span.TotalSeconds}]，经验增量[{xp_gaint}]"));
-					m_lastXPUpdateTime = DateTime.Now;
-					m_totalRunningTime += (int)time_span.TotalSeconds;
-					m_totalGaintXP += xp_gaint;
-				}
-
+					Out.Debug(string.Format($"[{ID}] 更新经验效率：经验增量[{xp_gaint}]"));
+				m_totalRunningTime += (int)time_span.TotalSeconds;
+				m_totalGaintXP += xp_gaint;
 			}
-			else
-			{
-				Out.Info(string.Format($"[{ID}] 更新经验效率：开启"));
-				m_lastXPUpdateTime = DateTime.Now;
-			}
+			LastXPUpdateTime = DateTime.Now;
 			m_rewardXP = rewardXP;
 		}
 
