@@ -972,10 +972,10 @@ namespace HSCentric
 			int xp_gaint = rewardXP.TotalXP-m_rewardXP.TotalXP;
 			if (time_span.TotalSeconds >= 0)
 			{
-				if (xp_gaint > 0)
-					Out.Debug(string.Format($"[{ID}] 更新经验效率：经验增量[{xp_gaint}]"));
 				m_totalRunningTime += (int)time_span.TotalSeconds;
 				m_totalGaintXP += xp_gaint;
+				if (xp_gaint > 0)
+					Out.Debug(string.Format($"[{ID}] 更新经验效率：经验增量[{xp_gaint}]，效率[{XPRate}]"));
 			}
 			LastXPUpdateTime = DateTime.Now;
 			m_rewardXP = rewardXP;
