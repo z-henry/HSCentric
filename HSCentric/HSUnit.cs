@@ -253,8 +253,10 @@ namespace HSCentric
 			MyConfig.WriteIniValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
  			MyConfig.WriteIniValue("全局", "游戏帧率", "15", pathConfig.ToString());
- 			MyConfig.WriteIniValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("全局", "自动置换卡牌", true.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("开发", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
+			
 		}
 
 		public void ReleaseConfig()
@@ -424,6 +426,8 @@ namespace HSCentric
 			process.StartInfo.Arguments += " " + m_token;
 			process.StartInfo.Arguments += " --hsunitid:" + m_ID;
 			process.StartInfo.Arguments += " --startmethod:hscentric";
+			string path_record = Path.Combine(Path.GetDirectoryName(HSPath), "BepinEX", "Log", m_ID, "gamerecord@" + DateTime.Today.ToString("yyyy-MM-dd") + ".log");
+			process.StartInfo.Arguments += " --matchPath:hscentric";
 			process.Start();
 			process.WaitForInputIdle();
 			m_pid = process.Id;
@@ -928,10 +932,10 @@ namespace HSCentric
 					line = lines.Pop();
 
 					// 判断是否包含指定的更新提示信息
-					if (line.Contains("排队中，预计"))
+					if (line.Contains("当前排队人数"))
 					{
 						// 正则表达式匹配 "预计" 后面的数字
-						string pattern = @"预计(\d+)秒";
+						string pattern = @"(\d+秒)";
 
 						// 使用正则表达式提取数字
 						Match match = Regex.Match(line, pattern);
