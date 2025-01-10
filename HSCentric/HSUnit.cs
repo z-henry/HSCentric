@@ -253,7 +253,7 @@ namespace HSCentric
 			MyConfig.WriteIniValue("全局", "HsMod状态", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("全局", "设置模板", "AwayFromKeyboard", pathConfig.ToString());
  			MyConfig.WriteIniValue("全局", "游戏帧率", "15", pathConfig.ToString());
-			MyConfig.WriteIniValue("全局", "自动置换卡牌", true.ToString(), pathConfig.ToString());
+			MyConfig.WriteIniValue("优化", "自动置换卡牌", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("炉石", "快速战斗", true.ToString(), pathConfig.ToString());
 			MyConfig.WriteIniValue("开发", "网站端口", m_hsmodPort.ToString(), pathConfig.ToString());
 			
@@ -426,8 +426,8 @@ namespace HSCentric
 			process.StartInfo.Arguments += " " + m_token;
 			process.StartInfo.Arguments += " --hsunitid:" + m_ID;
 			process.StartInfo.Arguments += " --startmethod:hscentric";
-			string path_record = Path.Combine(Path.GetDirectoryName(HSPath), "BepinEX", "Log", m_ID, "gamerecord@" + DateTime.Today.ToString("yyyy-MM-dd") + ".log");
-			process.StartInfo.Arguments += " --matchPath:hscentric";
+			string path_record = Path.Combine("BepinEX", "Log", m_ID, "gamerecord@" + DateTime.Today.ToString("yyyy-MM-dd") + ".log");
+			process.StartInfo.Arguments += " --matchPath:" + path_record;
 			process.Start();
 			process.WaitForInputIdle();
 			m_pid = process.Id;
