@@ -143,6 +143,24 @@ namespace HSCentric
 			get { return (Int64)this["total_gaint_xp"]; }
 			set { this["total_gaint_xp"] = value; }
 		}
+		[ConfigurationProperty("total_gaint_xp_quest", IsRequired = false, DefaultValue = 0L)]
+		public Int64 TotalGaintXP_Quest
+		{
+			get { return (Int64)this["total_gaint_xp_quest"]; }
+			set { this["total_gaint_xp_quest"] = value; }
+		}
+		[ConfigurationProperty("total_gaint_xp_achieve", IsRequired = false, DefaultValue = 0L)]
+		public Int64 TotalGaintXP_Achieve
+		{
+			get { return (Int64)this["total_gaint_xp_achieve"]; }
+			set { this["total_gaint_xp_achieve"] = value; }
+		}
+		[ConfigurationProperty("total_gaint_xp_other", IsRequired = false, DefaultValue = 0L)]
+		public Int64 TotalGaintXP_Other
+		{
+			get { return (Int64)this["total_gaint_xp_other"]; }
+			set { this["total_gaint_xp_other"] = value; }
+		}
 
 	}
 	public class TaskCollection : ConfigurationElementCollection

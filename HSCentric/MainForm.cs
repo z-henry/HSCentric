@@ -29,7 +29,7 @@ namespace HSCentric
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.成员.ToString(), 80);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.等级.ToString(), 40);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.经验.ToString(), 50);
-			this.listHS.Columns.Add(LIST_UNIT_COLUMN.经验效率.ToString(), 70);
+			this.listHS.Columns.Add(LIST_UNIT_COLUMN.经验效率.ToString(), 100);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.当前模式.ToString(), 70);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.预设模式.ToString(), 70);
 			this.listHS.Columns.Add(LIST_UNIT_COLUMN.启用时间段.ToString(), 95);
@@ -232,7 +232,7 @@ namespace HSCentric
 							//tooltips_str += $"{unit.ClassicRate}";
 							break;
 						case LIST_UNIT_COLUMN.经验效率:
-							subitem.Text = unit.XPRate.ToString("F2");
+							subitem.Text = unit.XPRate;
 							break;
 						default:
 							break;

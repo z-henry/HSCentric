@@ -116,13 +116,15 @@ namespace HSCentric
 			set { m_rewardXP = value; }
 		}
 
-		public double XPRate
+		public string XPRate
 		{
 			get 
 			{
 				if (m_totalRunningTime == 0)
-					return 0.0;
-				return (double)(m_totalGaintXP) / m_totalRunningTime * 3600; 
+					return "0+0+0";
+				return $"{((double)(m_totalGaintXP - m_totalGaintXP_Quest - m_totalGaintXP_Achieve - m_totalGaintXP_Other) / m_totalRunningTime * 3600):0}+" +
+					$"{((double)(m_totalGaintXP_Quest) / m_totalRunningTime * 3600):0}+" +
+					$"{((double)(m_totalGaintXP_Achieve + m_totalGaintXP_Other) / m_totalRunningTime * 3600):0}";
 			}
 		}
 
@@ -136,6 +138,24 @@ namespace HSCentric
 		{
 			get { return m_totalGaintXP; }
 			set { m_totalGaintXP = value; }
+		}
+
+		public Int64 TotalGaintXP_Quest
+		{
+			get { return m_totalGaintXP_Quest; }
+			set { m_totalGaintXP_Quest = value; }
+		}
+
+		public Int64 TotalGaintXP_Achieve
+		{
+			get { return m_totalGaintXP_Achieve; }
+			set { m_totalGaintXP_Achieve = value; }
+		}
+
+		public Int64 TotalGaintXP_Other
+		{
+			get { return m_totalGaintXP_Other; }
+			set { m_totalGaintXP_Other = value; }
 		}
 
 		public string ClassicRate
@@ -693,23 +713,55 @@ namespace HSCentric
 					return;
 				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.酒馆日志])
 					return;
+				DateTime lastCheckTime = m_fileLastEdit[(int)FILE_TYPE.酒馆日志];
 				m_fileLastEdit[(int)FILE_TYPE.酒馆日志] = targetFile.LastWriteTime;
+
+				// 读取总经验
 				foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
 				{
-					if (line.IndexOf("战令信息") > 0)
-					{
-						Regex regex = new Regex(@"^.*等级:([\d]*).*经验:([\d]*).*$");
-						Match match = regex.Match(line);
-						if (match.Groups.Count == 3)
-						{
-							XPUpdate(new RewardXP()
-							{
-								Level = Convert.ToInt32(match.Groups[1].Value),
-								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
-							});
-						}
+					Regex regex = new Regex(@"(\d{2}:\d{2}:\d{2}\.\d{3}).*战令信息.*等级:(\d+) 经验:(\d+)");
+					Match match = regex.Match(line);
+					if (false == match.Success)
+						continue;
+
+					//当前行时间戳如果比上次检查时间早，就不需要比对了
+					DateTime parsedTime;
+					DateTime.TryParseExact(match.Groups[1].Value, "HH:mm:ss.fff", null, DateTimeStyles.None, out parsedTime);
+					DateTime currentTimeWithParsedTime = DateTime.Today.Add(parsedTime.TimeOfDay);
+					if (currentTimeWithParsedTime <= lastCheckTime)
 						break;
-					}
+
+					XPUpdate(new RewardXP()
+					{
+						Level = Convert.ToInt32(match.Groups[2].Value),
+						ProgressXP = Convert.ToInt32(match.Groups[3].Value),
+					});
+					break;
+				}
+
+				// 读取部分经验
+				foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
+				{
+					Regex regex = new Regex(@"^(\d{2}:\d{2}:\d{2}\.\d{3})\t\[经验变动\] (.*)，传统通行证，获得经验:(\d+)$");
+					Match match = regex.Match(line);
+					if (false == match.Success)
+						continue;
+
+					//当前行时间戳如果比上次检查时间早，就不需要比对了
+					DateTime parsedTime;
+					DateTime.TryParseExact(match.Groups[1].Value, "HH:mm:ss.fff", null, DateTimeStyles.None, out parsedTime);
+					DateTime currentTimeWithParsedTime = DateTime.Today.Add(parsedTime.TimeOfDay);
+					if (currentTimeWithParsedTime <= lastCheckTime)
+						break;
+
+					if (match.Groups[2].Value.Contains("完成任务"))
+						m_totalGaintXP_Quest += Convert.ToInt32(match.Groups[3].Value);
+					else if (match.Groups[2].Value.Contains("完成成就"))
+						m_totalGaintXP_Achieve += Convert.ToInt32(match.Groups[3].Value);
+					else if (match.Groups[2].Value.Contains("完成对局"))
+					{ }
+					else
+						m_totalGaintXP_Other += Convert.ToInt32(match.Groups[3].Value);
 				}
 			}
 			catch
@@ -988,6 +1040,9 @@ namespace HSCentric
 		private DateTime m_lastXPUpdateTime = DateTime.MaxValue;
 		private Int64 m_totalRunningTime = 0;
 		private Int64 m_totalGaintXP = 0;
+		private Int64 m_totalGaintXP_Quest = 0;
+		private Int64 m_totalGaintXP_Achieve = 0;
+		private Int64 m_totalGaintXP_Other = 0;
 		private RewardXP m_rewardXP = new RewardXP();
 		private int m_pvpRate = 0;
 		private string m_classicRate = "";

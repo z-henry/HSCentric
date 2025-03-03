@@ -224,6 +224,9 @@ namespace HSCentric
 			{
 				m_listHS[index].TotalRunningTime = 0;
 				m_listHS[index].TotalGaintXP = 0;
+				m_listHS[index].TotalGaintXP_Achieve = 0;
+				m_listHS[index].TotalGaintXP_Other = 0;
+				m_listHS[index].TotalGaintXP_Quest = 0;
 			}
 		}
 
@@ -301,6 +304,9 @@ namespace HSCentric
 					HSModPort = hs.HSModPort,
 					StatsMonth = hs.StatsMonth,
 					TotalGaintXP = hs.TotalGaintXP,
+					TotalGaintXP_Quest = hs.TotalGaintXP_Quest,
+					TotalGaintXP_Achieve = hs.TotalGaintXP_Achieve,
+					TotalGaintXP_Other = hs.TotalGaintXP_Other,
 					TotalRunningTime = hs.TotalRunningTime,
 				};
 				hsunit.Tasks = new TaskManager(hsunit, tasks_common, taskSpec, hs.SwitchTask);//要传入对象，放到初始值设定里不会获取对象的this- -!!!
@@ -371,7 +377,9 @@ namespace HSCentric
 					SwitchTask = hs.Tasks.SwitchTask,
 					TotalRunningTime = hs.TotalRunningTime,
 					TotalGaintXP = hs.TotalGaintXP,
-
+					TotalGaintXP_Achieve = hs.TotalGaintXP_Achieve,
+					TotalGaintXP_Other = hs.TotalGaintXP_Other,
+					TotalGaintXP_Quest = hs.TotalGaintXP_Quest
 				});
 			}
 			config.Save();
