@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
@@ -394,6 +395,9 @@ namespace HSCentric
 			Common.Delay(5 * 1000);
 		}
 
+		// 声明 Win32 API 函数
+		[DllImport("user32.dll")]
+		private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 		public async void Start(string msg, bool need_hb)
 		{
 			StartHS(msg);
@@ -404,6 +408,19 @@ namespace HSCentric
 			m_hsLogFileDir = GetHSLogPath();
 			Out.Debug(string.Format("[{0}] 记录炉石日志路径 {1}", ID, m_hsLogFileDir));
 
+			//最小化窗口
+			Process proc = Process.GetProcessById(m_pid);
+			while (proc.MainWindowHandle == IntPtr.Zero)
+			{
+				Thread.Sleep(100);
+				proc.Refresh();
+			}
+			const int SW_MINIMIZE = 6;
+			IntPtr hWnd = proc.MainWindowHandle;
+			ShowWindow(hWnd, SW_MINIMIZE);
+			Out.Debug(string.Format("[{0}] 最小化窗口", ID));
+
+			//升级
 			if (true == NeedUpdateHS())
 				HSUnitManager.Get().InterruptBeforeUpdate();
 
