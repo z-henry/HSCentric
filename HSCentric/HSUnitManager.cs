@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data.Odbc;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
@@ -77,7 +78,10 @@ namespace HSCentric
 					if (m_waitForUpdateHS == true)
 					{
 						if (hsUnit.IsProcessAlive())
-							hsUnit.KillHS("需要升级");
+						{
+							Out.Error($"需要升级");
+							hsUnit.KillHS();
+						}
 
 						continue;
 					}
@@ -95,7 +99,8 @@ namespace HSCentric
 					{
 						if (hsUnit.IsProcessAlive())
 						{
-							hsUnit.KillHS("未到启用时间");
+							Out.Info($"[{hsUnit.ID}] 未到启用时间");
+							hsUnit.KillHS();
 							hsUnit.LastXPUpdateTime = DateTime.MaxValue;
 						}
 						continue;
@@ -104,16 +109,18 @@ namespace HSCentric
 					// 在运行就判断是否需要杀掉
 					if (hsUnit.IsProcessAlive())
 					{
-						string msg_kill_reason = "";
 						// 需要切换模式
 						if (hsUnit.NeedAdjustMode())
-							msg_kill_reason = "切换模式";
+						{
+							Out.Info($"[{hsUnit.ID}] 切换模式");
+							hsUnit.KillHS();
+						}
 						// 不更新日志就滚蛋
 						else if (!hsUnit.IsLogUpdated())
-							msg_kill_reason = "日志不更新";
-
-						if (msg_kill_reason.Length > 0)
-							hsUnit.KillHS(msg_kill_reason);
+						{
+							Out.Error($"[{hsUnit.ID}] 日志不更新");
+							hsUnit.KillHS();
+						}
 					}
 					//炉石没运行就判断是否需要启动
 					else
@@ -161,7 +168,10 @@ namespace HSCentric
 						continue;
 
 					if (false == hsUnit.ReadHSLog())
-						hsUnit.KillHS("炉石本体日志异常");
+					{
+						Out.Error($"[{hsUnit.ID}] 炉石本体日志异常");
+						hsUnit.KillHS();
+					}
 
 					if (Common.IsBGMode(hsUnit.CurrentTask.Mode))
 						hsUnit.ReadBGLog();
@@ -173,7 +183,10 @@ namespace HSCentric
 					else if (Common.IsBuddyMode(hsUnit.CurrentTask.Mode))
 					{
 						if (false == hsUnit.ReadHBLog())
-							hsUnit.KillHS("炉石兄弟日志异常");
+						{
+							Out.Error($"[{hsUnit.ID}] 炉石兄弟日志异常");
+							hsUnit.KillHS();
+						}
 					}
 
 				}

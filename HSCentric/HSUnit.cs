@@ -384,10 +384,10 @@ namespace HSCentric
 			return false;
 		}
 
-		public void KillHS(string msg = "")
+		public void KillHS()
 		{
 			HearthstoneProcess()?.Kill();
-			Out.Info(string.Format("[{0}] 结束 {1}", ID, msg));
+			Out.Info($"[{ID}] 关闭进程");
 			m_pid = 0;
 			m_hsLogFileDir = "";
 			m_hbLogFileDir = "";
@@ -435,8 +435,8 @@ namespace HSCentric
 						try_count++;
 					if (try_count >= 5)
 					{
-						Out.Info(string.Format("[{0}] HS登录检测失败", ID, try_count));
-						KillHS("HS登录检测失败");
+						Out.Error($"[{ID}] HS登录检测失败");
+						KillHS();
 						return;
 					}
 
