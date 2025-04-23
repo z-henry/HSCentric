@@ -190,9 +190,9 @@ namespace HSCentric
 				if (m_lastXPUpdateTime != value)
 				{
 					if (value == DateTime.MaxValue)
-						Out.Info(string.Format($"[{ID}] 更新经验效率：关闭"));
+						Out.Debug(string.Format($"[{ID}] 更新经验效率：关闭"));
 					else if (m_lastXPUpdateTime == DateTime.MaxValue)
-						Out.Info(string.Format($"[{ID}] 更新经验效率：开启"));
+						Out.Debug(string.Format($"[{ID}] 更新经验效率：开启"));
 				}
 				m_lastXPUpdateTime = value; 
 			}
@@ -724,8 +724,10 @@ namespace HSCentric
 				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "/battlegrounds/");
 				if (false == System.IO.Directory.Exists(rootHS.ToString()))
 					return;
-				List<FileInfo> testList = rootHS.GetFiles("battlegrounds@*.log", SearchOption.TopDirectoryOnly).ToList();
-				FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
+				string todayPattern = $"battlegrounds@{DateTime.Now:yyyy-MM-dd}.log";
+				FileInfo targetFile = rootHS
+					.GetFiles(todayPattern, SearchOption.TopDirectoryOnly)
+					.FirstOrDefault(); 
 				if (targetFile == null)
 					return;
 				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.酒馆日志])
