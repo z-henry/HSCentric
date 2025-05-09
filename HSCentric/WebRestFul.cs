@@ -90,7 +90,12 @@ namespace HSCentric
 
 				case "switch":
 					HSUnitManager.Get().SetEnable(requestInfo.unit.name, requestInfo.unit.enable);
-					Out.Info(string.Format("post修改[{0}][{1}]", requestInfo.unit.name, requestInfo.unit.enable));
+					Out.Info(string.Format("[{0}] post switch 修改[{1}]", requestInfo.unit.name, requestInfo.unit.enable));
+					break;
+
+				case "pause":
+					HSUnitManager.Get().SetPause(requestInfo.unit.name);
+					Out.Info(string.Format("[{0}] post pause", requestInfo.unit.name));
 					break;
 
 				default:

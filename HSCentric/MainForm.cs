@@ -250,6 +250,8 @@ namespace HSCentric
 		{
 			if (listHS.SelectedItems.Count > 0)
 			{
+				string unitID = HSUnitManager.Get().GetIDByIndex(listHS.SelectedItems[0].Index);
+				Out.Info($"[{unitID}] 界面操作：启用/停用");
 				HSUnitManager.Get().FlipEnable(listHS.SelectedItems[0].Index);
 				UI_Flush();
 			}
@@ -292,6 +294,9 @@ namespace HSCentric
 		{
 			if (listHS.SelectedItems.Count > 0)
 			{
+				string unitID = HSUnitManager.Get().GetIDByIndex(listHS.SelectedItems[0].Index);
+				Out.Info($"[{unitID}] 界面操作：启动一次");
+
 				int index = listHS.SelectedItems[0].Index;
 
 				HSUnitManager.Get().StartOnce(index);
@@ -403,6 +408,8 @@ namespace HSCentric
 		{
 			if (listHS.SelectedItems.Count > 0)
 			{
+				string unitID = HSUnitManager.Get().GetIDByIndex(listHS.SelectedItems[0].Index);
+				Out.Info($"[{unitID}] 界面操作：重置经验效率");
 				HSUnitManager.Get().ResetXPRate(listHS.SelectedItems[0].Index);
 				UI_Flush();
 			}
@@ -453,6 +460,19 @@ namespace HSCentric
 					UseShellExecute = true
 				});
 			}
+		}
+
+		private void 停用一天ToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (listHS.SelectedItems.Count > 0)
+			{
+				string unitID = HSUnitManager.Get().GetIDByIndex(listHS.SelectedItems[0].Index);
+				Out.Info($"[{unitID}] 界面操作：停用一天");
+				HSUnitManager.Get().SetPause(listHS.SelectedItems[0].Index);
+				UI_Flush();
+			}
+			else
+				MessageBox.Show("请选中一个成员", "ERROR");
 		}
 	}
 }

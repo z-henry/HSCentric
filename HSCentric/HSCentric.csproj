@@ -84,6 +84,7 @@
   <ItemGroup>
     <Compile Include="Common.cs" />
     <Compile Include="MyConfig.cs" />
+    <Compile Include="ScheduledTaskManager.cs" />
     <Compile Include="UpdateManger.cs" />
     <Compile Include="HSUnitManager.cs" />
     <Compile Include="RewardXP.cs" />

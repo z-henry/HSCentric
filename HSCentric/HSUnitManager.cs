@@ -6,6 +6,7 @@ using System.Data.Odbc;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
+using System.Reflection;
 using System.Runtime;
 using System.Threading.Tasks;
 
@@ -215,6 +216,40 @@ namespace HSCentric
 			}
 		}
 
+		internal void SetPause(string memberName)
+		{
+			lock (m_lockHS)
+			{
+				for (int i = 0; i < m_listHS.Count; i++)
+				{
+					if (m_listHS[i].ID == memberName)
+					{
+						SetPause(i);
+						break;
+					}
+				}
+			}
+		}
+
+		internal void SetPause(int index)
+		{
+			lock (m_lockHS)
+			{
+				m_listHS[index].Enable = false;
+				var memberId = m_listHS[index].ID;
+				ScheduledTaskManager.Instance.AddOrUpdateTask(
+					id: $"{m_listHS[index].ID}_pause",
+					time: DateTime.Now.AddHours(24),
+					callback: () =>
+					{
+						// 24 小时后再开
+						SetEnable(memberId, true);
+						Out.Info($"[{memberId}] 已恢复启用，时间：{DateTime.Now}");
+					}
+				);
+			}
+		}
+
 		internal void InitConfig(int index)
 		{
 			lock (m_lockHS)
@@ -404,6 +439,14 @@ namespace HSCentric
 			lock (m_lockHS)
 			{
 				m_listHS[index] = unit;
+			}
+		}
+
+		internal string GetIDByIndex(int index)
+		{
+			lock (m_lockHS)
+			{
+				return m_listHS[index].ID;
 			}
 		}
 
