@@ -201,6 +201,8 @@ namespace HSCentric
 			lock (m_lockHS)
 			{
 				m_listHS[index].Enable = !m_listHS[index].Enable;
+
+				ScheduledTaskManager.Instance.RemoveTask($"{m_listHS[index].ID}_pause");
 			}
 		}
 
@@ -211,7 +213,10 @@ namespace HSCentric
 				foreach (var iter in m_listHS)
 				{
 					if (iter.ID == memberName)
+					{
 						iter.Enable = flag;
+						ScheduledTaskManager.Instance.RemoveTask($"{memberName}_pause");
+					}
 				}
 			}
 		}
