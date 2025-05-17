@@ -49,6 +49,7 @@ namespace HSCentric
 			this.部署插件配置ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.关闭插件ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.重置经验效率ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.停用一天ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.label_currenttime = new System.Windows.Forms.Label();
 			this.label_checktime = new System.Windows.Forms.Label();
 			this.label1 = new System.Windows.Forms.Label();
@@ -61,7 +62,6 @@ namespace HSCentric
 			this.显示ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.退出ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.listLog = new System.Windows.Forms.ListView();
-			this.停用一天ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.contextMenuStrip_RMenu.SuspendLayout();
 			this.contextMenuStrip1.SuspendLayout();
 			this.SuspendLayout();
@@ -155,6 +155,13 @@ namespace HSCentric
 			this.重置经验效率ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.重置经验效率ToolStripMenuItem.Text = "重置经验效率";
 			this.重置经验效率ToolStripMenuItem.Click += new System.EventHandler(this.重置经验效率ToolStripMenuItem_Click);
+			// 
+			// 停用一天ToolStripMenuItem
+			// 
+			this.停用一天ToolStripMenuItem.Name = "停用一天ToolStripMenuItem";
+			this.停用一天ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.停用一天ToolStripMenuItem.Text = "停用8小时";
+			this.停用一天ToolStripMenuItem.Click += new System.EventHandler(this.停用一天ToolStripMenuItem_Click);
 			// 
 			// label_currenttime
 			// 
@@ -258,13 +265,6 @@ namespace HSCentric
 			this.listLog.UseCompatibleStateImageBehavior = false;
 			this.listLog.View = System.Windows.Forms.View.Details;
 			this.listLog.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listLog_MouseDoubleClick);
-			// 
-			// 停用一天ToolStripMenuItem
-			// 
-			this.停用一天ToolStripMenuItem.Name = "停用一天ToolStripMenuItem";
-			this.停用一天ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.停用一天ToolStripMenuItem.Text = "停用一天";
-			this.停用一天ToolStripMenuItem.Click += new System.EventHandler(this.停用一天ToolStripMenuItem_Click);
 			// 
 			// MainForm
 			// 

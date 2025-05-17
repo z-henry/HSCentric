@@ -244,12 +244,12 @@ namespace HSCentric
 				var memberId = m_listHS[index].ID;
 				ScheduledTaskManager.Instance.AddOrUpdateTask(
 					id: $"{m_listHS[index].ID}_pause",
-					time: DateTime.Now.AddHours(24),
+					time: DateTime.Now.AddHours(8),
 					callback: () =>
 					{
 						// 24 小时后再开
 						SetEnable(memberId, true);
-						Out.Info($"[{memberId}] 已恢复启用，时间：{DateTime.Now}");
+						Out.Info($"[{memberId}] 已恢复启用");
 					}
 				);
 			}
