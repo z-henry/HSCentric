@@ -27,8 +27,15 @@ namespace HSCentric
 			LoadConfig();
 			foreach (var process in HSProcess())
 			{
-				process.Kill();
-				Out.Info(string.Format("关闭炉石残留[pid:{0}]", process.Id));
+				try
+				{
+					process.Kill();
+					Out.Info(string.Format("关闭炉石残留[pid:{0}]", process.Id));
+				}
+				catch (Exception ex)
+				{
+					Out.Error("关闭炉石残留失败: " + ex.Message);
+				}
 				Common.Delay(5000);
 			}
 		}

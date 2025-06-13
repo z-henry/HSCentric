@@ -81,13 +81,27 @@ namespace HSCentric
 		{
 			foreach (Process process in this.BattleNetProcess)
 			{
-				process.Kill();
-				Out.Info("[升级]停止战网");
+				try
+				{
+					process.Kill();
+					Out.Info("[升级]停止战网");
+				}
+				catch (Exception ex)
+				{
+					Out.Error("[升级]停止战网失败：" + ex.Message);
+				}
 			}
 			foreach (Process process in this.BattleNetUpdateAgentProcess)
 			{
-				process.Kill();
-				Out.Info("[升级]停止战网Agent");
+				try
+				{
+					process.Kill();
+					Out.Info("[升级]停止战网Agent");
+				}
+				catch (Exception ex)
+				{
+					Out.Error("[升级]停止战网Agent失败：" + ex.Message);
+				}
 			}
 		}
 

@@ -386,11 +386,18 @@ namespace HSCentric
 
 		public void KillHS()
 		{
-			HearthstoneProcess()?.Kill();
-			Out.Info($"[{ID}] 关闭进程");
-			m_pid = 0;
-			m_hsLogFileDir = "";
-			m_hbLogFileDir = "";
+			try
+			{
+				HearthstoneProcess()?.Kill();
+				Out.Info($"[{ID}] 关闭进程");
+				m_pid = 0;
+				m_hsLogFileDir = "";
+				m_hbLogFileDir = "";
+			}
+			catch (Exception ex)
+			{
+				Out.Error($"[{ID}] 关闭进程失败：" + ex.Message);
+			}
 
 			Common.Delay(5 * 1000);
 		}
