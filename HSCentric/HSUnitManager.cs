@@ -172,13 +172,25 @@ namespace HSCentric
 					hsUnit.UpdateStatsMonth();
 
 					// 没启用就跳过
-					if (!hsUnit.Enable)
+					if (!hsUnit.IsActive())
 						continue;
 
-					if (false == hsUnit.ReadHSLog())
+					var hsStatus = hsUnit.ReadHSLog();
+					if (hsStatus == false)
 					{
-						Out.Error($"[{hsUnit.ID}] 炉石本体日志异常");
+						Out.Error($"[{hsUnit.ID}] 炉石本体日志异常[{++hsUnit.m_consecutiveFailureCount}]");
 						hsUnit.KillHS();
+
+						if (hsUnit.m_consecutiveFailureCount >= 3)
+						{
+							SetPause(hsUnit.ID, 24);
+							hsUnit.m_consecutiveFailureCount = 0;
+						}
+					}
+					else if (hsStatus == true)
+					{
+						Out.Debug($"[{hsUnit.ID}] 炉石本体日志正常");
+						hsUnit.m_consecutiveFailureCount = 0;
 					}
 
 					if (Common.IsBGMode(hsUnit.CurrentTask.Mode))
@@ -228,7 +240,7 @@ namespace HSCentric
 			}
 		}
 
-		internal void SetPause(string memberName)
+		internal void SetPause(string memberName, int addHour = 8)
 		{
 			lock (m_lockHS)
 			{
@@ -236,25 +248,25 @@ namespace HSCentric
 				{
 					if (m_listHS[i].ID == memberName)
 					{
-						SetPause(i);
+						SetPause(i, addHour);
 						break;
 					}
 				}
 			}
 		}
 
-		internal void SetPause(int index)
+		internal void SetPause(int index, int addHour = 8)
 		{
 			lock (m_lockHS)
 			{
 				m_listHS[index].Enable = false;
 				var memberId = m_listHS[index].ID;
+				Out.Info($"[{memberId}] 暂停{addHour}小时至：{DateTime.Now.AddHours(addHour)}");
 				ScheduledTaskManager.Instance.AddOrUpdateTask(
 					id: $"{m_listHS[index].ID}_pause",
-					time: DateTime.Now.AddHours(8),
+					time: DateTime.Now.AddHours(addHour),
 					callback: () =>
 					{
-						// 24 小时后再开
 						SetEnable(memberId, true);
 						Out.Info($"[{memberId}] 已恢复启用");
 					}

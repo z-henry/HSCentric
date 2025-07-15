@@ -211,7 +211,7 @@ namespace HSCentric
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 			{
 				// 获取文件的目录路径
-				string directory = Path.GetDirectoryName(pathConfig.ToString());
+				string directory = System.IO.Path.GetDirectoryName(pathConfig.ToString());
 
 				// 如果目录不存在，创建目录
 				if (!Directory.Exists(directory))
@@ -234,7 +234,7 @@ namespace HSCentric
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 			{
 				// 获取文件的目录路径
-				string directory = Path.GetDirectoryName(pathConfig.ToString());
+				string directory = System.IO.Path.GetDirectoryName(pathConfig.ToString());
 
 				// 如果目录不存在，创建目录
 				if (!Directory.Exists(directory))
@@ -254,11 +254,11 @@ namespace HSCentric
 
 		private void InitHsMod()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == File.Exists(pathConfig.ToString()))
 			{
 				// 获取文件的目录路径
-				string directory = Path.GetDirectoryName(pathConfig.ToString());
+				string directory = System.IO.Path.GetDirectoryName(pathConfig.ToString());
 
 				// 如果目录不存在，创建目录
 				if (!Directory.Exists(directory))
@@ -303,7 +303,7 @@ namespace HSCentric
 
 		private void ReleaseHsMod()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (true == File.Exists(pathConfig.ToString()))
 				MyConfig.WriteIniValue("全局", "HsMod状态", false.ToString(), pathConfig.ToString());
 		}
@@ -313,7 +313,7 @@ namespace HSCentric
 		{
 			TaskUnit currentTask = CurrentTask;
 			TimeSpan time_now = DateTime.Now.TimeOfDay;
-			return time_now >= currentTask.StartTime.TimeOfDay && time_now <= currentTask.StopTime.TimeOfDay;
+			return Enable && time_now >= currentTask.StartTime.TimeOfDay && time_now <= currentTask.StopTime.TimeOfDay;
 		}
 
 		public bool IsProcessAlive()
@@ -342,14 +342,14 @@ namespace HSCentric
 				return result && LogsUpdated(m_hbLogFileDir);
 			else if (Common.IsBGMode(CurrentTask.Mode))
 			{
-				string exeDirectory = Path.GetDirectoryName(HSPath);
-				string logDirectory = Path.Combine(exeDirectory, "BepinEx", "Log", ID, "battlegrounds");
+				string exeDirectory = System.IO.Path.GetDirectoryName(HSPath);
+				string logDirectory = System.IO.Path.Combine(exeDirectory, "BepinEx", "Log", ID, "battlegrounds");
 				return result && LogsUpdated(logDirectory);
 			}
 			else if (Common.IsMercMode(CurrentTask.Mode))
 			{
-				string exeDirectory = Path.GetDirectoryName(HSPath);
-				string logDirectory = Path.Combine(exeDirectory, "BepinEx", "Log", ID, "mercenarylog");
+				string exeDirectory = System.IO.Path.GetDirectoryName(HSPath);
+				string logDirectory = System.IO.Path.Combine(exeDirectory, "BepinEx", "Log", ID, "mercenarylog");
 				return result && LogsUpdated(logDirectory);
 			}
 
@@ -470,7 +470,7 @@ namespace HSCentric
 			process.StartInfo.Arguments += " " + m_token;
 			process.StartInfo.Arguments += " --hsunitid:" + m_ID;
 			process.StartInfo.Arguments += " --startmethod:hscentric";
-			string path_record = Path.Combine("BepinEX", "Log", m_ID, "gamerecord@" + DateTime.Today.ToString("yyyy-MM-dd") + ".log");
+			string path_record = System.IO.Path.Combine("BepinEX", "Log", m_ID, "gamerecord@" + DateTime.Today.ToString("yyyy-MM-dd") + ".log");
 			process.StartInfo.Arguments += " --matchPath:" + path_record;
 			process.Start();
 			process.WaitForInputIdle();
@@ -616,7 +616,7 @@ namespace HSCentric
 
 		private void WriteConfigHSMod(TaskUnit task)
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == System.IO.File.Exists(pathConfig.ToString()))
 				return;
 
@@ -668,7 +668,7 @@ namespace HSCentric
 
 		public string GetHSLogPath()
 		{
-			DirectoryInfo pathConfig = new DirectoryInfo(Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
+			DirectoryInfo pathConfig = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepInEx/config/" + ID + "/HsMod.cfg");
 			if (false == File.Exists(pathConfig.ToString()))
 				return "";
 
@@ -727,71 +727,105 @@ namespace HSCentric
 				if (string.IsNullOrEmpty(m_hsLogFileDir))
 					return;
 
-				//酒馆日志获取经验
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "/battlegrounds/");
-				if (false == System.IO.Directory.Exists(rootHS.ToString()))
+				// 酒馆日志路径
+				var rootPath = Path.Combine(Path.GetDirectoryName(m_hsPath), "BepinEx", "Log", ID, "battlegrounds");
+				if (!Directory.Exists(rootPath))
 					return;
+
+				// 找到今天的日志文件
 				string todayPattern = $"battlegrounds@{DateTime.Now:yyyy-MM-dd}.log";
-				FileInfo targetFile = rootHS
+				var targetFile = new DirectoryInfo(rootPath)
 					.GetFiles(todayPattern, SearchOption.TopDirectoryOnly)
-					.FirstOrDefault(); 
+					.FirstOrDefault();
 				if (targetFile == null)
 					return;
+
+				// 判断文件有没有更新过
 				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.酒馆日志])
 					return;
 				DateTime lastCheckTime = m_fileLastEdit[(int)FILE_TYPE.酒馆日志];
 				m_fileLastEdit[(int)FILE_TYPE.酒馆日志] = targetFile.LastWriteTime;
 
-				// 读取总经验
-				foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
+				// 先把所有行读到内存，再倒序处理
+				var lines = new List<string>();
+				using (var fs = new FileStream(
+					targetFile.FullName,
+					FileMode.Open,
+					FileAccess.Read,
+					FileShare.ReadWrite | FileShare.Delete))
+				using (var reader = new StreamReader(fs, Encoding.UTF8))
 				{
-					Regex regex = new Regex(@"(\d{2}:\d{2}:\d{2}\.\d{3}).*战令信息.*等级:(\d+) 经验:(\d+)");
-					Match match = regex.Match(line);
-					if (false == match.Success)
-						continue;
-
-					//当前行时间戳如果比上次检查时间早，就不需要比对了
-					DateTime parsedTime;
-					DateTime.TryParseExact(match.Groups[1].Value, "HH:mm:ss.fff", null, DateTimeStyles.None, out parsedTime);
-					DateTime currentTimeWithParsedTime = DateTime.Today.Add(parsedTime.TimeOfDay);
-					if (currentTimeWithParsedTime <= lastCheckTime)
-						break;
-
-					XPUpdate(new RewardXP()
+					string line;
+					while ((line = reader.ReadLine()) != null)
 					{
-						Level = Convert.ToInt32(match.Groups[2].Value),
-						ProgressXP = Convert.ToInt32(match.Groups[3].Value),
-					});
-					break;
+						lines.Add(line);
+					}
+				}
+
+				// 读取总经验
+				for (int i = lines.Count - 1; i >= 0; i--)
+				{
+					var line = lines[i];
+					var regex = new Regex(@"(\d{2}:\d{2}:\d{2}\.\d{3}).*战令信息.*等级:(\d+) 经验:(\d+)");
+					var match = regex.Match(line);
+					if (!match.Success) continue;
+
+					// 时间比对
+					if (DateTime.TryParseExact(
+							match.Groups[1].Value,
+							"HH:mm:ss.fff",
+							null,
+							DateTimeStyles.None,
+							out DateTime parsedTime))
+					{
+						var current = DateTime.Today.Add(parsedTime.TimeOfDay);
+						if (current > lastCheckTime)
+						{
+							XPUpdate(new RewardXP
+							{
+								Level = int.Parse(match.Groups[2].Value),
+								ProgressXP = int.Parse(match.Groups[3].Value),
+							});
+						}
+					}
+					break; // 找到最新一条就行
 				}
 
 				// 读取部分经验
-				foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
+				for (int i = lines.Count - 1; i >= 0; i--)
 				{
-					Regex regex = new Regex(@"^(\d{2}:\d{2}:\d{2}\.\d{3})\t\[经验变动\] (.*)，传统通行证，获得经验:(\d+)$");
-					Match match = regex.Match(line);
-					if (false == match.Success)
-						continue;
+					var line = lines[i];
+					var regex = new Regex(@"^(\d{2}:\d{2}:\d{2}\.\d{3})\t\[经验变动\] (.*)，传统通行证，获得经验:(\d+)$");
+					var match = regex.Match(line);
+					if (!match.Success) continue;
 
-					//当前行时间戳如果比上次检查时间早，就不需要比对了
-					DateTime parsedTime;
-					DateTime.TryParseExact(match.Groups[1].Value, "HH:mm:ss.fff", null, DateTimeStyles.None, out parsedTime);
-					DateTime currentTimeWithParsedTime = DateTime.Today.Add(parsedTime.TimeOfDay);
-					if (currentTimeWithParsedTime <= lastCheckTime)
-						break;
-
-					if (match.Groups[2].Value.Contains("完成任务"))
-						m_totalGaintXP_Quest += Convert.ToInt32(match.Groups[3].Value);
-					else if (match.Groups[2].Value.Contains("完成成就"))
-						m_totalGaintXP_Achieve += Convert.ToInt32(match.Groups[3].Value);
-					else if (match.Groups[2].Value.Contains("完成对局"))
-					{ }
-					else
-						m_totalGaintXP_Other += Convert.ToInt32(match.Groups[3].Value);
+					if (DateTime.TryParseExact(
+							match.Groups[1].Value,
+							"HH:mm:ss.fff",
+							null,
+							DateTimeStyles.None,
+							out DateTime parsedTime))
+					{
+						var current = DateTime.Today.Add(parsedTime.TimeOfDay);
+						if (current > lastCheckTime)
+						{
+							int xp = int.Parse(match.Groups[3].Value);
+							var desc = match.Groups[2].Value;
+							if (desc.Contains("完成任务"))
+								m_totalGaintXP_Quest += xp;
+							else if (desc.Contains("完成成就"))
+								m_totalGaintXP_Achieve += xp;
+							else
+								m_totalGaintXP_Other += xp;
+						}
+					}
+					// 不用 break，想把最后一次“部分经验”都处理了
 				}
 			}
-			catch
+			catch (Exception ex)
 			{
+				// 读日志抛异常也打出来，方便定位
+				Out.Error($"[{ID}] 读取酒馆日志异常: {ex.Message}\n堆栈: {ex.StackTrace}");
 			}
 		}
 
@@ -883,39 +917,68 @@ namespace HSCentric
 			return true;
 		}
 
-		public bool ReadHSLog()
+		public bool? ReadHSLog()
 		{
 			try
 			{
-				string logFilePath = System.IO.Path.GetDirectoryName(m_hsPath) + "/Hearthstone.log";
+				string logFilePath = System.IO.Path.Combine(m_hsLogFileDir, "Hearthstone.log");
 				if (!System.IO.File.Exists(logFilePath))
-					return true;
-
-				int anomalyCount = 0; // 计数连续出现子串的次数
-				foreach (string line in File.ReadLines(logFilePath).Reverse<string>())
 				{
-					// 检查是否包含指定子串
-					if (line.Contains("Network.DisconnectFromGameServer()"))
+					return null;
+				}
+
+				int anomalyCount = 0;
+				// 用 FileStream + FileShare 允许其他进程写也能读
+				using (var fs = new FileStream(
+					logFilePath,
+					FileMode.Open,
+					FileAccess.Read,
+					FileShare.ReadWrite | FileShare.Delete))
+				using (var reader = new StreamReader(fs, Encoding.UTF8))
+				{
+					// 读所有行并倒序
+					var lines = new List<string>();
+					string line;
+					while ((line = reader.ReadLine()) != null)
 					{
-						anomalyCount++;
-						if (anomalyCount >= 20)
-							return false;
+						lines.Add(line);
 					}
-					else
+					for (int i = lines.Count - 1; i >= 0; i--)
 					{
-						anomalyCount = 0; // 如果不连续出现，则重置计数器
+						line = lines[i];
+
+						if (line.Contains("Network.DisconnectFromGameServer()"))
+						{
+							anomalyCount++;
+							if (anomalyCount >= 20)
+							{
+								Out.Error($"[{ID}] 持续无法连接服务器");
+								return false;
+							}
+						}
+						else
+						{
+							anomalyCount = 0;
+						}
+
+						if (line.Contains("无法通过暴雪战网服务进行登录。请等待几分钟并再次尝试"))
+						{
+							Out.Error($"[{ID}] 无法通过暴雪战网服务进行登录");
+							return false;
+						}
 					}
 				}
 			}
-			catch
+			catch (Exception ex)
 			{
+				Out.Error($"[{ID}] 读取日志异常: {ex.Message}\n堆栈: {ex.StackTrace}");
 			}
 			return true;
 		}
 
 		public bool NeedUpdateHS()
 		{
-			string logFilePath = Path.Combine(m_hsLogFileDir, "Hearthstone.log");
+			string logFilePath = System.IO.Path.Combine(m_hsLogFileDir, "Hearthstone.log");
 
 			// 检查文件是否存在
 			if (!File.Exists(logFilePath))
@@ -951,7 +1014,7 @@ namespace HSCentric
 		}
 		public bool HSSuccessLogin()
 		{
-			string logFilePath = Path.Combine(m_hsLogFileDir, "Hearthstone.log");
+			string logFilePath = System.IO.Path.Combine(m_hsLogFileDir, "Hearthstone.log");
 
 			// 检查文件是否存在
 			if (!File.Exists(logFilePath))
@@ -985,7 +1048,7 @@ namespace HSCentric
 		}
 		public int GetQueueSec()
 		{
-			string logFilePath = Path.Combine(m_hsLogFileDir, "Hearthstone.log");
+			string logFilePath = System.IO.Path.Combine(m_hsLogFileDir, "Hearthstone.log");
 
 			// 检查文件是否存在
 			if (!File.Exists(logFilePath))
@@ -1095,5 +1158,6 @@ namespace HSCentric
 
 		private CacheConfig m_cacheConfig = new CacheConfig();
 		private int m_statsMonth = -1;
+		public int m_consecutiveFailureCount = 0;
 	}
 }

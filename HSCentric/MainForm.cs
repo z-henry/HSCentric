@@ -468,7 +468,7 @@ namespace HSCentric
 			{
 				string unitID = HSUnitManager.Get().GetIDByIndex(listHS.SelectedItems[0].Index);
 				Out.Info($"[{unitID}] 界面操作：停用一天");
-				HSUnitManager.Get().SetPause(listHS.SelectedItems[0].Index);
+				HSUnitManager.Get().SetPause(listHS.SelectedItems[0].Index, 24);
 				UI_Flush();
 			}
 			else
