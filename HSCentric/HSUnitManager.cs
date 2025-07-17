@@ -189,7 +189,7 @@ namespace HSCentric
 					}
 					else if (hsStatus == true)
 					{
-						Out.Debug($"[{hsUnit.ID}] 炉石本体日志正常");
+						//Out.Debug($"[{hsUnit.ID}] 炉石本体日志正常");
 						hsUnit.m_consecutiveFailureCount = 0;
 					}
 

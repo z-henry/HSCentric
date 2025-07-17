@@ -815,6 +815,8 @@ namespace HSCentric
 								m_totalGaintXP_Quest += xp;
 							else if (desc.Contains("完成成就"))
 								m_totalGaintXP_Achieve += xp;
+							else if (desc.Contains("完成对局"))
+							{ }
 							else
 								m_totalGaintXP_Other += xp;
 						}
