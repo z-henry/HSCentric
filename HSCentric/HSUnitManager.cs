@@ -87,7 +87,7 @@ namespace HSCentric
 					{
 						if (hsUnit.IsProcessAlive())
 						{
-							Out.Error($"需要升级");
+							Out.Error($"[{hsUnit.ID}] 需要升级");
 							hsUnit.KillHS();
 						}
 

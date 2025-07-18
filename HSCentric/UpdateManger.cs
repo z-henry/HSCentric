@@ -23,13 +23,14 @@ namespace HSCentric
 
 		public void Start()
 		{
+			Out.Info("5分钟后启动战网升级");
 			if (m_timer == null)
 			{
-				m_timer = new Timer(Check, "UpdateManger.Check", 10 * 1000, 30 * 1000);
+				m_timer = new Timer(Check, "UpdateManger.Check", 5 * 60 * 1000, 30 * 1000);
 			}
 			else
 			{
-				m_timer.Change(10 * 1000, 30 * 1000);
+				m_timer.Change(5 * 60 * 1000, 30 * 1000);
 			}
 		}
 
