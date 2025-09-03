@@ -339,18 +339,18 @@ namespace HSCentric
 
 			bool result = LogsUpdated(m_hsLogFileDir);
 			if (Common.IsBuddyMode(CurrentTask.Mode))
-				return result && LogsUpdated(m_hbLogFileDir);
+				return LogsUpdated(m_hbLogFileDir);
 			else if (Common.IsBGMode(CurrentTask.Mode))
 			{
 				string exeDirectory = System.IO.Path.GetDirectoryName(HSPath);
 				string logDirectory = System.IO.Path.Combine(exeDirectory, "BepinEx", "Log", ID, "battlegrounds");
-				return result && LogsUpdated(logDirectory);
+				return LogsUpdated(logDirectory);
 			}
 			else if (Common.IsMercMode(CurrentTask.Mode))
 			{
 				string exeDirectory = System.IO.Path.GetDirectoryName(HSPath);
 				string logDirectory = System.IO.Path.Combine(exeDirectory, "BepinEx", "Log", ID, "mercenarylog");
-				return result && LogsUpdated(logDirectory);
+				return LogsUpdated(logDirectory);
 			}
 
 			return result;
