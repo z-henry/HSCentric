@@ -428,6 +428,8 @@ namespace HSCentric
 			Out.Debug(string.Format("[{0}] 最小化窗口", ID));
 
 			//升级
+			// 等待30s再看看需不需要升级
+			await Delay(30 * 1000);
 			if (true == NeedUpdateHS())
 				HSUnitManager.Get().InterruptBeforeUpdate();
 

@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
+using FlaUI.Core;
+using FlaUI.Core.AutomationElements;
+using FlaUI.UIA3;
 
 namespace HSCentric
 {
@@ -46,6 +50,13 @@ namespace HSCentric
 			{
 				m_bnetStartTime = new DateTime(0);
 				StartBattleNet();
+
+				Thread.Sleep(3000);
+				if (ClickUpdateButtonFlaUI())
+					Out.Debug("[升级]点击更新按钮");
+				else
+					Out.Debug("[升级]无更新按钮");
+
 				return;
 			}
 
@@ -55,6 +66,34 @@ namespace HSCentric
 				Stop();
 				return;
 			}
+		}
+		public static bool ClickUpdateButtonFlaUI(int timeoutMs = 60000)
+		{
+			var app = Application.Attach("Battle.net");
+			using (app)
+			{
+				using (var automation = new UIA3Automation())
+				{
+					var win = app.GetMainWindow(automation);
+					var sw = System.Diagnostics.Stopwatch.StartNew();
+
+					while (sw.ElapsedMilliseconds < timeoutMs)
+					{
+						// 先找“更新/Update”按钮
+						var btn = win.FindAllDescendants(cf =>
+							cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button)
+							  .And(cf.ByName("更新").Or(cf.ByName("Update"))))
+							.FirstOrDefault();
+						if (btn != null)
+						{
+							btn.AsButton().Invoke();
+							return true;
+						}
+						Thread.Sleep(1200);
+					}
+				}
+			}
+			return false;
 		}
 
 		private Process[] BattleNetProcess
