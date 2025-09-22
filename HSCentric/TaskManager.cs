@@ -159,7 +159,7 @@ namespace HSCentric
 			get { return m_stopTime; }
 			set
 			{
-				m_stopTime = new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, 59);
+				m_stopTime = new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0);
 			}
 		}
 		public string TeamName
