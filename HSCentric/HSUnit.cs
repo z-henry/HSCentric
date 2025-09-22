@@ -312,8 +312,23 @@ namespace HSCentric
 		public bool IsActive()
 		{
 			TaskUnit currentTask = CurrentTask;
-			TimeSpan time_now = DateTime.Now.TimeOfDay;
-			return Enable && time_now >= currentTask.StartTime.TimeOfDay && time_now <= currentTask.StopTime.TimeOfDay;
+			TimeSpan now = DateTime.Now.TimeOfDay;
+			TimeSpan start = currentTask.StartTime.TimeOfDay;
+			TimeSpan stop = currentTask.StopTime.TimeOfDay;
+
+			if (!Enable)
+				return false;
+
+			if (stop >= start)
+			{
+				// 正常同一天区间
+				return now >= start && now <= stop;
+			}
+			else
+			{
+				// 跨天区间，例如 23:00 - 02:00
+				return now >= start || now <= stop;
+			}
 		}
 
 		public bool IsProcessAlive()

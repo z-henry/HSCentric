@@ -79,11 +79,36 @@ namespace HSCentric
 		}
 		public TaskUnit GetCurrentTask()
 		{
-			TaskUnit result = m_tasks[0];
 			DateTime currentTime = DateTime.Now;
+			TimeSpan now = currentTime.TimeOfDay;
+			// 默认值是当前时间点下一个开始的任务
+			TaskUnit result = m_tasks[0];
 			foreach (TaskUnit task in m_tasks)
 			{
-				if (currentTime.TimeOfDay <= task.StopTime.TimeOfDay)
+				if (task.StartTime.TimeOfDay >= now)
+				{
+					result = task;
+					break;
+				}
+			}
+
+			foreach (TaskUnit task in m_tasks)
+			{
+				TimeSpan start = task.StartTime.TimeOfDay;
+				TimeSpan stop = task.StopTime.TimeOfDay;
+				bool inRange;
+				if (stop >= start)
+				{
+					// 普通情况
+					inRange = now >= start && now <= stop;
+				}
+				else
+				{
+					// 跨天情况
+					inRange = now >= start || now <= stop;
+				}
+
+				if (inRange)
 				{
 					result = task;
 					break;
@@ -107,16 +132,37 @@ namespace HSCentric
 		}
 		private bool IsTimeLegal(TaskUnit task, int exclude = -1)
 		{
+			TimeSpan s = task.StartTime.TimeOfDay;
+			TimeSpan e = task.StopTime.TimeOfDay;
+			TimeSpan day = TimeSpan.FromDays(1);
+
+			// 把当前 task 的时间区间规整成 [s, e)，如果跨天则把 e 往后推一天
+			if (e <= s)
+				e += day;
+
 			for (int i = 0, ii = m_tasks.Count; i < ii; ++i)
 			{
 				if (i == exclude)
 					continue;
 
-				TaskUnit task_iter = m_tasks[i];
-				if ((task_iter.StartTime.TimeOfDay >= task.StartTime.TimeOfDay && task_iter.StopTime.TimeOfDay <= task.StopTime.TimeOfDay) ||
-					(task_iter.StopTime.TimeOfDay >= task.StartTime.TimeOfDay && task_iter.StartTime.TimeOfDay <= task.StopTime.TimeOfDay))
-					return false;
+				TaskUnit other = m_tasks[i];
+				TimeSpan os = other.StartTime.TimeOfDay;
+				TimeSpan oe = other.StopTime.TimeOfDay;
+
+				// 把对比区间在原位检查一次，再整体+24小时检查一次
+				for (int k = 0; k < 2; ++k)
+				{
+					TimeSpan os2 = os + (k == 1 ? day : TimeSpan.Zero);
+					TimeSpan oe2 = oe + (k == 1 ? day : TimeSpan.Zero);
+					if (oe2 <= os2)
+						oe2 += day;
+
+					// 判断是否有交集（允许首尾相贴，不算冲突）
+					if (s < oe2 && os2 < e)
+						return false;
+				}
 			}
+
 			return true;
 		}
 		private TaskUnit SwitchTaskIfMeetConditions(TaskUnit taskunit)
@@ -151,7 +197,7 @@ namespace HSCentric
 			get { return m_startTime; }
 			set 
 			{ 
-				m_startTime = new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0);
+				m_startTime = new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second);
 			}
 		}
 		public DateTime StopTime
@@ -159,7 +205,7 @@ namespace HSCentric
 			get { return m_stopTime; }
 			set
 			{
-				m_stopTime = new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, 0);
+				m_stopTime = new DateTime(value.Year, value.Month, value.Day, value.Hour, value.Minute, value.Second);
 			}
 		}
 		public string TeamName
@@ -205,6 +251,7 @@ namespace HSCentric
 
 		public bool IsTimeLegal()
 		{
+			return true;
 			return m_startTime.TimeOfDay < m_stopTime.TimeOfDay;
 		}
 		public object DeepClone()
