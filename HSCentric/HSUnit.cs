@@ -73,7 +73,17 @@ namespace HSCentric
 		public bool Enable
 		{
 			get { return m_enable; }
-			set { m_enable = value; }
+			set
+			{
+				if (m_enable != value && value == true)
+				{
+					for (int i = 0; i < m_fileLastEdit.Length; ++i)
+						m_fileLastEdit[i] = DateTime.Now;
+				}
+
+				m_enable = value;
+
+			}
 		}
 
 		public string ID
