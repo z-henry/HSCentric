@@ -453,36 +453,27 @@ namespace HSCentric
 			Out.Debug(string.Format("[{0}] 最小化窗口", ID));
 
 			//升级
-			// 等待30s再看看需不需要升级
 			await Delay(30 * 1000);
-			if (true == NeedUpdateHS())
-				HSUnitManager.Get().InterruptBeforeUpdate();
+			while (false == HSSuccessLogin())
+			{
+				if (pid != m_pid)
+					return;
+
+				if (true == NeedUpdateHS())
+				{
+					HSUnitManager.Get().InterruptBeforeUpdate();
+					return;
+				}
+				else
+				{
+					Out.Debug(string.Format("[{0}] HS启动等待", ID));
+					await Delay(10 * 1000);
+				}
+			}
+			Out.Info(string.Format("[{0}] HS正常运行", ID));
 
 			if (need_hb)
 			{
-				int try_count = 0;
-				while(false == HSSuccessLogin())
-				{
-
-					int delay = GetQueueSec();
-					if (delay < 30)
-						try_count++;
-					if (try_count >= 5)
-					{
-						Out.Error($"[{ID}] HS登录检测失败");
-						KillHS();
-						return;
-					}
-
-					if (delay < 0)
-						Out.Info(string.Format("[{0}] HS启动等待", ID, try_count));
-					else
-						Out.Debug(string.Format("[{0}] HS排队等待：{2}秒", ID, try_count, delay));
-					await Delay(30 * 1000);
-					if (pid != m_pid)
-						return;
-				}
-
 				StartHB(msg);
 				await Delay(30 * 1000);
 				m_hbLogFileDir = System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs";

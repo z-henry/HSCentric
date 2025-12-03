@@ -67,30 +67,41 @@ namespace HSCentric
 				return;
 			}
 		}
+
 		public static bool ClickUpdateButtonFlaUI(int timeoutMs = 60000)
 		{
-			var app = Application.Attach("Battle.net");
-			using (app)
+			var processes = Process.GetProcessesByName("Battle.net");
+			if (processes.Length <= 0)
 			{
-				using (var automation = new UIA3Automation())
-				{
-					var win = app.GetMainWindow(automation);
-					var sw = System.Diagnostics.Stopwatch.StartNew();
+				Out.Debug("[升级]未找到战网进程，无法点击更新");
+				return false;
+			}
 
-					while (sw.ElapsedMilliseconds < timeoutMs)
-					{
-						// 先找“更新/Update”按钮
-						var btn = win.FindAllDescendants(cf =>
+			using (var app = Application.Attach(processes.First().Id))
+			using (var automation = new UIA3Automation())
+			{
+				var win = app.GetMainWindow(automation);
+				if (win == null)
+				{
+					Out.Debug("[升级]未找到战网主窗口");
+					return false;
+				}
+
+				var sw = System.Diagnostics.Stopwatch.StartNew();
+
+				while (sw.ElapsedMilliseconds < timeoutMs)
+				{
+					// 先找“更新/Update”按钮
+					var btn = win.FindAllDescendants(cf =>
 							cf.ByControlType(FlaUI.Core.Definitions.ControlType.Button)
 							  .And(cf.ByName("更新").Or(cf.ByName("Update"))))
 							.FirstOrDefault();
-						if (btn != null)
-						{
-							btn.AsButton().Invoke();
-							return true;
-						}
-						Thread.Sleep(1200);
+					if (btn != null)
+					{
+						btn.AsButton().Invoke();
+						return true;
 					}
+					Thread.Sleep(1200);
 				}
 			}
 			return false;
