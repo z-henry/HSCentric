@@ -101,6 +101,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HSApiClient.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="MyConfig.cs" />
     <Compile Include="ScheduledTaskManager.cs" />

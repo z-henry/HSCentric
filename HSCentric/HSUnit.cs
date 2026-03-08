@@ -694,43 +694,41 @@ namespace HSCentric
 
 		}
 
+		private HSApiClient GetApiClient()
+		{
+			return new HSApiClient(ID, HSModPort);
+		}
+
+		private void ReadPassInfoFromApi()
+		{
+			if (!GetApiClient().TryGetPassInfo(out HSApiClient.PassInfo pass))
+				return;
+
+			if (pass.Level.HasValue && pass.ProgressXp.HasValue)
+			{
+				XPUpdate(new RewardXP
+				{
+					Level = pass.Level.Value,
+					ProgressXP = pass.ProgressXp.Value
+				});
+			}
+			else if (pass.IsMax == true)
+			{
+				XPUpdate(new RewardXP
+				{
+					Level = 400,
+					ProgressXP = 0
+				});
+			}
+		}
+
 		public void ReadMercLog()
 		{
 			try
 			{
-				// 炉石启动才读日志
 				if (string.IsNullOrEmpty(m_hsLogFileDir))
 					return;
-
-				//佣兵日志获取经验
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID + "/mercenarylog/");
-				if (false == System.IO.Directory.Exists(rootHS.ToString()))
-					return;
-				List<FileInfo> testList = rootHS.GetFiles("mercenarylog@*.log", SearchOption.TopDirectoryOnly).ToList();
-				FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
-				if (targetFile == null)
-					return;
-				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵日志])
-					return;
-				m_fileLastEdit[(int)FILE_TYPE.佣兵日志] = targetFile.LastWriteTime;
-				foreach (string line in File.ReadLines(targetFile.FullName).Reverse<string>())
-				{
-					if (line.IndexOf("战令信息") > 0)
-					{
-						Regex regex = new Regex(@"^.*等级:([\d]*).*经验:([\d]*).*$");
-						Match match = regex.Match(line);
-						if (match.Groups.Count == 3)
-						{
-
-							XPUpdate(new RewardXP()
-							{
-								Level = Convert.ToInt32(match.Groups[1].Value),
-								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
-							});
-						}
-						break;
-					}
-				}
+				ReadPassInfoFromApi();
 			}
 			catch
 			{
@@ -744,102 +742,10 @@ namespace HSCentric
 				// 炉石启动才读日志
 				if (string.IsNullOrEmpty(m_hsLogFileDir))
 					return;
-
-				// 酒馆日志路径
-				var rootPath = Path.Combine(Path.GetDirectoryName(m_hsPath), "BepinEx", "Log", ID, "battlegrounds");
-				if (!Directory.Exists(rootPath))
-					return;
-
-				// 找到今天的日志文件
-				string todayPattern = $"battlegrounds@{DateTime.Now:yyyy-MM-dd}.log";
-				var targetFile = new DirectoryInfo(rootPath)
-					.GetFiles(todayPattern, SearchOption.TopDirectoryOnly)
-					.FirstOrDefault();
-				if (targetFile == null)
-					return;
-
-				// 判断文件有没有更新过
-				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.酒馆日志])
-					return;
-				DateTime lastCheckTime = m_fileLastEdit[(int)FILE_TYPE.酒馆日志];
-				m_fileLastEdit[(int)FILE_TYPE.酒馆日志] = targetFile.LastWriteTime;
-
-				// 先把所有行读到内存，再倒序处理
-				var lines = new List<string>();
-				using (var fs = new FileStream(
-					targetFile.FullName,
-					FileMode.Open,
-					FileAccess.Read,
-					FileShare.ReadWrite | FileShare.Delete))
-				using (var reader = new StreamReader(fs, Encoding.UTF8))
+				ReadPassInfoFromApi();
+				if (GetApiClient().TryGetBattlegroundsPvp(out int? pvp) && pvp.HasValue)
 				{
-					string line;
-					while ((line = reader.ReadLine()) != null)
-					{
-						lines.Add(line);
-					}
-				}
-
-				// 读取总经验
-				for (int i = lines.Count - 1; i >= 0; i--)
-				{
-					var line = lines[i];
-					var regex = new Regex(@"(\d{2}:\d{2}:\d{2}\.\d{3}).*战令信息.*等级:(\d+) 经验:(\d+)");
-					var match = regex.Match(line);
-					if (!match.Success) continue;
-
-					// 时间比对
-					if (DateTime.TryParseExact(
-							match.Groups[1].Value,
-							"HH:mm:ss.fff",
-							null,
-							DateTimeStyles.None,
-							out DateTime parsedTime))
-					{
-						var current = DateTime.Today.Add(parsedTime.TimeOfDay);
-						if (current > lastCheckTime)
-						{
-							XPUpdate(new RewardXP
-							{
-								Level = int.Parse(match.Groups[2].Value),
-								ProgressXP = int.Parse(match.Groups[3].Value),
-							});
-						}
-					}
-					break; // 找到最新一条就行
-				}
-
-				// 读取部分经验
-				for (int i = lines.Count - 1; i >= 0; i--)
-				{
-					var line = lines[i];
-					var regex = new Regex(@"^(\d{2}:\d{2}:\d{2}\.\d{3})\t\[经验变动\] (.*)，传统通行证，获得经验:(\d+)$");
-					var match = regex.Match(line);
-					if (!match.Success) continue;
-
-					if (DateTime.TryParseExact(
-							match.Groups[1].Value,
-							"HH:mm:ss.fff",
-							null,
-							DateTimeStyles.None,
-							out DateTime parsedTime))
-					{
-						var current = DateTime.Today.Add(parsedTime.TimeOfDay);
-						if (current > lastCheckTime)
-						{
-							int xp = int.Parse(match.Groups[3].Value);
-							var desc = match.Groups[2].Value;
-							if (desc.Contains("完成任务"))
-								m_totalGaintXP_Quest += xp;
-							else if (desc.Contains("完成成就"))
-								m_totalGaintXP_Achieve += xp;
-							else if (desc.Contains("完成对局"))
-							{ }
-							else
-								m_totalGaintXP_Other += xp;
-						}
-					}
-					// 不用 break，想把最后一次“部分经验”都处理了
+					m_pvpRate = pvp.Value;
 				}
 			}
 			catch (Exception ex)
@@ -856,23 +762,10 @@ namespace HSCentric
 				// 炉石启动才读日志
 				if (string.IsNullOrEmpty(m_hsLogFileDir))
 					return;
-
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hsPath) + "/BepinEx/Log/" + ID);
-				if (false == System.IO.Directory.Exists(rootHS.ToString()))
-					return;
-				List<FileInfo> testList = rootHS.GetFiles("gamerecord@*.log", SearchOption.TopDirectoryOnly).ToList();
-				FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
-				if (targetFile == null)
-					return;
-				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.佣兵对局日志])
-					return;
-				m_fileLastEdit[(int)FILE_TYPE.佣兵对局日志] = targetFile.LastWriteTime;
-				string[] lines = File.ReadAllLines(targetFile.FullName);
-				if (lines.Length == 0)
-					return;
-
-				string[] lineSplit = lines.Last().Split('\t');
-				m_pvpRate = int.Parse(lineSplit[2]);
+				if (GetApiClient().TryGetMercenaryPvp(out int? pvp) && pvp.HasValue)
+				{
+					m_pvpRate = pvp.Value;
+				}
 			}
 			catch
 			{
@@ -885,56 +778,41 @@ namespace HSCentric
 			{
 				if (string.IsNullOrEmpty(m_hbPath))
 					return true;
-				DirectoryInfo rootHS = new DirectoryInfo(System.IO.Path.GetDirectoryName(m_hbPath) + "/Logs");
-				if (false == System.IO.Directory.Exists(rootHS.ToString()))
-					return true;
-				List<FileInfo> testList = rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly).ToList();
-				FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
-				if (targetFile == null)
-					return true;
-				if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.兄弟日志])
-					return true;
-				m_fileLastEdit[(int)FILE_TYPE.兄弟日志] = targetFile.LastWriteTime;
-				System.Text.Encoding GB2312 = System.Text.Encoding.GetEncoding("GB2312");
-				int anomalyCount = 0; // 计数连续出现子串"检测到异常情况，将随机点击"的次数
-				foreach (string line in File.ReadLines(targetFile.FullName, System.Text.Encoding.GetEncoding("GB2312")).Reverse<string>())
+
+				ReadPassInfoFromApi();
+				if (GetApiClient().TryGetConstructedInfo(out HSApiClient.ConstructedInfo info))
 				{
-					if (line.IndexOf("[监控插件] 合计: 战令") > 0)
+					string direct = info.ClassicRate;
+					if (!string.IsNullOrWhiteSpace(direct))
 					{
-						Regex regex = new Regex(@"^.*合计: 战令([\d]*)级\(([\d]*)/[\d]*\)\([\d]*/小时\)\s(.*)\s[\d]*/[\d]*.*$");
-						Match match = regex.Match(line);
-						if (match.Groups.Count == 4)
-						{
-							XPUpdate(new RewardXP()
-							{
-								Level = Convert.ToInt32(match.Groups[1].Value),
-								ProgressXP = Convert.ToInt32(match.Groups[2].Value),
-							});
-						}
-						m_classicRate = match.Groups[3].Value;
+						m_classicRate = direct;
 						return true;
 					}
 
-					// 尾部连续出现“检测到异常情况，将随机点击”，需要退出
-					if (line.Contains("检测到异常情况，将随机点击"))
+					string standardText = info.StandardText;
+					string wildText = info.WildText;
+
+					if (!string.IsNullOrWhiteSpace(standardText) || !string.IsNullOrWhiteSpace(wildText))
 					{
-						anomalyCount++;
-						if (anomalyCount >= 5) // 连续出现 5 次
-						{
-							return false;
-						}
-					}
-					else
-					{
-						anomalyCount = 0; // 如果不连续出现，则重置计数器
+						m_classicRate = $"标准:{standardText} 狂野:{wildText}".Trim();
 					}
 				}
-
 			}
 			catch
 			{
 			}
 			return true;
+		}
+
+		public void CallConcedeAndCloseByApi()
+		{
+			try
+			{
+				GetApiClient().TryCallConcedeAndClose();
+			}
+			catch
+			{
+			}
 		}
 
 		public bool? ReadHSLog()
