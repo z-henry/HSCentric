@@ -780,28 +780,73 @@ namespace HSCentric
 					return true;
 
 				ReadPassInfoFromApi();
-				if (GetApiClient().TryGetConstructedInfo(out HSApiClient.ConstructedInfo info))
-				{
-					string direct = info.ClassicRate;
-					if (!string.IsNullOrWhiteSpace(direct))
-					{
-						m_classicRate = direct;
-						return true;
-					}
+				ReadConstructedInfoFromApi();
 
-					string standardText = info.StandardText;
-					string wildText = info.WildText;
-
-					if (!string.IsNullOrWhiteSpace(standardText) || !string.IsNullOrWhiteSpace(wildText))
-					{
-						m_classicRate = $"标准:{standardText} 狂野:{wildText}".Trim();
-					}
-				}
+				if (HasHBLogAnomaly())
+					return false;
 			}
 			catch
 			{
 			}
 			return true;
+		}
+
+		private void ReadConstructedInfoFromApi()
+		{
+			if (!GetApiClient().TryGetConstructedInfo(out HSApiClient.ConstructedInfo info))
+				return;
+
+			string direct = info.ClassicRate;
+			if (!string.IsNullOrWhiteSpace(direct))
+			{
+				m_classicRate = direct;
+				return;
+			}
+
+			string standardText = info.StandardText;
+			string wildText = info.WildText;
+
+			if (!string.IsNullOrWhiteSpace(standardText) || !string.IsNullOrWhiteSpace(wildText))
+			{
+				m_classicRate = $"标准:{standardText} 狂野:{wildText}".Trim();
+			}
+		}
+
+		private bool HasHBLogAnomaly()
+		{
+			string hbDirectory = Path.GetDirectoryName(m_hbPath);
+			if (string.IsNullOrEmpty(hbDirectory))
+				return false;
+
+			DirectoryInfo rootHS = new DirectoryInfo(Path.Combine(hbDirectory, "Logs"));
+			if (false == Directory.Exists(rootHS.ToString()))
+				return false;
+
+			List<FileInfo> testList = rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly).ToList();
+			FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
+			if (targetFile == null)
+				return false;
+			if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.兄弟日志])
+				return false;
+
+			m_fileLastEdit[(int)FILE_TYPE.兄弟日志] = targetFile.LastWriteTime;
+
+			int anomalyCount = 0;
+			foreach (string line in File.ReadLines(targetFile.FullName, Encoding.GetEncoding("GB2312")).Reverse<string>())
+			{
+				if (line.Contains("检测到异常情况，将随机点击"))
+				{
+					anomalyCount++;
+					if (anomalyCount >= 5)
+						return true;
+				}
+				else
+				{
+					anomalyCount = 0;
+				}
+			}
+
+			return false;
 		}
 
 		public void CallConcedeAndCloseByApi()
