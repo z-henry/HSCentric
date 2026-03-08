@@ -102,6 +102,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HSApiClient.cs" />
+    <Compile Include="HSApiStatusReader.cs" />
+    <Compile Include="HSFallbackStatusReader.cs" />
+    <Compile Include="HSLogStatusReader.cs" />
+    <Compile Include="HSStatusReader.cs" />
     <Compile Include="Common.cs" />
     <Compile Include="MyConfig.cs" />
     <Compile Include="ScheduledTaskManager.cs" />

@@ -194,15 +194,15 @@ namespace HSCentric
 					}
 
 					if (Common.IsBGMode(hsUnit.CurrentTask.Mode))
-						hsUnit.ReadBGLog();
+						hsUnit.RefreshBattlegroundsStatus();
 					else if (Common.IsMercMode(hsUnit.CurrentTask.Mode))
 					{
-						hsUnit.ReadMercLog();
-						hsUnit.ReadMercRecordLog();
+						hsUnit.RefreshMercenaryStatus();
+						hsUnit.RefreshMercenaryRecord();
 					}
 					else if (Common.IsBuddyMode(hsUnit.CurrentTask.Mode))
 					{
-						if (false == hsUnit.ReadHBLog())
+						if (false == hsUnit.RefreshBuddyStatus())
 						{
 							Out.Error($"[{hsUnit.ID}] 炉石兄弟日志异常");
 							hsUnit.KillHS();

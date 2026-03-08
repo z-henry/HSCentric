@@ -694,77 +694,119 @@ namespace HSCentric
 
 		}
 
-		private HSApiClient GetApiClient()
+		private IHSStatusReader GetStatusReader()
 		{
-			return new HSApiClient(ID, HSModPort);
+			return HSStatusReaderFactory.Create(
+				new HSStatusReaderContext(
+					ID,
+					HSPath,
+					HBPath,
+					HSModPort,
+					GetFileLastEditTime,
+					SetFileLastEditTime));
 		}
 
-		private void ReadPassInfoFromApi()
+		private DateTime GetFileLastEditTime(FILE_TYPE fileType)
 		{
-			if (!GetApiClient().TryGetPassInfo(out HSApiClient.PassInfo pass))
+			return m_fileLastEdit[(int)fileType];
+		}
+
+		private void SetFileLastEditTime(FILE_TYPE fileType, DateTime value)
+		{
+			m_fileLastEdit[(int)fileType] = value;
+		}
+
+		private void ApplyRewardXP(RewardXP rewardXP)
+		{
+			if (rewardXP == null)
+				return;
+			XPUpdate(rewardXP);
+		}
+
+		private void ApplyBattlegroundsStatus(BattlegroundsStatusSnapshot status)
+		{
+			if (status == null)
 				return;
 
-			if (pass.Level.HasValue && pass.ProgressXp.HasValue)
+			ApplyRewardXP(status.RewardXP);
+			if (status.PvpRate.HasValue)
 			{
-				XPUpdate(new RewardXP
-				{
-					Level = pass.Level.Value,
-					ProgressXP = pass.ProgressXp.Value
-				});
+				m_pvpRate = status.PvpRate.Value;
 			}
-			else if (pass.IsMax == true)
-			{
-				XPUpdate(new RewardXP
-				{
-					Level = 400,
-					ProgressXP = 0
-				});
-			}
+			m_totalGaintXP_Quest += status.QuestXpGain;
+			m_totalGaintXP_Achieve += status.AchievementXpGain;
+			m_totalGaintXP_Other += status.OtherXpGain;
 		}
 
-		public void ReadMercLog()
+		private void ApplyMercenaryRecord(MercenaryRecordSnapshot status)
+		{
+			if (status == null || !status.PvpRate.HasValue)
+				return;
+
+			m_pvpRate = status.PvpRate.Value;
+		}
+
+		private bool ApplyBuddyStatus(BuddyStatusSnapshot status)
+		{
+			if (status == null)
+				return true;
+
+			ApplyRewardXP(status.RewardXP);
+			if (!string.IsNullOrWhiteSpace(status.ClassicRate))
+			{
+				m_classicRate = status.ClassicRate;
+			}
+			return !status.HasAnomaly;
+		}
+
+		public void RefreshMercenaryStatus()
 		{
 			try
 			{
 				if (string.IsNullOrEmpty(m_hsLogFileDir))
 					return;
-				ReadPassInfoFromApi();
+
+				MercenaryStatusSnapshot status;
+				if (GetStatusReader().TryReadMercenaryStatus(out status))
+				{
+					ApplyRewardXP(status.RewardXP);
+				}
 			}
 			catch
 			{
 			}
 		}
 
-		public void ReadBGLog()
+		public void RefreshBattlegroundsStatus()
 		{
 			try
 			{
-				// 炉石启动才读日志
 				if (string.IsNullOrEmpty(m_hsLogFileDir))
 					return;
-				ReadPassInfoFromApi();
-				if (GetApiClient().TryGetBattlegroundsPvp(out int? pvp) && pvp.HasValue)
+
+				BattlegroundsStatusSnapshot status;
+				if (GetStatusReader().TryReadBattlegroundsStatus(out status))
 				{
-					m_pvpRate = pvp.Value;
+					ApplyBattlegroundsStatus(status);
 				}
 			}
 			catch (Exception ex)
 			{
-				// 读日志抛异常也打出来，方便定位
-				Out.Error($"[{ID}] 读取酒馆日志异常: {ex.Message}\n堆栈: {ex.StackTrace}");
+				Out.Error($"[{ID}] 读取酒馆状态异常: {ex.Message}\n堆栈: {ex.StackTrace}");
 			}
 		}
 
-		public void ReadMercRecordLog()
+		public void RefreshMercenaryRecord()
 		{
 			try
 			{
-				// 炉石启动才读日志
 				if (string.IsNullOrEmpty(m_hsLogFileDir))
 					return;
-				if (GetApiClient().TryGetMercenaryPvp(out int? pvp) && pvp.HasValue)
+
+				MercenaryRecordSnapshot status;
+				if (GetStatusReader().TryReadMercenaryRecord(out status))
 				{
-					m_pvpRate = pvp.Value;
+					ApplyMercenaryRecord(status);
 				}
 			}
 			catch
@@ -772,18 +814,18 @@ namespace HSCentric
 			}
 		}
 
-		public bool ReadHBLog()
+		public bool RefreshBuddyStatus()
 		{
 			try
 			{
 				if (string.IsNullOrEmpty(m_hbPath))
 					return true;
 
-				ReadPassInfoFromApi();
-				ReadConstructedInfoFromApi();
-
-				if (HasHBLogAnomaly())
-					return false;
+				BuddyStatusSnapshot status;
+				if (GetStatusReader().TryReadBuddyStatus(out status))
+				{
+					return ApplyBuddyStatus(status);
+				}
 			}
 			catch
 			{
@@ -791,73 +833,20 @@ namespace HSCentric
 			return true;
 		}
 
-		private void ReadConstructedInfoFromApi()
-		{
-			if (!GetApiClient().TryGetConstructedInfo(out HSApiClient.ConstructedInfo info))
-				return;
-
-			string direct = info.ClassicRate;
-			if (!string.IsNullOrWhiteSpace(direct))
-			{
-				m_classicRate = direct;
-				return;
-			}
-
-			string standardText = info.StandardText;
-			string wildText = info.WildText;
-
-			if (!string.IsNullOrWhiteSpace(standardText) || !string.IsNullOrWhiteSpace(wildText))
-			{
-				m_classicRate = $"标准:{standardText} 狂野:{wildText}".Trim();
-			}
-		}
-
-		private bool HasHBLogAnomaly()
-		{
-			string hbDirectory = Path.GetDirectoryName(m_hbPath);
-			if (string.IsNullOrEmpty(hbDirectory))
-				return false;
-
-			DirectoryInfo rootHS = new DirectoryInfo(Path.Combine(hbDirectory, "Logs"));
-			if (false == Directory.Exists(rootHS.ToString()))
-				return false;
-
-			List<FileInfo> testList = rootHS.GetFiles("Hearthbuddy*.txt", SearchOption.TopDirectoryOnly).ToList();
-			FileInfo targetFile = testList.OrderByDescending(x => x.LastWriteTime.Ticks).FirstOrDefault();
-			if (targetFile == null)
-				return false;
-			if (targetFile.LastWriteTime <= m_fileLastEdit[(int)FILE_TYPE.兄弟日志])
-				return false;
-
-			m_fileLastEdit[(int)FILE_TYPE.兄弟日志] = targetFile.LastWriteTime;
-
-			int anomalyCount = 0;
-			foreach (string line in File.ReadLines(targetFile.FullName, Encoding.GetEncoding("GB2312")).Reverse<string>())
-			{
-				if (line.Contains("检测到异常情况，将随机点击"))
-				{
-					anomalyCount++;
-					if (anomalyCount >= 5)
-						return true;
-				}
-				else
-				{
-					anomalyCount = 0;
-				}
-			}
-
-			return false;
-		}
-
-		public void CallConcedeAndCloseByApi()
+		public void CallConcedeAndClose()
 		{
 			try
 			{
-				GetApiClient().TryCallConcedeAndClose();
+				GetStatusReader().TryCallConcedeAndClose();
 			}
 			catch
 			{
 			}
+		}
+
+		public void CallConcedeAndCloseByApi()
+		{
+			CallConcedeAndClose();
 		}
 
 		public bool? ReadHSLog()
