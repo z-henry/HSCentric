@@ -1,4 +1,6 @@
-# HSCentric
+﻿# HSCentric
+
+界面已迁移为 **Web UI + C# 本机后端**。构建、启动、旧配置迁移和功能位置见 [Web UI 使用说明](WEBUI.md)。下文保留原有插件配置说明。
 
 ### 说明
 

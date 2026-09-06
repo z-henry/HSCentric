@@ -23,11 +23,7 @@ namespace HSCentric
 		}
 		public static void Delay(int mm)
 		{
-			DateTime current = DateTime.Now;
-			while (current.AddMilliseconds(mm) > DateTime.Now)
-			{
-				System.Windows.Forms.Application.DoEvents();
-			}
+			System.Threading.Thread.Sleep(mm);
 		}
 	}
 }

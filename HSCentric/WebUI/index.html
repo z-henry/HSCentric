@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f4ef">
+  <title>HSCentric · 运行编排台</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#accounts">跳到账号列表</a>
+  <header class="masthead">
+    <a class="brand" href="/" aria-label="HSCentric 中控首页"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 5v22M26 5v22M6 16h20M12 10h8v12h-8z"/></svg><span>HSCentric <small>中控</small></span></a>
+    <div class="header-status"><span class="connection" id="connection" role="status">正在连接后端</span><time id="clock">--:--:--</time></div>
+    <button class="quiet" id="settings-open">运行设置</button>
+  </header>
+  <main>
+    <div class="page-title"><div><h1>运行编排台</h1><p>账号、时段与运行记录，在这里对齐。</p></div><p class="check-status" id="check-status">等待后端状态</p></div>
+    <div class="notice error" id="connection-error" role="alert" hidden><span></span><button id="retry">重新连接</button></div>
+    <div class="notice" id="safe-notice" hidden>安全模式 · 调度及游戏进程操作已停用，可查看和编辑配置。</div>
+    <div class="workspace">
+      <section class="accounts-section" id="accounts" aria-labelledby="accounts-title">
+        <div class="section-heading"><h2 id="accounts-title">账号 <span id="account-count" class="count">—</span></h2><button class="primary" id="add-account">添加账号</button></div>
+        <div class="list-toolbar"><label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="查找账号或模式" aria-label="查找账号或模式"></label><select id="filter" aria-label="筛选账号状态"><option value="all">全部状态</option><option value="enabled">已启用</option><option value="disabled">已停用</option><option value="running">运行中</option></select></div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="账号状态表"><table><thead><tr><th scope="col">账号 / 状态</th><th scope="col">模式 / 时段</th><th scope="col" class="numeric">等级 / 经验</th><th scope="col" class="numeric">经验效率 / 小时</th></tr></thead><tbody id="account-rows"></tbody></table></div>
+        <div id="list-empty" class="empty" role="status"><div class="empty-rule" aria-hidden="true"></div><h3>正在读取账号</h3><p>连接后端，加载运行配置。</p></div>
+        <div class="list-foot"><span id="list-summary">等待数据</span><span>选中账号，查看编排与操作</span></div>
+      </section>
+      <section class="detail-section" aria-label="账号编排"><div id="account-detail" class="detail-content"><div class="empty detail-empty"><h2>从一个账号开始</h2><p>选择已有账号，核对每日时段；<br>或添加账号，建立第一份运行编排。</p><svg class="empty-timeline" viewBox="0 0 280 50" aria-hidden="true"><path d="M0 25h280M0 19v12M70 19v12M140 19v12M210 19v12M280 19v12"/></svg></div></div></section>
+    </div>
+    <section class="logs-section" aria-labelledby="logs-title"><div class="section-heading"><div class="heading-inline"><h2 id="logs-title">运行记录</h2><span id="log-status" class="muted">最近 500 条</span></div><div class="log-controls"><select id="log-filter" aria-label="筛选日志级别"><option value="all">全部级别</option><option value="Error">仅错误</option><option value="Info">仅信息</option><option value="Debug">仅调试</option></select><button id="log-pause" class="quiet" aria-pressed="false">暂停滚动</button><button id="log-download" class="quiet">导出记录</button></div></div><div class="log-scroll" tabindex="0" role="region" aria-label="运行日志"><ol id="log-lines"><li class="log-empty">等待运行记录。</li></ol></div></section>
+    <footer><span>HSCentric · 运行编排台</span><span>关闭浏览器后，后端继续调度。</span></footer>
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <dialog id="account-dialog" aria-labelledby="editor-title">
+    <form id="account-form">
+      <header class="dialog-heading"><div><h2 id="editor-title">添加账号</h2><p>连接信息和每日时段一起保存。</p></div><button type="button" class="quiet" id="editor-close">关闭</button></header>
+      <div class="dialog-body">
+        <p id="editor-error" class="notice error" role="alert" tabindex="-1" hidden></p>
+        <fieldset><legend>账号连接</legend><div class="form-grid">
+          <label>账号 ID<input name="id" required maxlength="100" autocomplete="off"></label>
+          <label>炉石 Token<input name="token" type="password" autocomplete="new-password" spellcheck="false"><small id="token-hint">用于启动炉石，请填写当前 Token。</small></label>
+          <label class="wide">炉石路径<input name="hsPath" required placeholder="D:\Hearthstone\Hearthstone.exe" spellcheck="false"><small>填写后端所在电脑的完整程序路径。</small></label>
+          <label class="wide">HearthBuddy 路径<input name="hbPath" placeholder="传统模式需要填写" spellcheck="false"></label>
+          <label>HSMod 端口<input name="hsModPort" type="number" min="1" max="65535" required value="58744"></label>
+          <label class="check-label"><input name="enable" type="checkbox">启用此账号的自动调度</label>
+        </div></fieldset>
+        <fieldset><legend>每日编排</legend><p class="field-help">停止时间早于开始时间表示跨日；相邻时段可首尾衔接。</p><div id="draft-tasks"></div><button type="button" id="task-add">添加时段</button></fieldset>
+        <fieldset><legend>达标后切换</legend><label class="check-label"><input type="checkbox" name="switchTask">达到现有满级、PVP 或传说条件后，切换到替代模式</label><div class="special-row"><span id="special-summary">未设置替代模式</span><button type="button" id="special-edit">设置替代模式</button><button type="button" id="special-clear" class="quiet">清除</button></div></fieldset>
+        <section id="task-editor" class="task-editor" aria-labelledby="task-title" hidden>
+          <div class="section-heading"><h3 id="task-title">添加时段</h3><button type="button" id="task-cancel" class="quiet">取消编辑</button></div>
+          <p class="notice error" id="task-error" role="alert" hidden></p>
+          <div class="form-grid">
+            <label>运行模式<select id="task-mode"></select></label><label id="task-start-label">开始时间<input id="task-start" type="time" step="1" value="08:00:00"></label><label id="task-stop-label">停止时间<input id="task-stop" type="time" step="1" value="12:00:00"></label>
+            <label data-task-field="team">队伍名称<input id="task-team" value="初始队伍"></label><label data-task-field="team">策略名称<input id="task-strategy" list="strategies" value="PVE策略"><datalist id="strategies"></datalist></label><label data-task-field="merc">佣兵地图<input id="task-map" value="2-5"></label>
+            <label data-task-field="merc">核心人数<input id="task-core" type="number" min="0" max="6" value="0"></label><label data-task-field="merc">队伍总数<input id="task-total" type="number" min="1" max="6" value="6"></label>
+          </div>
+          <div class="checkboxes"><label><input id="task-scale" type="checkbox">启用齿轮</label><label><input id="task-quest" type="checkbox">刷新任务</label><label><input id="task-achievement" type="checkbox">领取成就</label><label><input id="task-reward" type="checkbox">领取奖励</label></div>
+          <button type="button" id="task-apply" class="primary">加入编排草稿</button>
+        </section>
+      </div>
+      <footer class="dialog-footer"><span id="draft-status">尚未保存</span><div><button type="button" id="editor-cancel">取消</button><button type="submit" class="primary" id="editor-save">保存账号</button></div></footer>
+    </form>
+  </dialog>
+  <dialog id="settings-dialog" class="small-dialog" aria-labelledby="settings-title"><form id="settings-form"><header class="dialog-heading"><h2 id="settings-title">运行设置</h2><button type="button" id="settings-close" class="quiet">关闭</button></header><div class="dialog-body"><p id="settings-error" class="notice error" role="alert" hidden></p><label>战网启动程序路径<input id="battle-net-path" placeholder="D:\Battle.net\Battle.net Launcher.exe" spellcheck="false"><small>用于后端自动更新炉石。</small></label><div class="shutdown-section"><h3>停止后端</h3><p>停止自动检测并保存配置。恢复运行需重新启动 HSCentric。</p><button type="button" id="shutdown" class="danger">停止后端服务</button></div></div><footer class="dialog-footer"><span>应用于当前连接的后端</span><button class="primary" type="submit">保存设置</button></footer></form></dialog>
+  <dialog id="confirm-dialog" class="small-dialog" aria-labelledby="confirm-title"><form method="dialog"><div class="dialog-body"><h2 id="confirm-title">确认操作</h2><p id="confirm-copy"></p></div><footer class="dialog-footer"><button value="cancel">取消</button><button value="confirm" id="confirm-accept" class="danger">确认</button></footer></form></dialog>
+</body>
+</html>

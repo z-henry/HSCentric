@@ -137,7 +137,8 @@ namespace HSCentric
 			TimeSpan day = TimeSpan.FromDays(1);
 
 			// 把当前 task 的时间区间规整成 [s, e)，如果跨天则把 e 往后推一天
-			if (e <= s)
+			if (e == s) return false;
+			if (e < s)
 				e += day;
 
 			for (int i = 0, ii = m_tasks.Count; i < ii; ++i)
@@ -149,11 +150,11 @@ namespace HSCentric
 				TimeSpan os = other.StartTime.TimeOfDay;
 				TimeSpan oe = other.StopTime.TimeOfDay;
 
-				// 把对比区间在原位检查一次，再整体+24小时检查一次
-				for (int k = 0; k < 2; ++k)
+				// 检查前一天、当天和后一天的区间，保证跨日重叠与输入顺序无关。
+				for (int k = -1; k <= 1; ++k)
 				{
-					TimeSpan os2 = os + (k == 1 ? day : TimeSpan.Zero);
-					TimeSpan oe2 = oe + (k == 1 ? day : TimeSpan.Zero);
+					TimeSpan os2 = os + TimeSpan.FromDays(k);
+					TimeSpan oe2 = oe + TimeSpan.FromDays(k);
 					if (oe2 <= os2)
 						oe2 += day;
 
@@ -251,8 +252,7 @@ namespace HSCentric
 
 		public bool IsTimeLegal()
 		{
-			return true;
-			return m_startTime.TimeOfDay < m_stopTime.TimeOfDay;
+			return m_startTime.TimeOfDay != m_stopTime.TimeOfDay;
 		}
 		public object DeepClone()
 		{

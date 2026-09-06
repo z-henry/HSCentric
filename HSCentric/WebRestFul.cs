@@ -118,7 +118,9 @@ namespace HSCentric
 		}
 		public static void Rlease()
 		{
-			m_serviceHost.Close();
+			if (m_serviceHost == null) return;
+			try { m_serviceHost.Close(); }
+			catch { m_serviceHost.Abort(); }
 		}
 
 		static WebServiceHost m_serviceHost;

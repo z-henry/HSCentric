@@ -21,10 +21,11 @@ namespace HSCentric
 			return instance;
 		}
 
-		public void Init(Action callbackUpdateHS)
+		public void Init(Action callbackUpdateHS, bool recoverProcesses = true)
 		{
 			m_callbackUpdateHS = callbackUpdateHS;
 			LoadConfig();
+			if (!recoverProcesses) return;
 			foreach (var process in HSProcess())
 			{
 				try
@@ -42,7 +43,13 @@ namespace HSCentric
 
 		public void Release()
 		{
-			SaveConfig();
+			lock (m_lockHS) SaveConfig();
+		}
+
+		// Web requests resolve stable IDs inside the scheduler lock.
+		internal T Access<T>(Func<List<HSUnit>, T> action)
+		{
+			lock (m_lockHS) return action(m_listHS);
 		}
 
 		public void InterruptBeforeUpdate()
@@ -321,6 +328,7 @@ namespace HSCentric
 		private void LoadConfig()
 		{
 			HSUnitSection config = ConfigurationManager.GetSection("userinfo") as HSUnitSection;
+			if (config == null) throw new ConfigurationErrorsException("缺少 userinfo 配置节。");
 			foreach (HSUnitElement hs in config.HSUnit.Cast<HSUnitElement>().ToList())
 			{
 				List<TaskUnit> tasks_common = new List<TaskUnit>();
