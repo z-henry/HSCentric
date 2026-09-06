@@ -42,6 +42,8 @@ async function poll() {
 }
 function render(force = false) {
   if (!state) return;
+  $('app-version').textContent = meta.version ? `中控 · ${meta.version}` : '中控';
+  document.title = meta.version ? `HSCentric ${meta.version} · 运行编排台` : 'HSCentric · 运行编排台';
   const listKey = JSON.stringify([state.accounts, selected, $('search').value, $('filter').value]);
   if (force || listKey !== listSignature) { renderAccounts(state.accounts, selected, loaded); listSignature = listKey; }
   const account = state.accounts.find(a => a.id === selected);
@@ -83,8 +85,23 @@ $('log-download').onclick = () => {
   const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `hscentric-${new Date().toISOString().slice(0, 10)}.log`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 };
 $('settings-open').onclick = async () => {
-  try { const fresh = await connect(); $('battle-net-path').value = fresh.battleNetPath; showError('settings-error', ''); $('settings-dialog').showModal(); }
+  try {
+    const fresh = await connect(); $('battle-net-path').value = fresh.battleNetPath; showError('settings-error', '');
+    const checkbox = $('run-at-login'); checkbox.disabled = true; checkbox.checked = false;
+    $('startup-help').textContent = '正在读取开机启动设置…'; $('settings-dialog').showModal();
+    try {
+      const startup = await request('/startup'); checkbox.checked = startup.enabled; checkbox.disabled = !startup.canChange;
+      $('startup-help').textContent = startup.disabledReason || (startup.canChange ? '后端电脑的当前用户登录后启动，不打开浏览器。更改后立即生效。' : '安全模式不修改开机启动设置。');
+    } catch (error) { $('startup-help').textContent = error.message; }
+  }
   catch (error) { toast(error.message); }
+};
+$('run-at-login').onchange = async event => {
+  const checkbox = event.currentTarget, enabled = checkbox.checked; checkbox.disabled = true; $('settings-open').disabled = true;
+  showError('settings-error', '');
+  try { const result = await request('/startup', { method: 'PUT', body: { enabled } }); toast(result.message); }
+  catch (error) { checkbox.checked = !enabled; showError('settings-error', error.message); }
+  finally { checkbox.disabled = false; $('settings-open').disabled = false; }
 };
 $('settings-close').onclick = () => $('settings-dialog').close();
 $('settings-form').onsubmit = async event => {

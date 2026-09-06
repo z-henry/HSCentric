@@ -175,6 +175,8 @@ legend { font-size: 1rem; font-weight: 650; padding: 0; margin-bottom: var(--spa
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
 .form-grid .wide { grid-column: 1 / -1; }
 .dialog-body .check-label { display: flex; flex-direction: row; align-items: center; gap: var(--space-3); }
+.startup-option { margin-top: var(--space-5); }
+.startup-option .check-label { min-height: 44px; cursor: pointer; }
 .field-help { margin-bottom: var(--space-4); }
 .draft-list { margin: 0 0 var(--space-4); padding: 0; list-style: none; }
 .draft-list li { display: flex; align-items: center; border-block-end: 1px solid var(--line); gap: var(--space-3); }

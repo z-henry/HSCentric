@@ -115,7 +115,34 @@ namespace HSCentric
                 return new { sessionId = runtime.SessionId, now = DateTime.Now, nextCheck = runtime.NextCheck, checking = runtime.Checking, safeMode = runtime.SafeMode,
                     accounts = units.Select(Summary).ToArray() };
             if (path == "/api/meta" && method == "GET")
-                return new { sessionId = runtime.SessionId, csrfToken = csrf, modes = Enum.GetNames(typeof(TASK_MODE)), strategies = Enum.GetNames(typeof(BEHAVIOR_MODE)), battleNetPath = runtime.BattleNetPath };
+                return new { sessionId = runtime.SessionId, version = typeof(WebUiServer).Assembly.GetName().Version.ToString(), csrfToken = csrf, modes = Enum.GetNames(typeof(TASK_MODE)), strategies = Enum.GetNames(typeof(BEHAVIOR_MODE)), battleNetPath = runtime.BattleNetPath };
+            if (path == "/api/startup" && method == "GET")
+            {
+                bool isAdministrator = LoginStartup.IsAdministrator();
+                string disabledReason = !isAdministrator ? LoginStartup.AdministratorRequiredMessage :
+                    runtime.SafeMode ? "安全模式不修改开机启动设置。" : null;
+                try { return new { enabled = LoginStartup.IsEnabled(), canChange = disabledReason == null, disabledReason }; }
+                catch (Exception ex)
+                {
+                    Out.Error("读取开机启动设置失败：" + ex);
+                    if (!isAdministrator) throw new ApiException(403, LoginStartup.AdministratorRequiredMessage + " 当前启动状态未能读取。");
+                    throw new ApiException(500, "无法读取开机启动设置，请查看后端日志，并检查运行权限和 Windows 任务计划程序服务。");
+                }
+            }
+            if (path == "/api/startup" && method == "PUT")
+            {
+                if (runtime.SafeMode) throw new ApiException(409, "安全模式不修改开机启动设置。");
+                if (!LoginStartup.IsAdministrator()) throw new ApiException(403, LoginStartup.AdministratorRequiredMessage);
+                JToken enabled = Read<JObject>(request)["enabled"];
+                if (enabled == null || enabled.Type != JTokenType.Boolean) throw new ApiException(400, "开机启动选项必须为布尔值。");
+                try { LoginStartup.SetEnabled(enabled.Value<bool>()); }
+                catch (Exception ex)
+                {
+                    Out.Error("保存开机启动设置失败：" + ex);
+                    throw new ApiException(500, "开机启动设置未保存，请以管理员身份运行中控，并查看后端日志检查具体原因。");
+                }
+                return new { enabled = enabled.Value<bool>(), message = enabled.Value<bool>() ? "已添加开机启动，下次登录 Windows 后自动运行。" : "已取消开机启动。" };
+            }
             if (path == "/api/logs" && method == "GET")
             {
                 long after; long.TryParse(request.QueryString["after"], out after);

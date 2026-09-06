@@ -24,7 +24,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationVersion>6.2.0.0</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <NuGetPackageImportStamp>
@@ -115,6 +115,7 @@
     <Compile Include="Out.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="BackendRuntime.cs" />
+    <Compile Include="LoginStartup.cs" />
     <Compile Include="WebUiServer.cs" />
     <Compile Include="WebModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

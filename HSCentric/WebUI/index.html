@@ -12,7 +12,7 @@
 <body>
   <a class="skip-link" href="#accounts">跳到账号列表</a>
   <header class="masthead">
-    <a class="brand" href="/" aria-label="HSCentric 中控首页"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 5v22M26 5v22M6 16h20M12 10h8v12h-8z"/></svg><span>HSCentric <small>中控</small></span></a>
+    <a class="brand" href="/" aria-label="HSCentric 中控首页"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M6 5v22M26 5v22M6 16h20M12 10h8v12h-8z"/></svg><span>HSCentric <small id="app-version">中控</small></span></a>
     <div class="header-status"><span class="connection" id="connection" role="status">正在连接后端</span><time id="clock">--:--:--</time></div>
     <button class="quiet" id="settings-open">运行设置</button>
   </header>
@@ -64,7 +64,7 @@
       <footer class="dialog-footer"><span id="draft-status">尚未保存</span><div><button type="button" id="editor-cancel">取消</button><button type="submit" class="primary" id="editor-save">保存账号</button></div></footer>
     </form>
   </dialog>
-  <dialog id="settings-dialog" class="small-dialog" aria-labelledby="settings-title"><form id="settings-form"><header class="dialog-heading"><h2 id="settings-title">运行设置</h2><button type="button" id="settings-close" class="quiet">关闭</button></header><div class="dialog-body"><p id="settings-error" class="notice error" role="alert" hidden></p><label>战网启动程序路径<input id="battle-net-path" placeholder="D:\Battle.net\Battle.net Launcher.exe" spellcheck="false"><small>用于后端自动更新炉石。</small></label><div class="shutdown-section"><h3>停止后端</h3><p>停止自动检测并保存配置。恢复运行需重新启动 HSCentric。</p><button type="button" id="shutdown" class="danger">停止后端服务</button></div></div><footer class="dialog-footer"><span>应用于当前连接的后端</span><button class="primary" type="submit">保存设置</button></footer></form></dialog>
+  <dialog id="settings-dialog" class="small-dialog" aria-labelledby="settings-title"><form id="settings-form"><header class="dialog-heading"><h2 id="settings-title">运行设置</h2><button type="button" id="settings-close" class="quiet">关闭</button></header><div class="dialog-body"><p id="settings-error" class="notice error" role="alert" hidden></p><label>战网启动程序路径<input id="battle-net-path" placeholder="D:\Battle.net\Battle.net Launcher.exe" spellcheck="false"><small>用于后端自动更新炉石。</small></label><div class="startup-option"><label class="check-label"><input id="run-at-login" type="checkbox" aria-describedby="startup-help" disabled>开机启动</label><p id="startup-help" class="field-help">后端电脑的当前用户登录后启动，不打开浏览器。更改后立即生效。</p></div><div class="shutdown-section"><h3>停止后端</h3><p>停止自动检测并保存配置。恢复运行需重新启动 HSCentric。</p><button type="button" id="shutdown" class="danger">停止后端服务</button></div></div><footer class="dialog-footer"><span>应用于当前连接的后端</span><button class="primary" type="submit">保存设置</button></footer></form></dialog>
   <dialog id="confirm-dialog" class="small-dialog" aria-labelledby="confirm-title"><form method="dialog"><div class="dialog-body"><h2 id="confirm-title">确认操作</h2><p id="confirm-copy"></p></div><footer class="dialog-footer"><button value="cancel">取消</button><button value="confirm" id="confirm-accept" class="danger">确认</button></footer></form></dialog>
 </body>
 </html>
