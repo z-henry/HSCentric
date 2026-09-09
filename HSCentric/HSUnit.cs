@@ -82,6 +82,7 @@ namespace HSCentric
 				}
 
 				m_enable = value;
+				if (!value) LastXPUpdateTime = DateTime.MaxValue;
 
 			}
 		}
@@ -138,6 +139,10 @@ namespace HSCentric
 					$"{((double)(m_totalGaintXP_Achieve + m_totalGaintXP_Other) / m_totalRunningTime * 3600):0}";
 			}
 		}
+
+		public DailyStatistics DailyStats { get; set; } = new DailyStatistics();
+		public ExperienceTotals HistoricalStats => new ExperienceTotals { Xp = Math.Max(0, TotalGaintXP), RuntimeSeconds = Math.Max(0, TotalRunningTime),
+			QuestXp = Math.Max(0, TotalGaintXP_Quest), OtherXp = Math.Max(0, TotalGaintXP_Achieve + TotalGaintXP_Other) };
 
 		public Int64 TotalRunningTime
 		{
@@ -411,6 +416,7 @@ namespace HSCentric
 
 		public void KillHS()
 		{
+			LastXPUpdateTime = DateTime.MaxValue;
 			try
 			{
 				HearthstoneProcess()?.Kill();
@@ -482,6 +488,7 @@ namespace HSCentric
 
 		public void StartHS(string msg = "")
 		{
+			LastXPUpdateTime = DateTime.MaxValue;
 			Process process = new Process();
 			process.StartInfo.UseShellExecute = false;
 			process.StartInfo.FileName = m_hsPath;
@@ -780,6 +787,9 @@ namespace HSCentric
 					}
 				}
 
+				// The first snapshot establishes a baseline; its source lines must not
+				// be counted as new gains after a restart or an explicit statistics reset.
+				bool classifyXp = LastXPUpdateTime != DateTime.MaxValue;
 				// 读取总经验
 				for (int i = lines.Count - 1; i >= 0; i--)
 				{
@@ -809,6 +819,7 @@ namespace HSCentric
 					break; // 找到最新一条就行
 				}
 
+				if (!classifyXp) return;
 				// 读取部分经验
 				for (int i = lines.Count - 1; i >= 0; i--)
 				{
@@ -830,13 +841,13 @@ namespace HSCentric
 							int xp = int.Parse(match.Groups[3].Value);
 							var desc = match.Groups[2].Value;
 							if (desc.Contains("完成任务"))
-								m_totalGaintXP_Quest += xp;
+							{ m_totalGaintXP_Quest += xp; DailyStats.Classify(current, xp, true); }
 							else if (desc.Contains("完成成就"))
-								m_totalGaintXP_Achieve += xp;
+							{ m_totalGaintXP_Achieve += xp; DailyStats.Classify(current, xp, false); }
 							else if (desc.Contains("完成对局"))
 							{ }
 							else
-								m_totalGaintXP_Other += xp;
+							{ m_totalGaintXP_Other += xp; DailyStats.Classify(current, xp, false); }
 						}
 					}
 					// 不用 break，想把最后一次“部分经验”都处理了
@@ -1133,16 +1144,18 @@ namespace HSCentric
 
 		private void XPUpdate(RewardXP rewardXP)
 		{
-			TimeSpan time_span = DateTime.Now - LastXPUpdateTime;
-			int xp_gaint = rewardXP.TotalXP-m_rewardXP.TotalXP;
-			if (time_span.TotalSeconds >= 0)
+			DateTime now = DateTime.Now;
+			int currentXP = rewardXP.TotalXP, previousXP = m_rewardXP.TotalXP;
+			if (currentXP < 0) return;
+			int xp_gaint = previousXP >= 0 ? Math.Max(0, currentXP - previousXP) : 0;
+			if (LastXPUpdateTime != DateTime.MaxValue && now >= LastXPUpdateTime)
 			{
-				m_totalRunningTime += (int)time_span.TotalSeconds;
+				m_totalRunningTime += DailyStats.Record(LastXPUpdateTime, now, xp_gaint);
 				m_totalGaintXP += xp_gaint;
 				if (xp_gaint > 0)
 					Out.Debug(string.Format($"[{ID}] 更新经验效率：经验增量[{xp_gaint}]，效率[{XPRate}]"));
 			}
-			LastXPUpdateTime = DateTime.Now;
+			LastXPUpdateTime = now;
 			m_rewardXP = rewardXP;
 		}
 

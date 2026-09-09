@@ -22,7 +22,7 @@ const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: 'reduce' });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto(base); await page.getByText('后端已连接', { exact: true }).waitFor();
-  await page.getByRole('button', { name: '测试账号 · 收菜', exact: true }).click();
+  await page.locator('[data-account="测试账号 · 收菜"] td').first().click();
   const second = page.locator('.schedule-list button').nth(1); await second.focus();
   const route = '/accounts/' + encodeURIComponent('测试账号 · 收菜');
   let account = await api(route); const originalTeam = account.tasks[1].teamName;

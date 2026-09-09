@@ -18,7 +18,19 @@ export function renderAccounts(accounts, selected, loaded) {
     .filter(a => filter === 'all' || filter === 'enabled' && a.enable || filter === 'disabled' && !a.enable || filter === 'running' && a.running);
   $('account-count').textContent = accounts.length;
   $('list-summary').textContent = `${accounts.filter(a => a.enable).length} 个启用 · ${accounts.filter(a => a.running).length} 个运行中`;
-  $('account-rows').innerHTML = visible.map(a => `<tr class="${a.id === selected ? 'selected' : ''}"><th scope="row"><button class="account-select" data-account="${escape(a.id)}" aria-pressed="${a.id === selected}">${escape(a.id)}</button><span class="state ${a.running ? 'running' : a.enable ? 'waiting' : 'off'}">${escape(a.status)}</span></th><td><strong>${escape(a.currentTask?.mode || '—')}</strong><small class="data">${escape(range(a.currentTask))}</small></td><td class="numeric"><strong>${escape(a.level)} <span class="unit">级</span></strong><small>${escape(a.xp)} XP</small></td><td class="numeric"><strong class="data">${escape(a.xpRate)}</strong><small>对战 + 任务 + 其他</small></td></tr>`).join('');
+  const rows = $('account-rows');
+  const ids = visible.map(a => a.id);
+  if (JSON.stringify([...rows.children].map(row => row.dataset.account)) !== JSON.stringify(ids))
+    rows.innerHTML = visible.map(a => `<tr tabindex="0" data-account="${escape(a.id)}" aria-controls="account-controls statistics-reveal"><th scope="row"></th><td></td><td></td><td class="data"></td><td class="numeric data"></td></tr>`).join('');
+  visible.forEach((a, index) => {
+    const row = rows.children[index], stats = a.todayStats;
+    row.classList.toggle('selected', a.id === selected); row.setAttribute('aria-expanded', String(a.id === selected));
+    const cells = row.children;
+    cells[0].textContent = a.id;
+    cells[1].innerHTML = `<span class="state ${a.running ? 'running' : a.enable ? 'waiting' : 'off'}">${escape(a.status)}</span>`;
+    cells[2].textContent = a.currentTask?.mode || '—'; cells[3].textContent = range(a.currentTask);
+    cells[4].textContent = stats?.rate == null ? '—' : [stats.battleRate, stats.questRate, stats.otherRate].map(n => Number(n).toLocaleString('zh-CN')).join(' + ');
+  });
   $('list-empty').hidden = visible.length > 0;
   if (!visible.length) $('list-empty').innerHTML = `<div class="empty-rule" aria-hidden="true"></div><h3>${!loaded ? '正在读取账号' : accounts.length ? '没有匹配的账号' : '还没有账号编排'}</h3><p>${!loaded ? '连接本机后端，加载运行配置。' : accounts.length ? '换个关键词，或将状态切回「全部状态」。' : '添加第一个账号，设置连接信息和每日运行时段。'}</p>${loaded && !accounts.length ? '<button class="primary" data-add>添加第一个账号</button>' : ''}`;
   if (focused) [...$('account-rows').querySelectorAll('[data-account]')].find(el => el.dataset.account === focused)?.focus({ preventScroll: true });
@@ -41,8 +53,8 @@ export function renderDetail(account, now, safeMode) {
   const focusedAction = focused?.matches('button[data-action]') ? focused.dataset.action : null;
   const focusedIndex = focused?.dataset.index;
   const focusedSummary = focused?.matches('.maintenance summary');
-  $('account-detail').innerHTML = `<div class="detail-heading"><div><h2>${escape(account.id)}</h2><span class="state ${account.running ? 'running' : account.enable ? 'waiting' : 'off'}">${escape(account.status)}</span></div><button data-action="edit">编辑配置</button></div>
-    <div class="account-facts"><span>佣兵 PVP <strong class="data">${escape(account.pvpRate)}</strong></span><span>传统等级 <strong>${escape(account.classicRate || '暂无记录')}</strong></span></div>
+  $('account-detail').innerHTML = `<div class="detail-heading"><div><h2>${escape(account.id)}</h2><span class="state ${account.running ? 'running' : account.enable ? 'waiting' : 'off'}">${escape(account.status)}</span></div><button data-action="edit">编辑配置</button><button data-action="collapse" class="quiet" aria-label="取消选择并收起账号详情">收起</button></div>
+    <div class="account-facts"><span>战令 <strong>${escape(account.level)} 级 · ${escape(account.xp)} XP</strong></span><span>佣兵 PVP <strong class="data">${escape(account.pvpRate)}</strong></span><span>传统等级 <strong>${escape(account.classicRate || '暂无记录')}</strong></span></div>
     <div class="schedule-title"><h3>每日时段</h3><span>${account.tasks.length} 段编排</span></div>${timeline(account.tasks, now)}
     <ol class="schedule-list">${account.tasks.map((t, i) => `<li><button data-action="edit-task" data-index="${i}"><span class="data">${escape(range(t))}</span><strong>${escape(t.mode)}</strong><small>${escape(t.mode === '酒馆' ? '酒馆模式' : `${t.teamName} · ${t.strategyName}`)}</small></button></li>`).join('')}</ol>
     ${account.switchTask ? '<p class="switch-note">已启用达标后自动换模式</p>' : ''}

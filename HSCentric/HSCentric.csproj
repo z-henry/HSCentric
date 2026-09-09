@@ -106,6 +106,7 @@
     <Compile Include="UpdateManger.cs" />
     <Compile Include="HSUnitManager.cs" />
     <Compile Include="RewardXP.cs" />
+    <Compile Include="DailyStatistics.cs" />
     <Compile Include="WebRestFul.cs" />
     <Compile Include="TaskManager.cs" />
     <Compile Include="UserInfoSection.cs" />

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -179,6 +180,7 @@ namespace HSCentric
                 int index = units.FindIndex(u => u.ID == id);
                 if (index < 0) throw new ApiException(404, "账号不存在，可能已被删除，请刷新列表。");
                 HSUnit existing = units[index];
+                if (parts.Length == 5 && parts[4] == "statistics" && method == "GET") return Statistics(request, existing);
                 if (parts.Length == 4 && method == "GET") return AccountInput.From(existing);
                 if (parts.Length == 4 && method == "PUT")
                 {
@@ -248,9 +250,30 @@ namespace HSCentric
             bool running = !runtime.SafeMode && unit.IsProcessAlive();
             string status = !configured ? "未配置时段" : !unit.Enable ? "已停用" : running ? "运行中" : unit.IsActive() ? "等待启动" : "等待时段";
             return new { id = unit.ID, enable = unit.Enable, status, running, level = unit.XP.Level, xp = unit.XP.ProgressXP, totalXp = unit.XP.TotalXP,
-                xpRate = unit.XPRate, pvpRate = unit.MercPvpRate, classicRate = unit.ClassicRate, currentTask = TaskInput.From(task),
+                xpRate = unit.XPRate, todayStats = unit.DailyStats.Get(DateTime.Today).Summary(), pvpRate = unit.MercPvpRate, classicRate = unit.ClassicRate, currentTask = TaskInput.From(task),
                 tasks = unit.Tasks.GetTasks().Select(TaskInput.From).ToArray(), switchTask = unit.Tasks.SwitchTask,
                 wakeTime = configured && !runtime.SafeMode ? (DateTime?)unit.BasicConfigValue.mercCacheConfig.awakeTime : null };
+        }
+
+        private object Statistics(HttpListenerRequest request, HSUnit unit)
+        {
+            DateTime today = DateTime.Today, from = today.AddDays(-6), to = today;
+            string start = request.QueryString["from"], end = request.QueryString["to"];
+            if ((start != null && !DateTime.TryParseExact(start, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out from)) ||
+                (end != null && !DateTime.TryParseExact(end, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out to)) ||
+                from > to || to > today || (to - from).TotalDays >= 366)
+                throw new ApiException(400, "请选择不晚于今天、起止顺序正确且不超过 366 天的日期范围。");
+            var daily = unit.DailyStats;
+            var recorded = ExperienceTotals.Sum(daily.Days.Values);
+            return new { accountId = unit.ID, today = DailyStatistics.Key(today), from = DailyStatistics.Key(from), to = DailyStatistics.Key(to),
+                timeZone = TimeZoneInfo.Local.Id, startedOn = daily.StartedOn,
+                hasLegacy = unit.TotalRunningTime > recorded.RuntimeSeconds || unit.TotalGaintXP > recorded.Xp,
+                todayStats = daily.Get(today).Summary(), weekStats = daily.Between(today.AddDays(-6), today).Summary(),
+                historicalStats = unit.HistoricalStats.Summary(), periodStats = daily.Between(from, to).Summary(),
+                days = Enumerable.Range(0, (to - from).Days + 1).Select(offset => {
+                    DateTime date = from.AddDays(offset); string key = DailyStatistics.Key(date);
+                    return new { date = key, isToday = date == today, recorded = daily.Days.ContainsKey(key), totals = daily.Get(date).Summary() };
+                }).ToArray() };
         }
 
         private static string Redact(string text, List<HSUnit> units)
@@ -279,7 +302,7 @@ namespace HSCentric
             // Explicit allowlist prevents exposing config, source, tokens, or traversal paths.
             string name = path == "/" ? "index.html" : path.TrimStart('/');
             var types = new Dictionary<string, string> { { "index.html", "text/html" }, { "styles.css", "text/css" }, { "app.js", "text/javascript" },
-                { "fonts/noto-sans-sc-display.woff2", "font/woff2" }, { "icon.svg", "image/svg+xml" }, { "editor.js", "text/javascript" }, { "view.js", "text/javascript" }, { "api.js", "text/javascript" } };
+                { "fonts/noto-sans-sc-display.woff2", "font/woff2" }, { "icon.svg", "image/svg+xml" }, { "editor.js", "text/javascript" }, { "view.js", "text/javascript" }, { "api.js", "text/javascript" }, { "statistics.js", "text/javascript" } };
             string type;
             if (!types.TryGetValue(name, out type)) throw new ApiException(404, "文件不存在。");
             byte[] data = File.ReadAllBytes(Path.Combine(root, name));

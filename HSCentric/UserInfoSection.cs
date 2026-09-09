@@ -44,6 +44,12 @@ namespace HSCentric
 	}
 	public class HSUnitElement : System.Configuration.ConfigurationElement
 	{
+		[ConfigurationProperty("daily_stats", IsRequired = false, DefaultValue = "")]
+		public string DailyStats
+		{
+			get { return (string)this["daily_stats"]; }
+			set { this["daily_stats"] = value; }
+		}
 
 		[ConfigurationProperty("id", IsRequired = true)]
 		public string ID

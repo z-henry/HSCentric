@@ -24,12 +24,28 @@
       <section class="accounts-section" id="accounts" aria-labelledby="accounts-title">
         <div class="section-heading"><h2 id="accounts-title">账号 <span id="account-count" class="count">—</span></h2><button class="primary" id="add-account">添加账号</button></div>
         <div class="list-toolbar"><label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="search" type="search" placeholder="查找账号或模式" aria-label="查找账号或模式"></label><select id="filter" aria-label="筛选账号状态"><option value="all">全部状态</option><option value="enabled">已启用</option><option value="disabled">已停用</option><option value="running">运行中</option></select></div>
-        <div class="table-scroll" tabindex="0" role="region" aria-label="账号状态表"><table><thead><tr><th scope="col">账号 / 状态</th><th scope="col">模式 / 时段</th><th scope="col" class="numeric">等级 / 经验</th><th scope="col" class="numeric">经验效率 / 小时</th></tr></thead><tbody id="account-rows"></tbody></table></div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label="账号状态表，点击整行展开账号详情"><table><thead><tr><th scope="col">账号</th><th scope="col">状态</th><th scope="col">模式</th><th scope="col">时间段</th><th scope="col" class="numeric">经验效率 <button type="button" class="rate-help" aria-label="经验效率说明：今日每小时经验，对战加任务加其他" title="今日经验效率：对战 + 任务 + 其他，单位 XP / 小时。无有效运行时长时显示 —。"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M10 5.5v5.5M10 13.5v.5"/></svg></button></th></tr></thead><tbody id="account-rows"></tbody></table></div>
         <div id="list-empty" class="empty" role="status"><div class="empty-rule" aria-hidden="true"></div><h3>正在读取账号</h3><p>连接后端，加载运行配置。</p></div>
-        <div class="list-foot"><span id="list-summary">等待数据</span><span>选中账号，查看编排与操作</span></div>
+        <div class="list-foot"><span id="list-summary">等待数据</span><span id="selection-hint">点击任意一行，展开账号控制与经验统计</span></div>
       </section>
-      <section class="detail-section" aria-label="账号编排"><div id="account-detail" class="detail-content"><div class="empty detail-empty"><h2>从一个账号开始</h2><p>选择已有账号，核对每日时段；<br>或添加账号，建立第一份运行编排。</p><svg class="empty-timeline" viewBox="0 0 280 50" aria-hidden="true"><path d="M0 25h280M0 19v12M70 19v12M140 19v12M210 19v12M280 19v12"/></svg></div></div></section>
+      <section id="account-controls" class="detail-section" aria-label="账号编排" aria-hidden="true" inert><div class="detail-clip"><div id="account-detail" class="detail-content"></div></div></section>
     </div>
+    <div id="statistics-reveal" class="statistics-reveal" aria-hidden="true" inert><div class="statistics-clip"><section class="statistics-section" aria-labelledby="statistics-title">
+      <div class="section-heading"><div class="heading-inline"><h2 id="statistics-title">效率趋势</h2><span id="statistics-account" class="muted"></span></div><span id="statistics-zone" class="muted"></span></div>
+      <div id="statistics-sources" class="statistics-sources" role="group" aria-labelledby="statistics-sources-title"><span id="statistics-sources-title">经验成分</span><label><input type="checkbox" name="xp-source" value="battleXp" checked>对局</label><label><input type="checkbox" name="xp-source" value="questXp">任务</label><label><input type="checkbox" name="xp-source" value="otherXp">其他</label><span id="statistics-source-summary" class="muted" role="status">当前统计：对局</span></div>
+      <p id="statistics-status" class="field-help" role="status"></p><button id="statistics-retry" hidden>重新读取统计</button>
+      <div id="statistics-metrics" class="metrics"></div>
+      <div class="section-heading chart-heading"><h3>每日经验效率</h3><div class="period-controls" aria-label="曲线日期范围"><button data-period="7" class="primary" aria-pressed="true">近7天</button><button data-period="30" aria-pressed="false">近30天</button><button data-period="custom" aria-pressed="false">自定义</button></div></div>
+      <form id="statistics-range" class="statistics-range" hidden><label>开始日期<input id="statistics-from" type="date" required></label><label>结束日期<input id="statistics-to" type="date" required></label><button type="submit">应用日期</button></form>
+      <p id="statistics-range-error" class="notice error" role="alert" hidden></p>
+      <div class="chart-legend"><span id="statistics-period"></span><span><i class="daily-line" aria-hidden="true"></i>每日效率 <i class="average-line" aria-hidden="true"></i>区间加权效率</span></div>
+      <div id="efficiency-chart" class="chart-scroll" tabindex="0" role="region" aria-label="每日效率曲线，可横向滚动"></div>
+      <p id="chart-readout" class="chart-readout">悬停或聚焦数据点，查看当日经验和运行时长。</p>
+      <p class="statistics-note">效率 = 所选成分的累计经验增量 ÷ 累计运行小时。汇总、曲线与明细使用相同成分；运行时长保持不变。近7天包含今天；无运行时长的日期留空，今天持续统计。</p>
+      <p id="statistics-legacy" class="statistics-note" hidden>历史累计包含升级前的旧记录，旧记录无法还原日期，不计入日曲线。</p>
+      <div class="section-heading"><h3>每日明细</h3><button id="statistics-expand" class="quiet" hidden>展开全部日期</button></div>
+      <div class="table-scroll" tabindex="0" role="region" aria-label="每日经验统计明细"><table><thead><tr><th scope="col">日期</th><th scope="col" class="numeric">经验增量</th><th scope="col" class="numeric">运行时长</th><th scope="col" class="numeric">效率 / 小时</th><th scope="col" class="numeric">状态</th></tr></thead><tbody id="statistics-rows"></tbody></table></div>
+    </section></div></div>
     <section class="logs-section" aria-labelledby="logs-title"><div class="section-heading"><div class="heading-inline"><h2 id="logs-title">运行记录</h2><span id="log-status" class="muted">最近 500 条</span></div><div class="log-controls"><select id="log-filter" aria-label="筛选日志级别"><option value="all">全部级别</option><option value="Error">仅错误</option><option value="Info">仅信息</option><option value="Debug">仅调试</option></select><button id="log-pause" class="quiet" aria-pressed="false">暂停滚动</button><button id="log-download" class="quiet">导出记录</button></div></div><div class="log-scroll" tabindex="0" role="region" aria-label="运行日志"><ol id="log-lines"><li class="log-empty">等待运行记录。</li></ol></div></section>
     <footer><span>HSCentric · 运行编排台</span><span>关闭浏览器后，后端继续调度。</span></footer>
   </main>

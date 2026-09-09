@@ -59,7 +59,7 @@ const account = (id, port, tasks) => ({ id, enable: false, hsPath: 'D:\\Hearthst
   const errors = []; page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !m.text().includes('404')) errors.push(m.text()); });
   await page.goto(base); await page.getByText('后端已连接', { exact: true }).waitFor();
   check('three real accounts rendered', await page.locator('#account-rows tr').count() === 3);
-  await page.getByRole('button', { name: '测试账号 · 收菜', exact: true }).click();
+  await page.locator('[data-account="测试账号 · 收菜"] td').first().click();
   await page.locator('#account-detail h2').filter({ hasText: '测试账号 · 收菜' }).waitFor();
   await page.getByRole('button', { name: '编辑配置', exact: true }).click();
   await page.locator('#account-dialog[open]').waitFor();
@@ -90,6 +90,7 @@ const account = (id, port, tasks) => ({ id, enable: false, hsPath: 'D:\\Hearthst
   check('settings save through browser', (await api('/meta')).battleNetPath.includes('Launcher.exe'));
   await page.locator('#search').fill('无此账号'); await page.getByText('没有匹配的账号', { exact: true }).waitFor();
   await page.locator('#search').fill('');
+  await page.locator('[data-account="测试账号 · 收菜"] td').first().click();
   await page.locator('#log-pause').click(); check('log pause exposes its state', await page.locator('#log-pause').getAttribute('aria-pressed') === 'true');
   const download = page.waitForEvent('download'); await page.locator('#log-download').click(); check('log export produces a download', (await download).suggestedFilename().endsWith('.log'));
   fs.mkdirSync(shots, { recursive: true });

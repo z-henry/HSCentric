@@ -1,6 +1,7 @@
 import { request, connect, accountPath } from './api.js';
 import { $, time, toast, showError, confirmAction, renderAccounts, renderDetail, renderLogs } from './view.js';
 import { openEditor, setupEditor } from './editor.js';
+import { showStatistics } from './statistics.js';
 let meta, state, selected = null, logs = [], lastLog = 0, loaded = false, autoScroll = true, polling = false, stopped = false, actionBusy = false;
 let listSignature = '', detailSignature = '';
 let sessionId = null;
@@ -29,7 +30,7 @@ async function poll() {
       renderLogs(logs, autoScroll);
     }
     state = next; loaded = true;
-    if (!state.accounts.some(a => a.id === selected)) selected = state.accounts[0]?.id ?? null;
+    if (!state.accounts.some(a => a.id === selected)) selected = null;
     $('connection-error').hidden = true; $('connection').textContent = '后端已连接'; $('connection').className = 'connection';
     $('clock').textContent = time(state.now); $('clock').dateTime = state.now;
     $('check-status').textContent = state.safeMode ? '安全模式 · 自动调度已停用' : state.checking ? '正在检测运行状态' : `下次检测 ${time(state.nextCheck)}`;
@@ -47,26 +48,41 @@ function render(force = false) {
   const listKey = JSON.stringify([state.accounts, selected, $('search').value, $('filter').value]);
   if (force || listKey !== listSignature) { renderAccounts(state.accounts, selected, loaded); listSignature = listKey; }
   const account = state.accounts.find(a => a.id === selected);
+  const open = !!account;
+  document.body.classList.toggle('has-selection', open);
+  for (const id of ['account-controls', 'statistics-reveal']) { $(id).inert = !open; $(id).setAttribute('aria-hidden', String(!open)); }
+  $('selection-hint').textContent = open ? '再次点击已选行可收起' : '点击任意一行，展开账号控制与经验统计';
+  showStatistics(selected, state.now);
   const detailKey = JSON.stringify([account, state.safeMode, new Date(state.now).getMinutes()]);
-  if (force || detailKey !== detailSignature) {
+  if (account && (force || detailKey !== detailSignature)) {
     const expanded = $('account-detail').querySelector('details')?.open;
     renderDetail(account, state.now, state.safeMode); detailSignature = detailKey;
     if (expanded && $('account-detail').querySelector('details')) $('account-detail').querySelector('details').open = true;
   }
+  if (!account) detailSignature = '';
 }
 async function edit(id = null, taskIndex = null) { try { await openEditor(id, taskIndex); } catch (error) { toast(error.message); } }
 $('add-account').onclick = () => edit();
 $('list-empty').onclick = event => { if (event.target.closest('[data-add]')) edit(); };
-$('account-rows').onclick = event => { const button = event.target.closest('[data-account]'); if (button) { selected = button.dataset.account; render(); } };
-$('search').oninput = () => render(); $('filter').onchange = () => render();
+function selectRow(row) {
+  if (!row) return;
+  selected = selected === row.dataset.account ? null : row.dataset.account; render();
+}
+$('account-rows').onclick = event => selectRow(event.target.closest('[data-account]'));
+$('account-rows').onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectRow(event.target.closest('[data-account]')); } };
+$('search').oninput = () => { selected = null; render(); }; $('filter').onchange = () => { selected = null; render(); };
 $('retry').onclick = () => { meta = null; stopped = false; bootstrap(); };
 $('account-detail').onclick = async event => {
   const button = event.target.closest('[data-action]'); if (!button || !selected || actionBusy) return;
   const id = selected, action = button.dataset.action;
+  if (action === 'collapse') {
+    selected = null; render();
+    [...$('account-rows').querySelectorAll('[data-account]')].find(row => row.dataset.account === id)?.focus({ preventScroll: true }); return;
+  }
   if (action === 'edit' || action === 'edit-task') return edit(id, action === 'edit-task' ? Number(button.dataset.index) : null);
   const confirmations = {
     delete: ['移除账号？', `移除「${id}」的中控配置与编排。已经启动的游戏进程不会因此关闭。`, '移除账号'],
-    'reset-xp': ['重置经验效率？', `清零「${id}」的累计运行时间和经验效率统计。`, '重置统计'],
+    'reset-xp': ['重置全部经验统计？', `清空「${id}」的每日记录、历史经验和累计运行时间。此操作无法恢复，下一次经验采样后重新开始统计。`, '清空全部统计'],
     deploy: ['部署插件配置？', `将「${id}」的中控设置写入本机游戏插件配置。`, '部署配置'],
     'disable-plugin': ['关闭插件？', `修改「${id}」的插件开关。自动调度仍可能在下次启动时重新部署设置。`, '关闭插件']
   };
