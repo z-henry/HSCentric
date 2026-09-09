@@ -11,25 +11,25 @@ powershell -ExecutionPolicy Bypass -File .\scripts\build.ps1
 .\artifacts\release\HSCentric.exe
 ```
 
-启动后默认打开 `http://127.0.0.1:17321/`，仅接受该地址的请求。沿用原项目的管理员运行清单，以便 HTTP 监听和原有游戏进程操作。
+直接启动程序与 `start.bat` 的行为一致，默认使用 `--host=* --port=17321 --no-browser`：监听端口 17321，允许局域网访问，不自动打开浏览器。本机可手动打开 `http://127.0.0.1:17321/`。沿用原项目的管理员运行清单，以便 HTTP 监听和原有游戏进程操作。
 
 可用参数：
 
 ```powershell
-# 不自动打开浏览器
-.\artifacts\release\HSCentric.exe --no-browser
+# 使用默认设置，并自动打开本机浏览器
+.\artifacts\release\HSCentric.exe --open-browser
 
 # 仅验证配置和界面；不恢复、启动或调度游戏进程
-.\artifacts\release\HSCentric.exe --safe-mode --port=17322
+.\artifacts\release\HSCentric.exe --safe-mode --host=127.0.0.1 --port=17322
 
-# 通配监听，允许通过服务器的局域网 IP 或主机名访问
+# 显式指定与默认值一致的通配监听
 .\artifacts\release\HSCentric.exe --host=* --port=17321
 
 # 也可明确指定服务器地址
 .\artifacts\release\HSCentric.exe --host=192.168.1.10 --port=17321
 ```
 
-`--host` 支持 `*`、IP 地址和主机名；`0.0.0.0` 作为 `*` 的别名。不传时使用 `127.0.0.1`。通配模式下，其他电脑打开 `http://服务器IP:17321/`；程序自动打开的本机浏览器仍使用 `127.0.0.1`，不会打开 `http://*:17321/`。`*` 使用 [HttpListener 的通配前缀](https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-net-httplistener)，接收该端口未被更具体前缀处理的请求。
+`--host` 支持 `*`、IP 地址和主机名；`0.0.0.0` 作为 `*` 的别名。不传时使用 `*`，端口默认为 17321。可用 `--host=127.0.0.1` 限制为本机访问。通配模式下，其他电脑打开 `http://服务器IP:17321/`；使用 `--open-browser` 时，本机浏览器仍使用 `127.0.0.1`，不会打开 `http://*:17321/`。`--no-browser` 保持兼容，与 `--open-browser` 同时传入时优先不打开浏览器。`*` 使用 [HttpListener 的通配前缀](https://learn.microsoft.com/en-us/dotnet/fundamentals/runtime-libraries/system-net-httplistener)，接收该端口未被更具体前缀处理的请求。
 
 如果其他电脑无法连接，请检查服务器 Windows 防火墙是否允许所选 TCP 端口；程序不会自动修改防火墙。当前没有登录认证，能访问此端口的人可以操作中控，因此应将放行范围限制在可信网络。写请求仍校验当前页面来源和会话令牌。
 
