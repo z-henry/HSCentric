@@ -21,7 +21,7 @@ export function renderAccounts(accounts, selected, loaded) {
   const rows = $('account-rows');
   const ids = visible.map(a => a.id);
   if (JSON.stringify([...rows.children].map(row => row.dataset.account)) !== JSON.stringify(ids))
-    rows.innerHTML = visible.map(a => `<tr tabindex="0" data-account="${escape(a.id)}" aria-controls="account-controls statistics-reveal"><th scope="row"></th><td></td><td></td><td class="data"></td><td class="numeric data"></td></tr>`).join('');
+    rows.innerHTML = visible.map(a => `<tr tabindex="0" data-account="${escape(a.id)}" aria-controls="account-controls statistics-reveal"><th scope="row"></th><td></td><td></td><td class="data"></td><td class="numeric data"></td><td class="numeric data"></td></tr>`).join('');
   visible.forEach((a, index) => {
     const row = rows.children[index], stats = a.todayStats;
     row.classList.toggle('selected', a.id === selected); row.setAttribute('aria-expanded', String(a.id === selected));
@@ -29,7 +29,8 @@ export function renderAccounts(accounts, selected, loaded) {
     cells[0].textContent = a.id;
     cells[1].innerHTML = `<span class="state ${a.running ? 'running' : a.enable ? 'waiting' : 'off'}">${escape(a.status)}</span>`;
     cells[2].textContent = a.currentTask?.mode || '—'; cells[3].textContent = range(a.currentTask);
-    cells[4].textContent = stats?.rate == null ? '—' : [stats.battleRate, stats.questRate, stats.otherRate].map(n => Number(n).toLocaleString('zh-CN')).join(' + ');
+    cells[4].textContent = `${a.level ?? '—'} 级 · ${a.xp ?? '—'} XP`;
+    cells[5].textContent = stats?.rate == null ? '—' : [stats.battleRate, stats.questRate, stats.otherRate].map(n => Number(n).toLocaleString('zh-CN')).join(' + ');
   });
   $('list-empty').hidden = visible.length > 0;
   if (!visible.length) $('list-empty').innerHTML = `<div class="empty-rule" aria-hidden="true"></div><h3>${!loaded ? '正在读取账号' : accounts.length ? '没有匹配的账号' : '还没有账号编排'}</h3><p>${!loaded ? '连接本机后端，加载运行配置。' : accounts.length ? '换个关键词，或将状态切回「全部状态」。' : '添加第一个账号，设置连接信息和每日运行时段。'}</p>${loaded && !accounts.length ? '<button class="primary" data-add>添加第一个账号</button>' : ''}`;
