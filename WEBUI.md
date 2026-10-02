@@ -54,6 +54,27 @@ powershell -ExecutionPolicy Bypass -File .\scripts\build.ps1
 
 首次可使用安全模式检查。普通启动会沿用旧程序的进程恢复和自动调度行为。所有路径都指向后端所在电脑；浏览器表单填写完整路径，替代原本的 Windows 文件选择框。未配置战网路径时可在「运行设置」补齐。
 
+## 炉石自动更新
+
+日志触发“需要升级”后，仍由原调度暂停账号并关闭炉石，等待5分钟，再每30秒检查一次更新。升级模块直接调用本机 Battle.net Agent，不操作战网窗口；“最新动态”等弹窗不会阻挡更新。已移除 FlaUI 及其 UIAutomation 依赖，继续使用 .NET Framework 4.8。
+
+后端电脑需要安装战网并登录过，启用账号的炉石程序必须共同指向一个由战网登记的安装目录。升级前会匹配目录、产品及地区；提交更新不会修改安装目录、地区或语言。多个不同目录、未登记的游戏副本或不一致的产品记录会停止自动更新并显示原因，需要先在战网确认安装目录。
+
+下载进度100%不会直接恢复账号：必须确认更新任务结束、下载和补丁应用完成、游戏可运行，且已应用的配置与当前地区的目标版本一致，才调用原恢复接口。查询暂时失败最多连续尝试3次；提交结果不明确时不会重复提交。15分钟没有进展或总计超过2小时会停止本次自动检查，账号继续暂停，处理日志所示问题后重启中控重试。停止后端会取消查询并清理本次启动的 Agent，不会批量关闭已有战网或其他 Agent。
+
+这是战网 Agent 的私有本地接口，已在本机 Agent 2.41.0.9775 验证连接和安装识别；战网未来改变协议时可能需要调整适配。
+
+```powershell
+# 回归测试：模拟协议、完成条件、重复提交、失败、取消和超时
+powershell -ExecutionPolicy Bypass -File .\scripts\test-agent-update.ps1
+
+# 真实连接验证：只启动辅助 Agent 并读取安装记录，不提交更新或启动游戏
+powershell -ExecutionPolicy Bypass -File .\scripts\test-agent-update.ps1 -LiveReadOnly `
+    -BattleNetExe 'D:\Program Files (x86)\Battle.net\Battle.net.exe' -GameDirectory 'E:\Hearthstone'
+```
+
+验证实际下载、补丁应用及账号恢复，需要在有更新可用时运行普通中控，并检查运行记录中的“炉石更新任务已提交”和“Agent确认炉石更新完成”。`scripts/test-battle-net-agent.ps1` 提供独立的只读状态报告，报告不包含认证令牌。
+
 ## 功能位置
 
 | 原功能 | Web UI |

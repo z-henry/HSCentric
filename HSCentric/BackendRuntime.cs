@@ -86,6 +86,7 @@ namespace HSCentric
         {
             stop.Set();
             if (worker != null) worker.Join();
+            UpdateManger.Get().Stop();
             MyRestFul.Rlease();
             if (Ready) HSUnitManager.Get().Release();
             Out.Logged -= OnLog;
